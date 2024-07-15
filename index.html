@@ -108,7 +108,8 @@
             left: 20px;
             right: 20px;
             /* bottom: 20px; */
-            overflow-y: scroll; height:800px;
+            overflow-y: scroll; 
+            /* height:800px; */
             z-index: 1;
             padding: 20px;
             background: rgba(0, 0, 0, 0.5);
@@ -358,6 +359,7 @@ function initWebGL() {
 #pragma vscode_glsllint_stage: vert
 
 precision highp float;
+precision highp int;
 
 uniform vec2 u_resolution;
 
@@ -400,11 +402,12 @@ void main() {
 #pragma vscode_glsllint_stage: frag
 
 precision highp float;
+precision highp int;
 
 uniform float u_time;
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-uniform float u_scroll;
+// uniform vec2 u_resolution;
+// uniform vec2 u_mouse;
+// uniform float u_scroll;
 
 uniform int u_iterations;
 uniform float u_epsilon;
@@ -617,14 +620,23 @@ vec3 interpolate_palette(in float x){
     const int color_count = 8; 
     
     vec3 palette[color_count];
-         palette[0] = hex2rgb(0x2b3634);
-         palette[1] = hex2rgb(0x474848);
-         palette[2] = hex2rgb(0x6e5f52);
-         palette[3] = hex2rgb(0xa2856c);
-         palette[4] = hex2rgb(0xa0a294);
-         palette[5] = hex2rgb(0xdcb9a0);
-         palette[6] = hex2rgb(0xf3dbc6);
-         palette[7] = hex2rgb(0xfffefe);
+         palette[0] = vec3(43,  54,  52)  / 255.0;
+         palette[1] = vec3(71,  72,  72)  / 255.0;
+         palette[2] = vec3(110, 95,  82)  / 255.0;
+         palette[3] = vec3(162, 133, 108) / 255.0;
+         palette[4] = vec3(160, 162, 148) / 255.0;
+         palette[5] = vec3(220, 185, 160) / 255.0;
+         palette[6] = vec3(243, 219, 198) / 255.0;
+         palette[7] = vec3(255, 254, 254) / 255.0;
+    
+        //  palette[0] = hex2rgb(0x2b3634);
+        //  palette[1] = hex2rgb(0x474848);
+        //  palette[2] = hex2rgb(0x6e5f52);
+        //  palette[3] = hex2rgb(0xa2856c);
+        //  palette[4] = hex2rgb(0xa0a294);
+        //  palette[5] = hex2rgb(0xdcb9a0);
+        //  palette[6] = hex2rgb(0xf3dbc6);
+        //  palette[7] = hex2rgb(0xfffefe);
         //  palette[8] = hex2rgb(0xb199a3);
         //  palette[9] = hex2rgb(0xd5a3a7);
         //  palette[10] = hex2rgb(0xf8adac);
@@ -658,17 +670,14 @@ vec3 color_surface(in vec3 pos, in vec3 nor, in float iter){
     //lighting
     float lighting = 0.15; // ambient     
     lighting += (-dot(nor, normalize(vec3(-1,-1,+1))))*0.6; //directional sun                
-
     
     vec3 plight_pos = vec3(1.3*sin(u_time), 1.3*cos(u_time), 0);
     vec3 plight_dir = pos - plight_pos;
     lighting += (-dot(nor, plight_dir))*0.1; //point light
     
-    float plight_depth = dot(plight_pos, ray_dir);
-    float    set_depth = dot(       pos, ray_dir);
-
-    
-    //draw light source itself
+    // float plight_depth = dot(plight_pos, ray_dir);
+    // float    set_depth = dot(       pos, ray_dir);
+    // //draw light source itself
     // if((plight_depth < set_depth) && (pligh))
 
     rgb_color *= lighting;
