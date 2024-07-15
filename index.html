@@ -8,9 +8,10 @@
         body, html {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            /* width: 100%;
+            height: 100%; */
+            /* flex-wrap: wrap; */
+            overflow: auto;
             font-family: 'Arial', sans-serif;
             color: #e3f6f5;
             display: flex;
@@ -26,7 +27,7 @@
             color: rgba(0, 0, 0, 0);
         }
         #backgroundCanvas {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -73,7 +74,8 @@
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
+            /* overflow: auto; */
+            overflow: scroll;
             /* background-color: rgba(0, 0, 0, 0.4); */
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
@@ -93,7 +95,7 @@
             float: right;
             font-size: 28px;
             font-weight: bold;
-        }
+        }   
         .close:hover,
         .close:focus {
             color: black;
@@ -108,15 +110,19 @@
             left: 20px;
             right: 20px;
             /* bottom: 20px; */
-            overflow-y: scroll; 
+            overflow-y: auto; 
+            /* -webkit-overflow-scrolling: touch; */
+            /* max-width: 100vw;
+            overflow: hidden;
+            overflow-y: auto; */
             /* height:800px; */
             z-index: 1;
             padding: 20px;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            overflow-y: auto;
             max-width: 90%;
+            max-height: 90%;
             border-radius: 10px;
         }
     </style>
@@ -127,7 +133,8 @@
     </div>
     <div id="content">
         <h1>Hi there!</h1>
-        <p>If you dont see any fractals or they are weirdly colored - try disabling all extensions and using desktop device =^◕⩊◕^=</p>
+        <p>If you dont see any fractals - try disabling all extensions and using desktop device (ᴗ_&nbspᴗ。)</p>
+        <!-- <p>(ᴗ_ ᴗ。)</p> -->
         <p>I'm a graphics/gamedev developer with a preference for C-family languages, and I'm also a voxel engines fan.</p>
         <p>If you have any good-looking ideas for a voxel game engine, you can message me for help.</p>
         <p>Currently, I'm working on a voxel path tracing engine called "Lum".</p>
@@ -743,8 +750,8 @@ void main() {
     const resolutionUniform = gl.getUniformLocation(program, 'u_resolution');
     const iterationsUniform = gl.getUniformLocation(program, 'u_iterations');
     const epsilonUniform = gl.getUniformLocation(program, 'u_epsilon');
-    const mouseUniform = gl.getUniformLocation(program, 'u_mouse');
-    const scrollUniform = gl.getUniformLocation(program, 'u_scroll');
+    // const mouseUniform = gl.getUniformLocation(program, 'u_mouse');
+    // const scrollUniform = gl.getUniformLocation(program, 'u_scroll');
     const ConstantUniform = gl.getUniformLocation(program, 'u_C');
     const swizzleMixUniform = gl.getUniformLocation(program, 'u_SwizzleMix');
 
@@ -754,8 +761,8 @@ void main() {
     if(window.mobileAndTabletCheck()){
             //if mobile, rescale for better experience
             // gl.uniform2f(resolutionUniform, canvas.width*3.0, canvas.height*1.5);
-            gl.uniform1f(epsilonUniform, 4e-3);
-            gl.uniform1i(iterationsUniform, 37);
+            gl.uniform1f(epsilonUniform, 5e-3);
+            gl.uniform1i(iterationsUniform, 31);
     } else {
             // gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
             // const int MAX_ITERATIONS_MARCH = 65;
@@ -819,8 +826,8 @@ void main() {
 
         gl.uniform4f(ConstantUniform, C_x, C_y, C_z, C_w);
 
-        gl.uniform2f(mouseUniform, mouseX, canvas.height - mouseY);
-        gl.uniform1f(scrollUniform, scrollY);
+        // gl.uniform2f(mouseUniform, mouseX, canvas.height - mouseY);
+        // gl.uniform1f(scrollUniform, scrollY);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
 
