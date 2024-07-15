@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>platonvin</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            color: #e3f6f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scrollbar-color: rgb(26, 26, 26) rgb(53, 53, 53);
+        }
+        #clickBackground {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            color: rgba(0, 0, 0, 0);
+        }
+        #backgroundCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        #content {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: inline-block;
+            max-width: 90%;
+            border-radius: 10px;
+            scrollbar-color: rgb(223, 223, 223) gray;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin: 0 0 20px;
+        }
+        p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        a {
+            color: #51b0b8;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #9751b8;
+        }
+                /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            /* background-color: rgba(0, 0, 0, 0.4); */
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .modal-content {
+            /* background-color: #fefefe; */
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* CV content styles */
+        #cv-content {
+            display: none;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            /* bottom: 20px; */
+            overflow-y: scroll; height:800px;
+            z-index: 1;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            overflow-y: auto;
+            max-width: 90%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    <div id="clickBackground">
+    </div>
+    <div id="content">
+        <h1>Hi there!</h1>
+        <p>I'm a graphics/gamedev developer with a preference for C-family languages, and I'm also a voxel engines fan.</p>
+        <p>If you have any good-looking ideas for a voxel game engine, you can message me for help.</p>
+        <p>Currently, I'm working on a voxel path tracing engine called "Lum".</p>
+        <p>You can reach me at <a href="https://t.me/platonvin" target="_blank">t.me/platonvin</a> or <a href="mailto:platonvin@gmail.com">platonvin@gmail.com</a>.</p>
+        <p>This site only exists to showcase my Julia set renderer =^◕⩊◕^=</p>
+        <h1><a href="javascript:void(0);" onclick="openModal()">Hire me</a></h1>
+    </div>
+    <div id="cv-content">
+        <span class="close" onclick="closeCv()">&times;</span>
+        <h2 id="professional-summary">Professional Summary</h2>
+        <p>Graphics and game development programmer with ~3 years of experience focusing on low-level game engine programming. Background in physics competitions</p>
+        <hr>
+        <h2 id="programming-experience">Programming Experience</h2>
+        <h3 id="lum-game-engine"><em>Lum</em> Game Engine</h3>
+        <h6 id="mostly-vulkan-renderer">(mostly Vulkan renderer)</h6>
+        <ul>
+        <li>
+        <p><strong>Sparse voxel block grid real-time path tracer</strong> (part of <em><strong>Lum</strong></em> engine)
+        Implemented without VK_KHR_ray_tracing_pipeline, using only compute shaders</p>
+        </li>
+        <li>
+        <p><strong>Spatiotemporal A-trous real-time filter</strong> (part of <em><strong>Lum</strong></em> engine)
+        Developed a denoiser and accumulator (through motion vectors)</p>
+        </li>
+        <li>
+        <p><strong>Profile-guided upscaler</strong> (part of <em><strong>Lum</strong></em> engine)
+        Created an upscaler that performs better than FSR (for voxels)</p>
+        </li>
+        <li>
+        <p><strong>Distance field Builder and path tracer</strong> (initially part of <em><strong>Lum</strong></em> engine)
+        Created linear time sdf builder and pretty efficient sdf marcher</p>
+        </li>
+        </ul>
+        <h4 id="assembler-language">Assembler language</h4>
+        <ul>
+        <li>Designed and implemented CPU emulator with custom ASM language - compiler and interpreter</li>
+        </ul>
+        <h4 id="webgl2-fractal-raymarcher">WebGl2 fractal raymarcher</h4>
+        <ul>
+        <li>Implemented Julia set (&quot;3D fractal bulb&quot;) renderer developed as the background for my portfolio <a href="https://platonvin.github.io">site</a> on GitHub</li>
+        </ul>
+        <h4 id="opengl-path-tracer-truemmo">OpenGL path tracer (<em>true_mmo</em>)</h4>
+        <ul>
+        <li>Developed a path tracer in OpenGL (for textured-blocks-only) with simple physics engine (convex shape intersection + Newton laws of motion) and server side (<em>true_mmo-server</em>)</li>
+        </ul>
+        <h5 id="minor-experience">minor experience:</h5>
+        <ul>
+        <li>Libraries ranging from a &quot;safe stack&quot; to a macro's monster for GLSL-style linear algebra in pure C</li>
+        </ul>
+        <hr>
+        <h3 id="education">Education</h3>
+        <h4 id="incomplete-degree-in-applied-mathematics-and-physic">Incomplete Degree in applied mathematics and physic</h4>
+        <p><strong>Moscow Institute of Physics and Technology (MIPT)</strong></p>
+        <hr>
+        <h2 id="skills">Skills</h2>
+        <ul>
+        <li>
+        <h3 id="primary">Primary</h3>
+        <ul>
+        <li><strong>C &amp; C++ core</strong></li>
+        <li><strong>C &amp; C++ Build systems &amp; toolchains</strong></li>
+        <li><strong>ASM and hardware relationships with languages</strong></li>
+        <li><strong>Vulkan</strong></li>
+        <li><strong>OpenGL/WebGL</strong></li>
+        <li><strong>ray-tracing</strong>
+        <ul>
+        <li>physically correct rendering</li>
+        <li>brdf</li>
+        </ul>
+        </li>
+        <li><strong>in-depth Physics knowledge</strong></li>
+        </ul>
+        </li>
+        <li>
+        <h3 id="secondary">Secondary</h3>
+        <ul>
+        <li>
+        <p><strong>GLSL</strong></p>
+        <ul>
+        <li>subgroup operations</li>
+        </ul>
+        </li>
+        <li>
+        <p><strong>shader effects</strong></p>
+        <ul>
+        <li>color mapping, noise, dithering, bloom and others</li>
+        </ul>
+        </li>
+        <li>
+        <p><strong>Python</strong></p>
+        <ul>
+        <li>network data scrapping and analytics, &quot;everyday&quot; scripts</li>
+        </ul>
+        </li>
+        <li>
+        <p><strong>C/C++ Code Generation (Macros)</strong></p>
+        <ul>
+        <li>C macro system</li>
+        </ul>
+        </li>
+        <li>
+        <p><strong>Networking</strong></p>
+        <ul>
+        <li>KCP / TCP / UDP</li>
+        </ul>
+        </li>
+        <li>
+        <p><strong>Git</strong></p>
+        </li>
+        <li>
+        <p><strong>CSS/HTML</strong></p>
+        <ul>
+        <li>also RmlUi (Qt but faster) markup &amp; styling languages, they are pretty similar</li>
+        </ul>
+        </li>
+        </ul>
+        </li>
+        </ul>
+    </div>
+        <div id="hireMeModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Hire Me</h2>
+                <p><a href="javascript:void(0);" onclick="toggleCV()">View my CV</a></p>
+                <p><a href="cv.pdf" target="_blank">Download my CV (pdf)</a></p>
+            </div>
+        </div>
+        <script>
+            var modal = document.getElementById("hireMeModal");
+            var cvContent = document.getElementById("cv-content");
+            var mainContent = document.getElementById("content");
+            var backgroundContent = document.getElementById("clickBackground");
+
+            function  getStateModal() {return     (modal.style.display === "block")}
+            function  getStateCv()    {return (cvContent.style.display === "block")}
+            
+            function  openModal() {modal.style.display = "block";}
+            function closeModal() {modal.style.display = "none";}
+            function  openCv() {
+                cvContent.style.display = "block";
+                mainContent.style.filter = 'blur(10px)';
+            }
+            function closeCv() {
+                cvContent.style.display = "none";
+                mainContent.style.filter = 'blur(0px)';
+            }
+            
+            function toggleCV() {
+                if (getStateModal()) {
+                    closeModal();
+                }
+                if(getStateCv()){
+                    closeCv();
+                } else {
+                    openCv();
+                }
+            }
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                } 
+            }
+            document.addEventListener("keydown", function(event) {
+                if (event.key === "Escape") {
+                    if (getStateModal()) {
+                        closeModal();
+                    }
+                    if (getStateCv()) {
+                        closeCv();
+                    }
+                }
+            });
+        </script>
+        <script src="main.js"></script>
+    </body>
+</html>
