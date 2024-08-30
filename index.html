@@ -139,120 +139,99 @@
         <p>If you have any good-looking ideas for a voxel game engine, you can message me for help.</p>
         <p>Currently, I'm working on a voxel path tracing engine called "Lum".</p>
         <p>You can reach me at <a href="https://t.me/platonvin" target="_blank">t.me/platonvin</a> or <a href="mailto:platonvin@gmail.com">platonvin@gmail.com</a>.</p>
-        <p>This site only exists to showcase my Julia set renderer =^◕⩊◕^=</p>
+        <p>This site exists to showcase my Julia set renderer =^◕⩊◕^=</p>
         <h1><a href="javascript:void(0);" onclick="openModal()">Hire me</a></h1>
     </div>
     <div id="cv-content">
         <span class="close" onclick="closeCv()">&times;</span>
-        <h2 id="professional-summary">Professional Summary</h2>
-        <p>Graphics and game development programmer with ~3 years of experience focusing on low-level game engine programming. Background in physics competitions</p>
-        <hr>
-        <h2 id="programming-experience">Programming Experience</h2>
-        <h3 id="lum-game-engine"><em>Lum</em> Game Engine</h3>
-        <h6 id="mostly-vulkan-renderer">(mostly Vulkan renderer)</h6>
-        <ul>
-        <li>
-        <p><strong>Sparse voxel block grid real-time path tracer</strong> (part of <em><strong>Lum</strong></em> engine)
-        Implemented without VK_KHR_ray_tracing_pipeline, using only compute shaders</p>
-        </li>
-        <li>
-        <p><strong>Spatiotemporal A-trous real-time filter</strong> (part of <em><strong>Lum</strong></em> engine)
-        Developed a denoiser and accumulator (through motion vectors)</p>
-        </li>
-        <li>
-        <p><strong>Profile-guided upscaler</strong> (part of <em><strong>Lum</strong></em> engine)
-        Created an upscaler that performs better than FSR (for voxels)</p>
-        </li>
-        <li>
-        <p><strong>Distance field Builder and path tracer</strong> (initially part of <em><strong>Lum</strong></em> engine)
-        Created linear time sdf builder and pretty efficient sdf marcher</p>
-        </li>
-        </ul>
-        <h4 id="assembler-language">Assembler language</h4>
-        <ul>
-        <li>Designed and implemented CPU emulator with custom ASM language - compiler and interpreter</li>
-        </ul>
-        <h4 id="webgl2-fractal-raymarcher">WebGl2 fractal raymarcher</h4>
-        <ul>
-        <li>Implemented Julia set (&quot;3D fractal bulb&quot;) renderer developed as the background for my portfolio <a href="https://platonvin.github.io">site</a> on GitHub</li>
-        </ul>
-        <h4 id="opengl-path-tracer-truemmo">OpenGL path tracer (<em>true_mmo</em>)</h4>
-        <ul>
-        <li>Developed a path tracer in OpenGL (for textured-blocks-only) with simple physics engine (convex shape intersection + Newton laws of motion) and server side (<em>true_mmo-server</em>)</li>
-        </ul>
-        <h5 id="minor-experience">minor experience:</h5>
-        <ul>
-        <li>Libraries ranging from a &quot;safe stack&quot; to a macro's monster for GLSL-style linear algebra in pure C</li>
-        </ul>
-        <hr>
-        <h3 id="education">Education</h3>
-        <h4 id="incomplete-degree-in-applied-mathematics-and-physic">Incomplete Degree in applied mathematics and physic</h4>
-        <p><strong>Moscow Institute of Physics and Technology (MIPT)</strong></p>
-        <hr>
-        <h2 id="skills">Skills</h2>
-        <ul>
-        <li>
-        <h3 id="primary">Primary</h3>
-        <ul>
-        <li><strong>C &amp; C++ core</strong></li>
-        <li><strong>C &amp; C++ Build systems &amp; toolchains</strong></li>
-        <li><strong>ASM and hardware relationships with languages</strong></li>
-        <li><strong>Vulkan</strong></li>
-        <li><strong>OpenGL/WebGL</strong></li>
-        <li><strong>ray-tracing</strong>
-        <ul>
-        <li>physically correct rendering</li>
-        <li>brdf</li>
-        </ul>
-        </li>
-        <li><strong>in-depth Physics knowledge</strong></li>
-        </ul>
-        </li>
-        <li>
-        <h3 id="secondary">Secondary</h3>
-        <ul>
-        <li>
-        <p><strong>GLSL</strong></p>
-        <ul>
-        <li>subgroup operations</li>
-        </ul>
-        </li>
-        <li>
-        <p><strong>shader effects</strong></p>
-        <ul>
-        <li>color mapping, noise, dithering, bloom and others</li>
-        </ul>
-        </li>
-        <li>
-        <p><strong>Python</strong></p>
-        <ul>
-        <li>network data scrapping and analytics, &quot;everyday&quot; scripts</li>
-        </ul>
-        </li>
-        <li>
-        <p><strong>C/C++ Code Generation (Macros)</strong></p>
-        <ul>
-        <li>C macro system</li>
-        </ul>
-        </li>
-        <li>
-        <p><strong>Networking</strong></p>
-        <ul>
-        <li>KCP / TCP / UDP</li>
-        </ul>
-        </li>
-        <li>
-        <p><strong>Git</strong></p>
-        </li>
-        <li>
-        <p><strong>CSS/HTML</strong></p>
-        <ul>
-        <li>also RmlUi (Qt but faster) markup &amp; styling languages, they are pretty similar</li>
-        </ul>
-        </li>
-        </ul>
-        </li>
-        </ul>
+        <div class="tip" markdown="1">
+            <h2 id="education">Education</h2>
+            <p><strong>MIPT</strong> (expelled)
+              ~ Moscow Institute of Physics and Technology</p>
+            <p>Applied Mathematics and Physics
+              ~ 2022 - 2023</p>
+            <h2 id="experience">Experience</h2>
+            <p><strong>Lum Engine</strong>
+              ~ <a style="color:blue" href="https://github.com/platonvin/lum">Repository</a>
+              ~ written in C++17</p>
+            <ul>
+            <li>Vulkan C++ Voxel engine written from scratch by myself. Fully dynamic GI, raytraced reflections, insane perfomance</li>
+            <li><strong>Software voxel raytracer</strong> 
+            ~ <a style="color:blue" href="https://github.com/platonvin/RaVE">Repository</a>
+            ~     will be part of Lum engine.
+            ~      written in C99<ul>
+            <li>RaVE - CPU multithreaded SIMD Raytracer for Voxel Engines. Designed to support GPU</li>
+            </ul>
+            </li>
+            <li><strong>Deferred renderer</strong>
+            ~     part of Lum engine<ul>
+            <li>Vulkan subpass-based approach to shade with first-class support for Tile-Based GPUs</li>
+            </ul>
+            </li>
+            <li><strong>Radiance Field Global Illumination</strong>
+            ~     part of Lum engine<ul>
+            <li>GPU-driven fully dynamic real-time Global Illumination updated via custom raytracing algorithm. Paired with reflections for glossy materials</li>
+            </ul>
+            </li>
+            <li><strong>Reflections renderer</strong>
+            ~     part of Lum engine<ul>
+            <li>Real-time reflections raytraced with highly specialized algorithm and voxel acceleration structure. Paired with radiance field for rough materials<!-- ~ part of Lum engine --></li>
+            </ul>
+            </li>
+            <li><strong>Screen-space Horizon-Based Ambient Occlusion</strong>
+            ~     part of Lum engine<ul>
+            <li>SSHBAO based on Nvidia paper, accelerated with runtime-computed LUT&#39;s</li>
+            </ul>
+            </li>
+            <li><strong>Volumetrics renderer</strong>
+            ~     part of Lum engine<ul>
+            <li>Based on Lambert law and tileable 3D Perlin noise<!-- ~ part of Lum engine --></li>
+            </ul>
+            </li>
+            <li><strong>Foliage renderer</strong>
+            ~     part of Lum engine<ul>
+            <li>GPU-driven foliage renderer integrated in Lum, based on Ghost of Tsushima 2021 GDC talk<!-- ~ part of Lum engine --></li>
+            </ul>
+            </li>
+            <li><strong>Lightmapper</strong>
+            ~     part of Lum engine<ul>
+            <li>Real-time PCF-filtered lightmaps<!-- ~ part of Lum engine --></li>
+            </ul>
+            </li>
+            <li><strong>Temporal Accumulator</strong>
+            ~     currently unused part of Lum engine<ul>
+            <li>Surface-driven temporal accumulation by motion vectors: like TAA but faster and higher quality</li>
+            </ul>
+            </li>
+            <li><strong>Realtime denoiser</strong> 
+            ~     currently unused part of Lum engine<ul>
+            <li>edge-avoiding À-trous wavelet Spatial Filtering - Reconstruction for Path-Traced Global Illumination</li>
+            </ul>
+            </li>
+            </ul>
+            <p><strong>Assembler</strong> 
+              ~ <a style="color:blue" href="https://github.com/platonvin/Assembler">Repository</a>
+              ~ written in C99</p>
+            <ul>
+            <li>CPU emulator with custom insctruction set</li>
+            </ul>
+            <p><strong>SL-Vec</strong> 
+              ~ <a style="color:blue" href="https://github.com/platonvin/sl-vector">Repository</a>
+              ~ written in C23</p>
+            <ul>
+            <li>Powerfull C23 macro library for GLSL vector types, casts and functions in C</li>
+            </ul>
+            <p><strong>Fractal Raymarcher</strong> 
+              ~ <a style="color:blue" href="https://github.com/platonvin/platonvin.github.io">Repository</a>
+              ~ <a style="color:blue" href="https://platonvin.github.io/">Site</a>
+              ~ written in JavaScript</p>
+            <ul>
+            <li>WebGl 4D Julia set renderer</li>
+            </ul>
+            <h2 id="remarkable-awards-and-honors">Remarkable Awards and Honors</h2>
+            <p><strong>Gold</strong>, International Al-Farghani Physics Olympiad (IAFPhO)
+              ~ 2021</p>
+</div>
     </div>
         <div id="hireMeModal" class="modal">
             <div class="modal-content">
