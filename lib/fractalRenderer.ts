@@ -15,7 +15,6 @@ export function initFractalRenderer(canvas: HTMLCanvasElement) {
         return;
     }
 
-    // Vertex shader source code
     const vertexShaderSource = 
 /*glsl*/`#version 300 es
 #pragma vscode_glsllint_stage: vert
@@ -57,7 +56,6 @@ void main() {
 }
     `;
 
-    // Fragment shader source code
     const fragmentShaderSource = 
 /*glsl*/`#version 300 es
 #pragma vscode_glsllint_stage: frag
@@ -470,10 +468,8 @@ void main() {
 
     render();
     // isRendering = false;
-    // Return a cleanup function
     // return () => {
     //     cancelAnimationFrame(animationFrameId);
-    //     // Any other cleanup (e.g., deleting WebGL contexts, buffers, etc.)
     // };
 }
 
@@ -488,6 +484,5 @@ export function stopFractalRenderer(){
         //     const gl = canvas.getContext('webgl2');
         //     gl?.disable;
         // }
-        // Any other cleanup (e.g., deleting WebGL contexts, buffers, etc.)
     };
 }

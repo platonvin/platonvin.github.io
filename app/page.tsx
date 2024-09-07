@@ -279,7 +279,7 @@ const cvContent = /*html*/`
                 <li>
                     <strong>Lum-al</strong> — <a class = "alink" href="https://github.com/platonvin/lum-al">Repository</a> (C++ Vulkan)
                     <ul>
-                        <li>Designed a low-level Vulkan engine optimized for high-performance applications with a simple and efficient architecture.</li>
+                        <li>Designed a low-level Vulkan library optimized for high-performance applications with a simple and efficient architecture.</li>
                         <li><strong>Vulkan Resources Management</strong>
                             <ul>
                                 <li>Reduced complexity by cutting useless for game engines features, enabling automated resource management for streamlined performance.</li>
@@ -287,7 +287,7 @@ const cvContent = /*html*/`
                         </li>
                         <li><strong>CPU Synchronization</strong>
                             <ul>
-                                <li>Implemented Frames In Flight, utilizing ring buffers for every CPU-GPU resource to enhance performance while keeping syncronization simple</li>
+                                <li>Implemented Frames In Flight, utilizing ring buffers for every CPU-GPU resource to enhance performance while keeping syncronization easy</li>
                             </ul>
                         </li>
                     </ul>
@@ -365,19 +365,17 @@ export default function ProjectShowcase() {
     setExpandedSubcards(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
-  // Initialize fractal renderer when showFractal is true
   useEffect(() => {
     if (showFractal) {
       const canvas = document.getElementById('backgroundCanvas') as HTMLCanvasElement;
       if (canvas) {
-        initFractalRenderer(canvas); // Pass the canvas to your fractal renderer initialization
+        initFractalRenderer(canvas);
       }
     }
   
     return () => {
-      // Cleanup code to stop the fractal renderer
       // if (showFractal) {
-        stopFractalRenderer(); // Ensure that you have a method to stop the rendering loop and release resources
+        stopFractalRenderer();
       // }
     };
   }, [showFractal]);
@@ -396,7 +394,6 @@ export default function ProjectShowcase() {
   }, [])
 
   useEffect(() => {
-    // On mount, check localStorage for the theme
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setIsDarkMode(true);
