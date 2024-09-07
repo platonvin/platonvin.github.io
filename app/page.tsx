@@ -365,6 +365,15 @@ export default function ProjectShowcase() {
   }
 
   useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        stopFractalRenderer();
+        setShowFractal(false);
+      }
+    }
+    //its fine stopFractal is just bool=false
+    window.addEventListener('keydown', handleEsc)
+
     if (showFractal) {
       const canvas = document.getElementById('backgroundCanvas') as HTMLCanvasElement;
       if (canvas) {
@@ -373,9 +382,7 @@ export default function ProjectShowcase() {
     }
   
     return () => {
-      // if (showFractal) {
         stopFractalRenderer();
-      // }
     };
   }, [showFractal]);
 
