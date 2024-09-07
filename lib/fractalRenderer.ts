@@ -271,68 +271,56 @@ vec3 hex2rgb (in int u_color){
 //WHER IS MY __VA_ARGS__
 // #define interpolator(color_count, ...)
 
-vec3 interpolate_palette(in float x){
-    const int color_count = 8; 
+vec3 interpolate_palette(in float x) {
+    const int color_count = 8;
     
     vec3 palette[color_count];
-         palette[0] = hex2rgb(0x2b3634);
-         palette[1] = hex2rgb(0x474848);
-         palette[2] = hex2rgb(0x6e5f52);
-         palette[3] = hex2rgb(0xa2856c);
-         palette[4] = hex2rgb(0xa0a294);
-         palette[5] = hex2rgb(0xdcb9a0);
-         palette[6] = hex2rgb(0xf3dbc6);
-         palette[7] = hex2rgb(0xfffefe);
-        //  palette[8] = hex2rgb(0xb199a3);
-        //  palette[9] = hex2rgb(0xd5a3a7);
-        //  palette[10] = hex2rgb(0xf8adac);
-        //  palette[11] = hex2rgb(0xffbdbb);
+    palette[0] = hex2rgb(0x191d1b); // Darker tones for shadow depth
+    palette[1] = hex2rgb(0x2b3634);
+    palette[2] = hex2rgb(0x474848);
+    palette[3] = hex2rgb(0x8a6e61); // Warmer midtones
+    palette[4] = hex2rgb(0xdca290); // Vivid highlights
+    palette[5] = hex2rgb(0xf3dbc6);
+    palette[6] = hex2rgb(0xfffefe); // Brightest highlight
+    palette[7] = hex2rgb(0xffe0b5);
 
-    vec3 color = vec3(0);
+    float section_count = float(color_count - 1);
+    float scaled_x = x * section_count;
 
-    float section_count = float(color_count-1);
-    float scaled_x = x*section_count;
-
-    int section = int(ceil(scaled_x));
+    int section = int(floor(scaled_x)); // More stable interpolation
     float fraction = fract(scaled_x);
 
-    if(section == (color_count-1)) {
-        section -= 1;
-        fraction = 1.0;
-    }
-    
     vec3 color1 = palette[section];
-    vec3 color2 = palette[section+1];
-    color = mix(color1, color2, fraction);
-    
-    return color; 
+    vec3 color2 = palette[section + 1];
+    vec3 color = mix(color1, color2, smoothstep(0.0, 1.0, fraction)); // Smoother interpolation
+
+    return color;
 }
-vec3 color_surface(in vec3 pos, in vec3 nor, in float iter){
-    vec3 rgb_color;
-    
-    //assigning color to iterations
-    rgb_color = interpolate_palette(0.5+sin(iter/5.0)*0.5) / 1.5;
-    
-    //lighting
-    float lighting = 0.15; // ambient     
-    lighting += (-dot(nor, normalize(vec3(-1,-1,+1))))*0.6; //directional sun                
 
-    
-    vec3 plight_pos = vec3(1.3*sin(u_time), 1.3*cos(u_time), 0);
-    vec3 plight_dir = pos - plight_pos;
-    lighting += (-dot(nor, plight_dir))*0.3; //point light
-    lighting *= 1.4;
-    
-    float plight_depth = dot(plight_pos, ray_dir);
-    float    set_depth = dot(       pos, ray_dir);
+vec3 color_surface(in vec3 pos, in vec3 normal, in float iter) {
+    vec3 rgb_color = interpolate_palette(0.5 + sin(iter / 10.0 + u_time * 0.5) * 0.5); // More dynamic modulation
 
-    
-    //draw light source itself
-    // if((plight_depth < set_depth) && (pligh))
+    // Lighting
+    float ambient = 0.2; // Slightly stronger ambient light for more visibility
+    vec3 sun_dir = normalize(vec3(-1.0, -1.0, 1.0));
+    float sun_light = max(0.0, dot(normal, sun_dir)) * 0.6;
+
+    // Point light
+    vec3 plight_pos = vec3(1.5 * sin(u_time * 0.5), 1.5 * cos(u_time * 0.5), 0.5); // Smoothly rotating
+    vec3 plight_dir = normalize(plight_pos - pos);
+    float point_light = max(0.0, dot(normal, plight_dir)) * 0.4;
+
+    // Specular highlight (for a glossy effect)
+    vec3 view_dir = normalize(ray_dir);
+    vec3 half_vec = normalize(plight_dir + view_dir);
+    float specular = pow(max(0.0, dot(normal, half_vec)), 32.0) * 0.5; // Shininess
+
+    // Combine lighting
+    float lighting = ambient + sun_light + point_light + specular;
+    lighting = clamp(lighting, 0.0, 1.5);
 
     rgb_color *= lighting;
-    // u_time;
-    
+
     return rgb_color;
 }
 //how close is already point of set

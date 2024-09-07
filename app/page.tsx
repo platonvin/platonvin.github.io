@@ -68,8 +68,8 @@ const projects = [
   {
     id: 2,
     title: 'Lum-al',
-    description: 'Vulkan C++ low-level engine',
-    details: 'Vulkan engine designed to create high-perfomance applications fast. Specific constraints allow it to stay simple',
+    description: 'Vulkan C++ low-level library',
+    details: 'Vulkan abstraction layer designed to create high-perfomance applications fast. Specific constraints allow it to stay simple',
     github: 'https://github.com/platonvin/lum-al',
     subcards: [
       { 
@@ -354,6 +354,7 @@ export default function ProjectShowcase() {
   const [expandedSubcards, setExpandedSubcards] = useState<Record<string, boolean>>({})
   const [showCV, setShowCV] = useState(false)
   const [showFractal, setShowFractal] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleCard = (id: number) => {
     setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }))
@@ -394,25 +395,81 @@ export default function ProjectShowcase() {
     }
   }, [])
 
+  useEffect(() => {
+    // On mount, check localStorage for the theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+  
   const colorVariants = [
     'from-pink-400 to-purple-500',
     'from-green-400 to-blue-500',
     'from-yellow-400 to-orange-500',
     'from-red-400 to-pink-500',
     'from-indigo-400 to-cyan-500',
+    'from-pink-500 to-purple-400',
   ]
+  const darkColorVariants = [
+    'from-blue-800 to-purple-800',
+    'from-green-800 to-blue-900',
+    'from-blue-800 to-teal-700',
+    // 'from-teal-900 to-cyan-900',
+    'from-green-900 to-blue-800',
+    'from-indigo-900 to-cyan-800',
+    'from-purple-900 to-teal-800',
+    'from-purple-900 to-indigo-800',
+    'from-teal-900 to-blue-800',
+    'from-indigo-900 to-pink-900',
+    'from-blue-900 to-pink-800',
+    'from-cyan-900 to-indigo-900',
+    'from-purple-900 to-pink-900',
+  ];
 
   const openFractalRenderer = () => {
     setShowFractal(true)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      className={`min-h-screen py-12 px-4 sm:px-6 lg:px-8 ${
+        isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100'
+      }`}
+    >
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">My Projects Showcase</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+            My Projects Showcase
+          </h1>
+          <button
+            onClick={toggleTheme}
+            className="px-4 py-2 bg-gray-200 text-black rounded dark:bg-gray-700 dark:text-white"
+          >
+            {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">  
           {projects.map((project, index) => (
-            <Card key={project.id} className={`overflow-hidden bg-gradient-to-br ${colorVariants[index % colorVariants.length]} text-white`}>
+            <Card key={project.id} className={`overflow-hidden bg-gradient-to-br ${
+              isDarkMode
+                ? darkColorVariants[index % darkColorVariants.length]
+                : colorVariants[index % colorVariants.length]
+            } text-white`}
+            >
               <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="text-2xl font-semibold">{project.title}</h2>
@@ -426,7 +483,7 @@ export default function ProjectShowcase() {
                   </div>
                 </div>
                 <p className="mb-4">{project.description}</p>
-                <Button
+                <Button 
                   variant="outline"
                   onClick={() => toggleCard(project.id)}
                   aria-expanded={expandedCards[project.id]}
