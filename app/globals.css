@@ -20,7 +20,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   padding: 0;
 }
-
+html, body {
+  height: 100%;
+  width: 100%;
+}
 .CVcontact {
   display: flex;
   align-items: center;
@@ -38,7 +41,11 @@ body {
   margin-right: 0.2rem;
   margin-left: 0.2rem;
 }
-
+.prose {
+  /* color: rgb(0, 0, 0); */
+  /* background-color: rgba(128, 128, 128, 0); */
+  /* text-gray-800 bg-gray bg-opacity-99 */
+}
 section ul {
   list-style-type: disc;
   padding-left: 15px;
@@ -128,4 +135,22 @@ section ul ul ul ul{
   body {
     @apply bg-background text-foreground;
   }
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  border: 3px solid transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.7);
 }

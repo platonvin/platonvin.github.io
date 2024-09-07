@@ -440,7 +440,7 @@ void main() {
 
     function render(): void {
         if(isRendering){
-            console.error('r');
+            // console.error('r');
             const currentTime = 10.0 + (Date.now() - startTime) / 1000;
 
             if(gl == null) return;
@@ -475,10 +475,10 @@ void main() {
 
 export function stopFractalRenderer(){
         isRendering = false;
-        console.error('stop 1');
+        // console.error('stop 1');
     return () => {
         // isRendering = false;
-        console.error('stop 2');
+        // console.error('stop 2');
         // if (animationFrameId) {
         //     cancelAnimationFrame(animationFrameId);
         //     const gl = canvas.getContext('webgl2');

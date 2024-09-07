@@ -171,17 +171,16 @@ const cvContent = /*html*/`
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Platon Vinnichek - Graphics Engineer</title>
     <style>
-        body {
+        html, body {
             font-family: Arial, sans-serif;
-            margin: 0;
-        }
+          }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 0;
         }
         h1, h2, h3 {
         }
@@ -552,16 +551,16 @@ export default function ProjectShowcase() {
             </Card>
           ))}
         </div>
-        <div className="mt-12 flex justify-center space-x-4">
-          <Button onClick={() => setShowCV(true)} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+        <div className="mt-12 flex flex-wrap justify-center gap-4">
+          <Button onClick={() => setShowCV(true)} className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 text-white">
             <FileText className="mr-2 h-4 w-4" />
             View CV
           </Button>
-          <Button onClick={() => window.open('https://raw.githubusercontent.com/platonvin/platonvin.github.io/main/cv.pdf?v=1', '_blank')} className="bg-gradient-to-r from-pink-600 to-purple-600 text-white">
+          <Button onClick={() => window.open('https://raw.githubusercontent.com/platonvin/platonvin.github.io/main/cv.pdf?v=1', '_blank')} className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-purple-600 text-white">
             <Download className="mr-2 h-4 w-4" />
             Download CV (PDF)
           </Button>
-          <Button onClick={openFractalRenderer} className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
+          <Button onClick={openFractalRenderer} className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
             <Sparkles className="mr-2 h-4 w-4" />
             (Fun button) Open Fractal Renderer
           </Button>
@@ -573,27 +572,31 @@ export default function ProjectShowcase() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-25"
             onClick={() => setShowCV(false)}
           >
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
-              className="relative w-full max-w-4xl max-h-[90vh] overflow-auto bg-white bg-opacity-80 backdrop-blur-md rounded-lg shadow-xl"
+              className={`relative w-full max-w-4xl max-h-[90vh] overflow-auto backdrop-blur-3xl rounded-lg shadow-xl ${
+                isDarkMode ? 'bg-white bg-opacity-10 text-slate-300' : 'bg-white bg-opacity-10 text-slate-950'
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                className={`absolute top-4 right-4${
+                  isDarkMode ? 'text-white' : 'text-black'
+                }`}
                 onClick={() => setShowCV(false)}
               >
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6 " />
                 <span className="sr-only">Close</span>
               </Button>
               <div className="p-8">
-                <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: cvContent }} />
+                <div className="prose" dangerouslySetInnerHTML={{ __html: cvContent }} />
               </div>
             </motion.div>
           </motion.div>
