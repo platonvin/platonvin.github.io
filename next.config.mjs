@@ -12,7 +12,7 @@ export default (phase) => {
       loader: "akamai",
       path: "",
     },
-    assetPrefix: isDev ? undefined : './',
+    assetPrefix: isDev ? undefined : 'https://github.com/platonvin/platonvin.github.io/tree/main/',
   }
   return nextConfig
 }
