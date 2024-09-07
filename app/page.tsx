@@ -557,7 +557,7 @@ export default function ProjectShowcase() {
             <FileText className="mr-2 h-4 w-4" />
             View CV
           </Button>
-          <Button onClick={() => window.open('https://raw.githubusercontent.com/platonvin/platonvin.github.io/main/cv.pdf', '_blank')} className="bg-gradient-to-r from-pink-600 to-purple-600 text-white">
+          <Button onClick={() => window.open('https://raw.githubusercontent.com/platonvin/platonvin.github.io/main/cv.pdf?v=1', '_blank')} className="bg-gradient-to-r from-pink-600 to-purple-600 text-white">
             <Download className="mr-2 h-4 w-4" />
             Download CV (PDF)
           </Button>
