@@ -8,11 +8,6 @@ export default (phase) => {
    */
   const nextConfig = {
     output: "export",
-    images: {
-      loader: "akamai",
-      path: "",
-    },
-    assetPrefix: isDev ? undefined : 'https://github.com/platonvin/platonvin.github.io/tree/main/',
   }
   return nextConfig
 }
