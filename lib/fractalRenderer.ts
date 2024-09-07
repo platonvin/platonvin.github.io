@@ -1,21 +1,17 @@
-function createShader(gl, type, source) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error(gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
-        return null;
-    }
-    return shader;
-}
+let animationFrameId: number;
 
-function initWebGL() {
-    const canvas = document.getElementById('backgroundCanvas');
+let isRendering: boolean = true;
+
+export function initFractalRenderer(canvas: HTMLCanvasElement) {
+    // const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+    // if (!canvas) {
+    //     console.error(`Canvas element with id '${canvasId}' not found`);
+    //     return;
+    // }
+
     const gl = canvas.getContext('webgl2');
-
     if (!gl) {
-        console.error('WebGL not supported');
+        console.error('WebGL2 not supported');
         return;
     }
 
@@ -324,7 +320,8 @@ vec3 color_surface(in vec3 pos, in vec3 nor, in float iter){
     
     vec3 plight_pos = vec3(1.3*sin(u_time), 1.3*cos(u_time), 0);
     vec3 plight_dir = pos - plight_pos;
-    lighting += (-dot(nor, plight_dir))*0.1; //point light
+    lighting += (-dot(nor, plight_dir))*0.3; //point light
+    lighting *= 1.4;
     
     float plight_depth = dot(plight_pos, ray_dir);
     float    set_depth = dot(       pos, ray_dir);
@@ -358,13 +355,39 @@ void main() {
 }
     `;
 
+    const createShader = (gl: WebGL2RenderingContext, type: number, source: string): WebGLShader | null => {
+        const shader = gl.createShader(type);
+        if (!shader) {
+            console.error('Error creating shader');
+            return null;
+        }
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.error(gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+            return null;
+        }
+        return shader;
+    };
+
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
+    if (!vertexShader || !fragmentShader) {
+        return;
+    }
+
     const program = gl.createProgram();
+    if (!program) {
+        console.error('Error creating program');
+        return;
+    }
+
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
+
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
         console.error(gl.getProgramInfoLog(program));
         return;
@@ -372,7 +395,7 @@ void main() {
 
     gl.useProgram(program);
 
-    //fullscreen triangle
+    // Fullscreen triangle
     const vertices = new Float32Array([
         -1, 1,
         3, 1,
@@ -380,6 +403,11 @@ void main() {
     ]);
 
     const buffer = gl.createBuffer();
+    if (!buffer) {
+        console.error('Error creating buffer');
+        return;
+    }
+
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -391,61 +419,87 @@ void main() {
     const resolutionUniform = gl.getUniformLocation(program, 'u_resolution');
     const mouseUniform = gl.getUniformLocation(program, 'u_mouse');
     const scrollUniform = gl.getUniformLocation(program, 'u_scroll');
-    const ConstantUniform = gl.getUniformLocation(program, 'u_C');
+    const constantUniform = gl.getUniformLocation(program, 'u_C');
     const swizzleMixUniform = gl.getUniformLocation(program, 'u_SwizzleMix');
 
     gl.hint(gl.FRAGMENT_SHADER_DERIVATIVE_HINT, gl.NICEST);
     
-    function resizeCanvas() {
+    function resizeCanvas(): void {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        if(gl == null) return;
+            gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     }
 
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    let startTime = Date.now();
+    const startTime = Date.now();
     let mouseX = 0, mouseY = 0;
     let scrollY = 0;
 
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('mousemove', (e: MouseEvent) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
     });
 
-    window.addEventListener('scroll', (e) => {
+    window.addEventListener('scroll', () => {
         scrollY = window.scrollY;
     });
 
-    function render() {
-        //10.0 to prevent 0-time boring trigonometry
-        const currentTime = 10.0 + (Date.now() - startTime) / 1000;
+    if(animationFrameId) 
+    isRendering = true;
+    else 
+    isRendering = true;
 
-        gl.clear(gl.COLOR_BUFFER_BIT);
+    function render(): void {
+        if(isRendering){
+            console.error('r');
+            const currentTime = 10.0 + (Date.now() - startTime) / 1000;
 
-        gl.uniform1f(timeUniform, currentTime);
-        gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
-        
-        //per-dispatch instead of per-invocatopn
-        C_x = -0.65 + -0.65*0.15 * Math.sin((currentTime + 23.0)/2.12);
-        C_y = -0.3  + -0.3 *0.15 * Math.sin((currentTime + 23.0)/3.523);
-        C_z = +0.6  + +0.6 *0.15 * Math.sin((currentTime + 23.0)/5.634);
-        C_w = -0.2  + -0.2 *0.15 * Math.sin((currentTime + 23.0)/7.6345);
-        
-        gl.uniform1f(swizzleMixUniform, Math.sin((currentTime / 3.312)));
+            if(gl == null) return;
 
-        gl.uniform4f(ConstantUniform, C_x, C_y, C_z, C_w);
+            gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.uniform2f(mouseUniform, mouseX, canvas.height - mouseY);
-        gl.uniform1f(scrollUniform, scrollY);
+            gl.uniform1f(timeUniform, currentTime);
+            gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
 
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
+            const C_x = -0.65 + -0.65 * 0.15 * Math.sin((currentTime + 23.0) / 2.12);
+            const C_y = -0.3 + -0.3 * 0.15 * Math.sin((currentTime + 23.0) / 3.523);
+            const C_z = 0.6 + 0.6 * 0.15 * Math.sin((currentTime + 23.0) / 5.634);
+            const C_w = -0.2 + -0.2 * 0.15 * Math.sin((currentTime + 23.0) / 7.6345);
 
-        requestAnimationFrame(render);
+            gl.uniform1f(swizzleMixUniform, Math.sin(currentTime / 3.312));
+            gl.uniform4f(constantUniform, C_x, C_y, C_z, C_w);
+
+            gl.uniform2f(mouseUniform, mouseX, canvas.height - mouseY);
+            gl.uniform1f(scrollUniform, scrollY);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            animationFrameId = requestAnimationFrame(render);
+        }
     }
 
     render();
+    // isRendering = false;
+    // Return a cleanup function
+    // return () => {
+    //     cancelAnimationFrame(animationFrameId);
+    //     // Any other cleanup (e.g., deleting WebGL contexts, buffers, etc.)
+    // };
 }
 
-initWebGL();
+export function stopFractalRenderer(){
+        isRendering = false;
+        console.error('stop 1');
+    return () => {
+        // isRendering = false;
+        console.error('stop 2');
+        // if (animationFrameId) {
+        //     cancelAnimationFrame(animationFrameId);
+        //     const gl = canvas.getContext('webgl2');
+        //     gl?.disable;
+        // }
+        // Any other cleanup (e.g., deleting WebGL contexts, buffers, etc.)
+    };
+}
