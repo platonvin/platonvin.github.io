@@ -88,7 +88,7 @@ const projects = [
   },
   {
     id: 3,
-    title: 'mangaka',
+    title: 'Mangaka',
     description: 'Manga-style renderer',
     details: 'Manga-style renderer, written with Lum-al',
     github: 'https://github.com/platonvin/mangaka',
@@ -143,7 +143,7 @@ const projects = [
   },
   {
     id: 6,
-    title: 'sl-vector',
+    title: 'SL-vector',
     description: 'GLSL in C23',
     details: 'powerful C23 macro-library to bring vector casts in C',
     github: 'https://github.com/platonvin/sl-vector',
@@ -319,7 +319,7 @@ const cvContent = /*html*/`
                     </ul>
                 </li>
                 <li>
-                    <strong>SL-Vec</strong> — <a class = "alink" href="https://github.com/platonvin/sl-vector">Repository</a> (C23)
+                    <strong>SL-vec</strong> — <a class = "alink" href="https://github.com/platonvin/sl-vector">Repository</a> (C23)
                     <ul>
                         <li>Designed a macro library for GLSL vector types, casts, and functions in C23.</li>
                     </ul>
@@ -452,6 +452,11 @@ export default function ProjectShowcase() {
         isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100'
       }`}
     >
+    {/* <div
+      className={`animated-gradient min-h-screen py-12 px-4 sm:px-6 lg:px-8 ${
+        isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900'
+      }`}
+    ></div> */}
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-12">
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
@@ -467,11 +472,13 @@ export default function ProjectShowcase() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">  
           {projects.map((project, index) => (
-            <Card key={project.id} className={`overflow-hidden bg-gradient-to-br ${
-              isDarkMode
-                ? darkColorVariants[index % darkColorVariants.length]
-                : colorVariants[index % colorVariants.length]
-            } text-white`}
+            <Card 
+              key={project.id}
+              className={`card overflow-hidden bg-gradient-to-br ${
+                isDarkMode
+                  ? darkColorVariants[index % darkColorVariants.length]
+                  : colorVariants[index % colorVariants.length]
+              } text-white transition-transform transform hover:scale-105 hover:shadow-xl`}
             >
               <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-2">
