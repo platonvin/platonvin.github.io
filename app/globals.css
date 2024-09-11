@@ -26,7 +26,7 @@ html, body {
 }
 
 /* lazy fix to make text visible for more browsers */
-.bg-clip-tex  t {
+.bg-clip-text {
   -webkit-background-clip: text;
   background-clip: text;
 }
