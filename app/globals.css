@@ -24,6 +24,13 @@ html, body {
   height: 100%;
   width: 100%;
 }
+
+/* lazy fix to make text visible for more browsers */
+.bg-clip-tex  t {
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
 .CVcontact {
   display: flex;
   align-items: center;
@@ -41,11 +48,7 @@ html, body {
   margin-right: 0.2rem;
   margin-left: 0.2rem;
 }
-.prose {
-  /* color: rgb(0, 0, 0); */
-  /* background-color: rgba(128, 128, 128, 0); */
-  /* text-gray-800 bg-gray bg-opacity-99 */
-}
+
 section ul {
   list-style-type: disc;
   padding-left: 15px;
