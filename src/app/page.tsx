@@ -77,43 +77,35 @@ function isValidPosition(packedWindows: (Window & Position)[], window: Window, p
   })
 }
 
-function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Position; onExpand: (id: string, expandedHeight: number) => void; isExpanded: boolean }) {
+function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Position; onExpand: (id: string, height: number) => void; isExpanded: boolean }) {
   const [openSubcardIds, setOpenSubcardIds] = useState<Set<string>>(new Set())
   const contentRef = useRef<HTMLDivElement>(null)
   const subcardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
-  const calculateExpandedHeight = useCallback(() => {
+  const calculateHeight = useCallback(() => {
     if (!contentRef.current) return window.height;
-
+  
     const contentHeight = contentRef.current.scrollHeight;
-
-    // Ensure subcardRefs are properly defined and not undefined
+  
     const subcardsTotalHeight = window.subcards.reduce((total, subcard) => {
       const subcardEl = subcardRefs.current[subcard.id];
+      console.log(openSubcardIds.has(subcard.id))
+      console.log(subcardEl?.scrollHeight)
       return total + (openSubcardIds.has(subcard.id) && subcardEl ? subcardEl.scrollHeight : 0);
     }, 0);
-
-    return Math.max(contentHeight, window.height) + subcardsTotalHeight + SPACING; // Adding spacing for clarity
+  
+    return contentHeight + subcardsTotalHeight + SPACING; // Adding spacing for clarity
   }, [window.height, window.subcards, openSubcardIds]);
 
   const toggleSubcards = () => {
     if (isExpanded) {
-      if (openSubcardIds.size > 0) {
-        // Collapse all subcards
-        setOpenSubcardIds(new Set())
-        onExpand(window.id, window.height)
-      } else {
-        // Expand all subcards
-        const newOpenSubcardIds = new Set(window.subcards.map(subcard => subcard.id))
-        setOpenSubcardIds(newOpenSubcardIds)
-        const expandedHeight = calculateExpandedHeight()
-        onExpand(window.id, expandedHeight)
-      }
+      setOpenSubcardIds(new Set())
+      onExpand(window.id, window.height)
     } else {
-      // Expand window and subcards
       const newOpenSubcardIds = new Set(window.subcards.map(subcard => subcard.id))
+      // setOpenSubcardIds(new Set())
       setOpenSubcardIds(newOpenSubcardIds)
-      const expandedHeight = calculateExpandedHeight()
+      const expandedHeight = calculateHeight()
       onExpand(window.id, expandedHeight)
     }
   }
