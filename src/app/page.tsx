@@ -24,6 +24,8 @@ type Window = {
   subcards: Subcard[]
   width: number
   height: number
+  baseWidth: number
+  baseHeight: number
 }
 
 type Position = {
@@ -92,7 +94,9 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
     const contentHeight = contentRef.current.scrollHeight;
     const subcardsHeight = subcardsContainerRef.current?.scrollHeight || 0;
   
-    return Math.max(contentHeight, window.height) + (areSubcardsOpen ? subcardsHeight : 0) + SPACING;
+    return Math.max(contentHeight, window.baseHeight) + (areSubcardsOpen ? subcardsHeight : 0) + SPACING;
+    window.width = window.baseWidth
+    window.height = window.baseHeight
   }, [window.height, areSubcardsOpen]);
 
   const toggleSubcards = () => {
@@ -100,6 +104,8 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
   };
 
   useEffect(() => {
+    window.width = window.baseWidth
+    window.height = window.baseHeight
     if (isExpanded) {
       const expandedHeight = calculateExpandedHeight();
       onExpand(window.id, expandedHeight);
@@ -235,8 +241,10 @@ export default function Page() {
           { id: 'a1', title: 'Subcard A1', description: 'Description of A1', problem: 'Problem A1', solution: 'Solution A1' },
           { id: 'a2', title: 'Subcard A2', description: 'Description of A2', problem: 'Problem A2', solution: 'Solution A2' },
         ],
-        width: 320,
-        height: 400,
+        width: 0,
+        baseWidth: 320,
+        height: 0,
+        baseHeight: 400,
       },
       {
         id: '2',
@@ -252,8 +260,10 @@ export default function Page() {
             solution: 'Developed AI-driven task allocation system'
           }
         ],
-        width: 280,
-        height: 350+100,
+        width: 0,
+        baseWidth: 280,
+        height: 0,
+        baseHeight: 350+100,
       },
       {
         id: '3',
@@ -277,8 +287,10 @@ export default function Page() {
             solution: 'Optimized animation pipeline for consistent performance across devices'
           }
         ],
-        width: 320,
-        height: 420+100,
+        width: 0,
+        baseWidth: 320,
+        height: 0,
+        baseHeight: 420+100,
       },
       {
         id: '4',
@@ -302,8 +314,10 @@ export default function Page() {
             solution: 'Optimized animation pipeline for consistent performance across devices'
           }
         ],
-        width: 320,
-        height: 420+100,
+        width: 0,
+        baseWidth: 320,
+        height: 0,
+        baseHeight: 420+100,
       },
       {
         id: '5',
@@ -327,8 +341,10 @@ export default function Page() {
             solution: 'Optimized animation pipeline for consistent performance across devices'
           }
         ],
-        width: 320,
-        height: 420+100,
+        width: 0,
+        baseWidth: 320,
+        height: 0,
+        baseHeight: 420+100,
       }
     ]
 
