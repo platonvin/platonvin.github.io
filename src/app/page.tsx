@@ -21,6 +21,7 @@ type Window = {
   subcards: Subcard[]
   width: number
   height: number
+  expandedHeight: number
 }
 
 type Position = {
@@ -30,26 +31,14 @@ type Position = {
 
 const SPACING = 22
 
-function packWindows(windows: Window[], containerWidth: number, expandedWindowId: string | null): (Window & Position)[] {
+function packWindows(windows: Window[], containerWidth: number): (Window & Position)[] {
   const packedWindows: (Window & Position)[] = []
   let maxHeight = 0
 
   windows.forEach((window) => {
-    if (window.id === expandedWindowId) {
-      const existingPosition = packedWindows.find(w => w.id === expandedWindowId)
-      if (existingPosition) {
-        packedWindows.push({ ...window, x: existingPosition.x, y: existingPosition.y })
-        maxHeight = Math.max(maxHeight, existingPosition.y + window.height)
-      } else {
-        const bestPosition = findBestPosition(packedWindows, window, containerWidth)
-        packedWindows.push({ ...window, ...bestPosition })
-        maxHeight = Math.max(maxHeight, bestPosition.y + window.height)
-      }
-    } else {
-      const bestPosition = findBestPosition(packedWindows, window, containerWidth)
-      packedWindows.push({ ...window, ...bestPosition })
-      maxHeight = Math.max(maxHeight, bestPosition.y + window.height)
-    }
+    const bestPosition = findBestPosition(packedWindows, window, containerWidth)
+    packedWindows.push({ ...window, ...bestPosition })
+    maxHeight = Math.max(maxHeight, bestPosition.y + (window.expandedHeight || window.height))
   })
 
   return packedWindows
@@ -83,28 +72,53 @@ function isValidPosition(packedWindows: (Window & Position)[], window: Window, p
       position.x < packedWindow.x + packedWindow.width + SPACING &&
       packedWindow.x < position.x + window.width + SPACING
     const verticalOverlap =
-      position.y < packedWindow.y + packedWindow.height + SPACING &&
-      packedWindow.y < position.y + window.height + SPACING
+      position.y < packedWindow.y + (packedWindow.expandedHeight || packedWindow.height) + SPACING &&
+      packedWindow.y < position.y + (window.expandedHeight || window.height) + SPACING
     return horizontalOverlap && verticalOverlap
   })
 }
 
-function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Position; onExpand: (id: string, height: number) => void; isExpanded: boolean }) {
+function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Position; onExpand: (id: string, expandedHeight: number) => void; isExpanded: boolean }) {
   const [openSubcardId, setOpenSubcardId] = useState<string | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const subcardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+
+  const calculateExpandedHeight = useCallback(() => {
+    if (!contentRef.current) return window.height
+
+    const contentHeight = contentRef.current.scrollHeight
+    const subcardsTotalHeight = window.subcards.reduce((total, subcard) => {
+      const subcardEl = subcardRefs.current[subcard.id]
+      return total + (subcardEl ? subcardEl.scrollHeight : 0)
+    }, 0)
+
+    return Math.max(contentHeight, window.height) + subcardsTotalHeight + 40 // 40px for padding
+  }, [window])
 
   const toggleSubcards = () => {
     if (isExpanded) {
       onExpand(window.id, window.height)
     } else {
-      const contentHeight = contentRef.current?.scrollHeight || 0
-      onExpand(window.id, contentHeight + 40) // 40px for padding
+      const expandedHeight = calculateExpandedHeight()
+      onExpand(window.id, expandedHeight)
     }
   }
 
   const toggleSubcard = (id: string) => {
-    setOpenSubcardId(openSubcardId === id ? null : id)
+    setOpenSubcardId((prevId) => {
+      const newOpenId = prevId === id ? null : id
+      const expandedHeight = calculateExpandedHeight()
+      onExpand(window.id, expandedHeight)
+      return newOpenId
+    })
   }
+
+  useEffect(() => {
+    if (isExpanded) {
+      const expandedHeight = calculateExpandedHeight()
+      onExpand(window.id, expandedHeight)
+    }
+  }, [isExpanded, openSubcardId, calculateExpandedHeight, onExpand, window.id])
 
   return (
     <div
@@ -113,7 +127,7 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
         left: window.x,
         top: window.y,
         width: window.width,
-        height: isExpanded ? 'auto' : window.height,
+        height: isExpanded ? window.expandedHeight : window.height,
       }}
     >
       <div className="p-2 bg-gray-200 border-b border-gray-300 flex justify-between items-center">
@@ -141,6 +155,7 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
             {window.subcards.map((subcard) => (
               <div 
                 key={subcard.id} 
+                ref={(el) => subcardRefs.current[subcard.id] = el}
                 className="border rounded p-2 cursor-pointer hover:bg-gray-50"
                 onClick={() => toggleSubcard(subcard.id)}
               >
@@ -173,7 +188,6 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
 export default function Page() {
   const [packedWindows, setPackedWindows] = useState<(Window & Position)[]>([])
   const [containerWidth, setContainerWidth] = useState(0)
-  const [expandedWindowId, setExpandedWindowId] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const updateSize = useCallback(() => {
@@ -189,16 +203,15 @@ export default function Page() {
     return () => window.removeEventListener('resize', updateSize)
   }, [updateSize])
 
-  const handleExpand = useCallback((id: string, height: number) => {
-    setExpandedWindowId((prevId) => (prevId === id ? null : id))
+  const handleExpand = useCallback((id: string, expandedHeight: number) => {
     setPackedWindows((prevWindows) => {
       const updatedWindows = prevWindows.map((window) => {
         if (window.id === id) {
-          return { ...window, height: height }
+          return { ...window, expandedHeight: expandedHeight }
         }
         return window
       })
-      return packWindows(updatedWindows, containerWidth, id)
+      return packWindows(updatedWindows, containerWidth)
     })
   }, [containerWidth])
 
@@ -230,7 +243,8 @@ export default function Page() {
           }
         ],
         width: 320,
-        height: 400
+        height: 400,
+        expandedHeight: 400
       },
       {
         id: '2',
@@ -247,7 +261,8 @@ export default function Page() {
           }
         ],
         width: 280,
-        height: 350
+        height: 350,
+        expandedHeight: 350
       },
       {
         id: '3',
@@ -272,7 +287,8 @@ export default function Page() {
           }
         ],
         width: 320,
-        height: 420
+        height: 420,
+        expandedHeight: 420
       },
       {
         id: '4',
@@ -282,7 +298,7 @@ export default function Page() {
         description: 'Revolutionizing user interfaces with cutting-edge design.',
         subcards: [
           {
-            id: 'g1',
+            id: 'e1',
             title: 'UI Component',
             description: 'Adaptive color scheme',
             problem: 'Poor accessibility in varying light conditions',
@@ -297,32 +313,8 @@ export default function Page() {
           }
         ],
         width: 320,
-        height: 420
-      },
-      {
-        id: '5',
-        title: 'Project Gamma',
-        githubLink: 'https://github.com/example/gamma',
-        screenshot: '/placeholder.svg?height=160&width=320',
-        description: 'Revolutionizing user interfaces with cutting-edge design.',
-        subcards: [
-          {
-            id: 'g1',
-            title: 'UI Component',
-            description: 'Adaptive color scheme',
-            problem: 'Poor accessibility in varying light conditions',
-            solution: 'Implemented dynamic contrast adjustment based on ambient light'
-          },
-          {
-            id: 'g2',
-            title: 'Animation System',
-            description: 'Fluid micro-interactions',
-            problem: 'Jerky transitions on low-end devices',
-            solution: 'Optimized animation pipeline for consistent performance across devices'
-          }
-        ],
-        width: 320,
-        height: 420
+        height: 420,
+        expandedHeight: 420
       }
     ]
 
@@ -333,10 +325,10 @@ export default function Page() {
       width: isMobile ? Math.min(window.width, containerWidth - SPACING * 2) : window.width,
     }))
 
-    setPackedWindows(packWindows(adjustedWindows, containerWidth, null))
+    setPackedWindows(packWindows(adjustedWindows, containerWidth))
   }, [containerWidth])
 
-  const maxHeight = Math.max(...packedWindows.map(w => w.y + w.height), 0)
+  const maxHeight = Math.max(...packedWindows.map(w => w.y + (w.expandedHeight || w.height)), 0)
 
   return (
     <div 
@@ -349,7 +341,7 @@ export default function Page() {
           key={window.id} 
           window={window} 
           onExpand={handleExpand}
-          isExpanded={expandedWindowId === window.id}
+          isExpanded={window.expandedHeight > window.height}
         />
       ))}
     </div>
