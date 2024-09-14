@@ -1,101 +1,357 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, useEffect, useCallback, useRef } from 'react'
+import Image from 'next/image'
+import { ChevronDown, ChevronUp, Github } from 'lucide-react'
+
+type Subcard = {
+  id: string
+  title: string
+  description: string
+  problem: string
+  solution: string
+}
+
+type Window = {
+  id: string
+  title: string
+  githubLink: string
+  screenshot?: string
+  description: string
+  subcards: Subcard[]
+  width: number
+  height: number
+}
+
+type Position = {
+  x: number
+  y: number
+}
+
+const SPACING = 22
+
+function packWindows(windows: Window[], containerWidth: number, expandedWindowId: string | null): (Window & Position)[] {
+  const packedWindows: (Window & Position)[] = []
+  let maxHeight = 0
+
+  windows.forEach((window) => {
+    if (window.id === expandedWindowId) {
+      const existingPosition = packedWindows.find(w => w.id === expandedWindowId)
+      if (existingPosition) {
+        packedWindows.push({ ...window, x: existingPosition.x, y: existingPosition.y })
+        maxHeight = Math.max(maxHeight, existingPosition.y + window.height)
+      } else {
+        const bestPosition = findBestPosition(packedWindows, window, containerWidth)
+        packedWindows.push({ ...window, ...bestPosition })
+        maxHeight = Math.max(maxHeight, bestPosition.y + window.height)
+      }
+    } else {
+      const bestPosition = findBestPosition(packedWindows, window, containerWidth)
+      packedWindows.push({ ...window, ...bestPosition })
+      maxHeight = Math.max(maxHeight, bestPosition.y + window.height)
+    }
+  })
+
+  return packedWindows
+}
+
+function findBestPosition(packedWindows: (Window & Position)[], window: Window, containerWidth: number): Position {
+  let bestPosition: Position = { x: 0, y: 0 }
+  let minY = Infinity
+
+  for (let x = 0; x <= containerWidth - window.width; x += SPACING) {
+    let y = 0
+    while (true) {
+      const position = { x, y }
+      if (isValidPosition(packedWindows, window, position)) {
+        if (y < minY) {
+          minY = y
+          bestPosition = position
+        }
+        break
+      }
+      y += SPACING
+    }
+  }
+
+  return bestPosition
+}
+
+function isValidPosition(packedWindows: (Window & Position)[], window: Window, position: Position): boolean {
+  return !packedWindows.some((packedWindow) => {
+    const horizontalOverlap =
+      position.x < packedWindow.x + packedWindow.width + SPACING &&
+      packedWindow.x < position.x + window.width + SPACING
+    const verticalOverlap =
+      position.y < packedWindow.y + packedWindow.height + SPACING &&
+      packedWindow.y < position.y + window.height + SPACING
+    return horizontalOverlap && verticalOverlap
+  })
+}
+
+function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Position; onExpand: (id: string, height: number) => void; isExpanded: boolean }) {
+  const [openSubcardId, setOpenSubcardId] = useState<string | null>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  const toggleSubcards = () => {
+    if (isExpanded) {
+      onExpand(window.id, window.height)
+    } else {
+      const contentHeight = contentRef.current?.scrollHeight || 0
+      onExpand(window.id, contentHeight + 40) // 40px for padding
+    }
+  }
+
+  const toggleSubcard = (id: string) => {
+    setOpenSubcardId(openSubcardId === id ? null : id)
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
+    <div
+      className="absolute bg-white border border-gray-300 rounded shadow overflow-hidden transition-all duration-300 ease-in-out"
+      style={{
+        left: window.x,
+        top: window.y,
+        width: window.width,
+        height: isExpanded ? 'auto' : window.height,
+      }}
+    >
+      <div className="p-2 bg-gray-200 border-b border-gray-300 flex justify-between items-center">
+        <h2 className="font-bold">{window.title}</h2>
+        <a href={window.githubLink} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900">
+          <Github className="w-5 h-5" />
         </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+      <div ref={contentRef} className="p-2">
+        {window.screenshot && (
+          <div className="relative w-full h-40 mb-2">
+            <Image src={window.screenshot} alt={`Screenshot of ${window.title}`} layout="fill" objectFit="cover" />
+          </div>
+        )}
+        <p className="text-sm mb-2">{window.description}</p>
+        <button
+          className="flex items-center justify-between w-full p-2 bg-gray-100 hover:bg-gray-200 rounded"
+          onClick={toggleSubcards}
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <span>Subcards ({window.subcards.length})</span>
+          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+        {isExpanded && (
+          <div className="mt-2 space-y-2">
+            {window.subcards.map((subcard) => (
+              <div 
+                key={subcard.id} 
+                className="border rounded p-2 cursor-pointer hover:bg-gray-50"
+                onClick={() => toggleSubcard(subcard.id)}
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <h3 className="font-semibold">{subcard.title}</h3>
+                  {openSubcardId === subcard.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </div>
+                <p className="text-sm text-gray-600">{subcard.description}</p>
+                {openSubcardId === subcard.id && (
+                  <div className="mt-2 space-y-2">
+                    <div>
+                      <h4 className="font-semibold text-sm">Problem:</h4>
+                      <p className="text-sm">{subcard.problem}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm">Solution:</h4>
+                      <p className="text-sm">{subcard.solution}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
-  );
+  )
+}
+
+export default function Page() {
+  const [packedWindows, setPackedWindows] = useState<(Window & Position)[]>([])
+  const [containerWidth, setContainerWidth] = useState(0)
+  const [expandedWindowId, setExpandedWindowId] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const updateSize = useCallback(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.offsetWidth)
+    }
+  }, [])
+
+  useEffect(() => {
+    window.addEventListener('resize', updateSize)
+    updateSize()
+
+    return () => window.removeEventListener('resize', updateSize)
+  }, [updateSize])
+
+  const handleExpand = useCallback((id: string, height: number) => {
+    setExpandedWindowId((prevId) => (prevId === id ? null : id))
+    setPackedWindows((prevWindows) => {
+      const updatedWindows = prevWindows.map((window) => {
+        if (window.id === id) {
+          return { ...window, height: height }
+        }
+        return window
+      })
+      return packWindows(updatedWindows, containerWidth, id)
+    })
+  }, [containerWidth])
+
+  useEffect(() => {
+    if (containerWidth === 0) return
+
+    // Sample windows data
+    const windows: Window[] = [
+      {
+        id: '1',
+        title: 'Project Alpha',
+        githubLink: 'https://github.com/example/alpha',
+        screenshot: '/placeholder.svg?height=160&width=320',
+        description: 'A revolutionary project pushing the boundaries of technology.',
+        subcards: [
+          {
+            id: 'a1',
+            title: 'Feature 1',
+            description: 'Innovative AI integration',
+            problem: 'Slow processing of large datasets',
+            solution: 'Implemented distributed computing architecture'
+          },
+          {
+            id: 'a2',
+            title: 'Feature 2',
+            description: 'Real-time collaboration',
+            problem: 'High latency in multi-user environments',
+            solution: 'Optimized WebSocket connections and implemented efficient data syncing'
+          }
+        ],
+        width: 320,
+        height: 400
+      },
+      {
+        id: '2',
+        title: 'Project Beta',
+        githubLink: 'https://github.com/example/beta',
+        description: 'Streamlining workflows for maximum productivity.',
+        subcards: [
+          {
+            id: 'b1',
+            title: 'Module 1',
+            description: 'Automated task management',
+            problem: 'Manual assignment causing bottlenecks',
+            solution: 'Developed AI-driven task allocation system'
+          }
+        ],
+        width: 280,
+        height: 350
+      },
+      {
+        id: '3',
+        title: 'Project Gamma',
+        githubLink: 'https://github.com/example/gamma',
+        screenshot: '/placeholder.svg?height=160&width=320',
+        description: 'Revolutionizing user interfaces with cutting-edge design.',
+        subcards: [
+          {
+            id: 'g1',
+            title: 'UI Component',
+            description: 'Adaptive color scheme',
+            problem: 'Poor accessibility in varying light conditions',
+            solution: 'Implemented dynamic contrast adjustment based on ambient light'
+          },
+          {
+            id: 'g2',
+            title: 'Animation System',
+            description: 'Fluid micro-interactions',
+            problem: 'Jerky transitions on low-end devices',
+            solution: 'Optimized animation pipeline for consistent performance across devices'
+          }
+        ],
+        width: 320,
+        height: 420
+      },
+      {
+        id: '4',
+        title: 'Project Gamma',
+        githubLink: 'https://github.com/example/gamma',
+        screenshot: '/placeholder.svg?height=160&width=320',
+        description: 'Revolutionizing user interfaces with cutting-edge design.',
+        subcards: [
+          {
+            id: 'g1',
+            title: 'UI Component',
+            description: 'Adaptive color scheme',
+            problem: 'Poor accessibility in varying light conditions',
+            solution: 'Implemented dynamic contrast adjustment based on ambient light'
+          },
+          {
+            id: 'g2',
+            title: 'Animation System',
+            description: 'Fluid micro-interactions',
+            problem: 'Jerky transitions on low-end devices',
+            solution: 'Optimized animation pipeline for consistent performance across devices'
+          }
+        ],
+        width: 320,
+        height: 420
+      },
+      {
+        id: '5',
+        title: 'Project Gamma',
+        githubLink: 'https://github.com/example/gamma',
+        screenshot: '/placeholder.svg?height=160&width=320',
+        description: 'Revolutionizing user interfaces with cutting-edge design.',
+        subcards: [
+          {
+            id: 'g1',
+            title: 'UI Component',
+            description: 'Adaptive color scheme',
+            problem: 'Poor accessibility in varying light conditions',
+            solution: 'Implemented dynamic contrast adjustment based on ambient light'
+          },
+          {
+            id: 'g2',
+            title: 'Animation System',
+            description: 'Fluid micro-interactions',
+            problem: 'Jerky transitions on low-end devices',
+            solution: 'Optimized animation pipeline for consistent performance across devices'
+          }
+        ],
+        width: 320,
+        height: 420
+      }
+    ]
+
+    // Adjust window sizes for mobile
+    const isMobile = containerWidth < 768
+    const adjustedWindows = windows.map(window => ({
+      ...window,
+      width: isMobile ? Math.min(window.width, containerWidth - SPACING * 2) : window.width,
+    }))
+
+    setPackedWindows(packWindows(adjustedWindows, containerWidth, null))
+  }, [containerWidth])
+
+  const maxHeight = Math.max(...packedWindows.map(w => w.y + w.height), 0)
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative w-full bg-gray-100 overflow-x-hidden overflow-y-auto"
+      style={{ minHeight: '100vh', height: `${maxHeight + SPACING}px` }}
+    >
+      {packedWindows.map((window) => (
+        <WindowComponent 
+          key={window.id} 
+          window={window} 
+          onExpand={handleExpand}
+          isExpanded={expandedWindowId === window.id}
+        />
+      ))}
+    </div>
+  )
 }
