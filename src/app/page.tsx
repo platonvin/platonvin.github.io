@@ -1,8 +1,11 @@
 'use client'
+import { useState, useEffect, useCallback, useRef } from 'react';
+// import { ChevronUp, ChevronDown,  } from 'react-feather'; // Ensure you have these icons
+import { ChevronUp, ChevronDown, X, FileText, Download, Github, Sparkles} from 'lucide-react'
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+// import { packWindows, Window, Position, Subcard, SPACING } from './your-utils'; // Adjust imports accordingly
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import Image from 'next/image'
-import { ChevronDown, ChevronUp, Github } from 'lucide-react'
 
 type Subcard = {
   id: string
@@ -37,7 +40,7 @@ function packWindows(windows: Window[], containerWidth: number): (Window & Posit
   windows.forEach((window) => {
     const bestPosition = findBestPosition(packedWindows, window, containerWidth)
     packedWindows.push({ ...window, ...bestPosition })
-    maxHeight = Math.max(maxHeight, bestPosition.y + window.height)
+    // maxHeight = Math.max(maxHeight, bestPosition.y + window.height)
   })
 
   return packedWindows
@@ -77,57 +80,32 @@ function isValidPosition(packedWindows: (Window & Position)[], window: Window, p
   })
 }
 
-function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Position; onExpand: (id: string, height: number) => void; isExpanded: boolean }) {
-  const [openSubcardIds, setOpenSubcardIds] = useState<Set<string>>(new Set())
-  const contentRef = useRef<HTMLDivElement>(null)
-  const subcardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Position; onExpand: (id: string, expandedHeight: number) => void; isExpanded: boolean }) {
+  const [areSubcardsOpen, setAreSubcardsOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const subcardsContainerRef = useRef<HTMLDivElement>(null);
 
-  const calculateHeight = useCallback(() => {
+  const calculateExpandedHeight = useCallback(() => {
+    console.log("expanded")
     if (!contentRef.current) return window.height;
   
     const contentHeight = contentRef.current.scrollHeight;
+    const subcardsHeight = subcardsContainerRef.current?.scrollHeight || 0;
   
-    const subcardsTotalHeight = window.subcards.reduce((total, subcard) => {
-      const subcardEl = subcardRefs.current[subcard.id];
-      console.log(openSubcardIds.has(subcard.id))
-      console.log(subcardEl?.scrollHeight)
-      return total + (openSubcardIds.has(subcard.id) && subcardEl ? subcardEl.scrollHeight : 0);
-    }, 0);
-  
-    return contentHeight + subcardsTotalHeight + SPACING; // Adding spacing for clarity
-  }, [window.height, window.subcards, openSubcardIds]);
+    return Math.max(contentHeight, window.height) + (areSubcardsOpen ? subcardsHeight : 0) + SPACING;
+  }, [window.height, areSubcardsOpen]);
 
   const toggleSubcards = () => {
-    if (isExpanded) {
-      setOpenSubcardIds(new Set())
-      onExpand(window.id, window.height)
-    } else {
-      const newOpenSubcardIds = new Set(window.subcards.map(subcard => subcard.id))
-      // setOpenSubcardIds(new Set())
-      setOpenSubcardIds(newOpenSubcardIds)
-      const expandedHeight = calculateHeight()
-      onExpand(window.id, expandedHeight)
-    }
-  }
-
-  const toggleSubcard = (id: string) => {
-    setOpenSubcardIds(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet
-    })
-  }
+    setAreSubcardsOpen(prev => !prev);
+  };
 
   useEffect(() => {
     if (isExpanded) {
-      const expandedHeight = calculateHeight()
-      onExpand(window.id, expandedHeight)
+      const expandedHeight = calculateExpandedHeight();
+      onExpand(window.id, expandedHeight);
+      // isExpanded = true
     }
-  }, [isExpanded, openSubcardIds, calculateHeight, onExpand, window.id])
+  }, [isExpanded, areSubcardsOpen, calculateExpandedHeight, onExpand, window.id]);
 
   return (
     <div
@@ -136,7 +114,7 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
         left: window.x,
         top: window.y,
         width: window.width,
-        height: isExpanded ? 'auto' : window.height, // Set height based on expansion
+        height: window.height,
       }}
     >
       <div className="p-2 bg-gray-200 border-b border-gray-300 flex justify-between items-center">
@@ -152,82 +130,98 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
           </div>
         )}
         <p className="text-sm mb-2">{window.description}</p>
+
         <button
           className="flex items-center justify-between w-full p-2 bg-gray-100 hover:bg-gray-200 rounded"
           onClick={toggleSubcards}
         >
           <span>Subcards ({window.subcards.length})</span>
-          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          {areSubcardsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
-        {isExpanded && (
-          <div className="mt-2 space-y-2">
+
+        {areSubcardsOpen && (
+          <div ref={subcardsContainerRef} className="mt-2 space-y-2">
             {window.subcards.map((subcard) => (
-              <div 
-                key={subcard.id} 
-                ref={(el) => {
-                  if (el) subcardRefs.current[subcard.id] = el;
-                }}
-                className="border rounded p-2 cursor-pointer hover:bg-gray-50"
-                onClick={() => toggleSubcard(subcard.id)}
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="font-semibold">{subcard.title}</h3>
-                  {openSubcardIds.has(subcard.id) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </div>
-                <p className="text-sm text-gray-600">{subcard.description}</p>
-                {openSubcardIds.has(subcard.id) && (
-                  <div className="mt-2 space-y-2">
-                    <div>
-                      <h4 className="font-semibold text-sm">Problem:</h4>
-                      <p className="text-sm">{subcard.problem}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-sm">Solution:</h4>
-                      <p className="text-sm">{subcard.solution}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <Subcard key={subcard.id} subcard={subcard} />
             ))}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
 
+function Subcard({ subcard }: { subcard: Subcard }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    setIsExpanded(prev => !prev);
+  };
+
+  return (
+    <div 
+      className="border rounded p-2 hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer" 
+      onClick={toggleExpand}
+    >
+      <div className="flex justify-between items-center mb-1">
+        <h3 className="font-semibold">{subcard.title}</h3>
+        <button onClick={toggleExpand}>
+          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+      </div>
+      <p className="text-sm text-gray-600">{subcard.description}</p>
+      {isExpanded && (
+        <div className="mt-2 space-y-2">
+          <div>
+            <h4 className="font-semibold text-sm">Problem:</h4>
+            <p className="text-sm">{subcard.problem}</p>
+          </div>
+          <div>
+            <h4 className="font-semibold text-sm">Solution:</h4>
+            <p className="text-sm">{subcard.solution}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 export default function Page() {
-  const [packedWindows, setPackedWindows] = useState<(Window & Position)[]>([])
-  const [containerWidth, setContainerWidth] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [packedWindows, setPackedWindows] = useState<(Window & Position)[]>([]);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showCV, setShowCV] = useState(false);
+  const [showFractal, setShowFractal] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const updateSize = useCallback(() => {
     if (containerRef.current) {
-      setContainerWidth(containerRef.current.offsetWidth)
+      setContainerWidth(containerRef.current.offsetWidth);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    window.addEventListener('resize', updateSize)
-    updateSize()
+    window.addEventListener('resize', updateSize);
+    updateSize();
 
-    return () => window.removeEventListener('resize', updateSize)
-  }, [updateSize])
+    return () => window.removeEventListener('resize', updateSize);
+  }, [updateSize]);
 
   const handleExpand = useCallback((id: string, height: number) => {
     setPackedWindows((prevWindows) => {
       const updatedWindows = prevWindows.map((window) => {
         if (window.id === id) {
-          return { ...window, height }
+          return { ...window, height: Math.max(window.height, height) };
         }
-        return window
-      })
-      return packWindows(updatedWindows, containerWidth)
-    })
-  }, [containerWidth])
+        return window;
+      });
+      return packWindows(updatedWindows, containerWidth);
+    });
+  }, [containerWidth]);
 
   useEffect(() => {
-    if (containerWidth === 0) return
+    if (containerWidth === 0) return;
 
     // Sample windows data
     const windows: Window[] = [
@@ -339,18 +333,47 @@ export default function Page() {
     ]
 
     // Adjust window sizes for mobile
-    const isMobile = containerWidth < 768
+    const isMobile = containerWidth < 768;
     const adjustedWindows = windows.map(window => ({
       ...window,
       width: isMobile ? Math.min(window.width, containerWidth - SPACING * 2) : window.width,
-    }))
+    }));
 
-    setPackedWindows(packWindows(adjustedWindows, containerWidth))
-  }, [containerWidth])
+    setPackedWindows(packWindows(adjustedWindows, containerWidth));
+  }, [containerWidth]);
 
+  const toggleTheme = () => {
+    setIsDarkMode(prevMode => !prevMode);
+  };
+
+  const openFractalRenderer = () => {
+    setShowFractal(true);
+  };
 
   return (
-    <div ref={containerRef} className="relative w-full h-screen overflow-auto">
+    <div ref={containerRef} className={`relative w-full h-screen overflow-auto ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100'}`}>
+      <div className="p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">My Projects Showcase</h1>
+          <button
+            onClick={toggleTheme}
+            className="px-4 py-2 bg-gray-200 text-black rounded dark:bg-gray-700 dark:text-white"
+          >
+            {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-4 mb-4">
+          <button onClick={() => setShowCV(true)} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded">
+            <FileText className="inline mr-2" /> View CV
+          </button>
+          <button onClick={() => window.open('https://raw.githubusercontent.com/platonvin/platonvin.github.io/main/cv.pdf?v=1', '_blank')} className="bg-gradient-to-r from-pink-600 to-purple-600 text-white px-4 py-2 rounded">
+            <Download className="inline mr-2" /> Download CV (PDF)
+          </button>
+          <button onClick={openFractalRenderer} className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded">
+            <Sparkles className="inline mr-2" /> (Fun button) Open Fractal Renderer
+          </button>
+        </div>
+      </div>
       {packedWindows.map((window) => (
         <WindowComponent
           key={window.id}
@@ -359,6 +382,42 @@ export default function Page() {
           isExpanded={window.height > 200}
         />
       ))}
+      <AnimatePresence>
+        {showCV && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowCV(false)}
+          >
+            <div className="bg-white p-6 rounded shadow-lg" onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-2xl font-bold mb-4">CV</h2>
+              <iframe src="https://raw.githubusercontent.com/platonvin/platonvin.github.io/main/cv.pdf?v=1" className="w-full h-96" />
+              <button onClick={() => setShowCV(false)} className="mt-4 px-4 py-2 bg-gray-200 text-black rounded">
+                Close
+              </button>
+            </div>
+          </motion.div>
+        )}
+        {showFractal && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowFractal(false)}
+          >
+            <div className="bg-white p-6 rounded shadow-lg" onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-2xl font-bold mb-4">Fractal Renderer</h2>
+              {/* Your fractal renderer component here */}
+              <button onClick={() => setShowFractal(false)} className="mt-4 px-4 py-2 bg-gray-200 text-black rounded">
+                Close
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
-  )
+  );
 }
