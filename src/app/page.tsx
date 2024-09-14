@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronDown, ChevronUp, Github } from 'lucide-react'
+import { debug } from 'console'
 
 type Subcard = {
   id: string
@@ -48,8 +49,8 @@ function findBestPosition(packedWindows: (Window & Position)[], window: Window, 
   let bestPosition: Position = { x: 0, y: 0 }
   let minY = Infinity
 
-  for (let x = 0; x <= containerWidth - window.width; x += SPACING) {
-    let y = 0
+  for (let x = SPACING; x <= containerWidth - window.width; x += SPACING) {
+    let y = SPACING
     while (true) {
       const position = { x, y }
       if (isValidPosition(packedWindows, window, position)) {
@@ -79,37 +80,47 @@ function isValidPosition(packedWindows: (Window & Position)[], window: Window, p
 }
 
 function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Position; onExpand: (id: string, expandedHeight: number) => void; isExpanded: boolean }) {
-  const [openSubcardId, setOpenSubcardId] = useState<string | null>(null)
+  const [openSubcardIds, setOpenSubcardIds] = useState<Set<string>>(new Set())
   const contentRef = useRef<HTMLDivElement>(null)
   const subcardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
   const calculateExpandedHeight = useCallback(() => {
-    if (!contentRef.current) return window.height
-
-    const contentHeight = contentRef.current.scrollHeight
+    if (!contentRef.current) return window.height;
+  
+    const contentHeight = contentRef.current.scrollHeight;
+  
+    // Ensure subcardRefs are properly defined and not undefined
     const subcardsTotalHeight = window.subcards.reduce((total, subcard) => {
-      const subcardEl = subcardRefs.current[subcard.id]
-      return total + (subcardEl ? subcardEl.scrollHeight : 0)
-    }, 0)
-
-    return Math.max(contentHeight, window.height) + subcardsTotalHeight + 40 // 40px for padding
-  }, [window])
+      const subcardEl = subcardRefs.current[subcard.id];
+      // console.log(subcardEl)
+      console.log(subcardEl?.scrollHeight)
+      return total + (subcardEl ? subcardEl.scrollHeight : 0);
+    }, 0);
+  
+    return Math.max(contentHeight, window.height) + subcardsTotalHeight + SPACING; // Adding spacing for clarity
+  }, [window.height, window.subcards, openSubcardIds]);
 
   const toggleSubcards = () => {
     if (isExpanded) {
+      setOpenSubcardIds(new Set())
       onExpand(window.id, window.height)
     } else {
+      const newOpenSubcardIds = new Set(window.subcards.map(subcard => subcard.id))
+      setOpenSubcardIds(new Set())
       const expandedHeight = calculateExpandedHeight()
       onExpand(window.id, expandedHeight)
     }
   }
 
   const toggleSubcard = (id: string) => {
-    setOpenSubcardId((prevId) => {
-      const newOpenId = prevId === id ? null : id
-      const expandedHeight = calculateExpandedHeight()
-      onExpand(window.id, expandedHeight)
-      return newOpenId
+    setOpenSubcardIds(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+      } else {
+        newSet.add(id)
+      }
+      return newSet
     })
   }
 
@@ -118,7 +129,7 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
       const expandedHeight = calculateExpandedHeight()
       onExpand(window.id, expandedHeight)
     }
-  }, [isExpanded, openSubcardId, calculateExpandedHeight, onExpand, window.id])
+  }, [isExpanded, openSubcardIds, calculateExpandedHeight, onExpand, window.id])
 
   return (
     <div
@@ -138,7 +149,7 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
       </div>
       <div ref={contentRef} className="p-2">
         {window.screenshot && (
-          <div className="relative w-full h-40 mb-2">
+          <div className="relative w-full h-4 mb-2">
             <Image src={window.screenshot} alt={`Screenshot of ${window.title}`} layout="fill" objectFit="cover" />
           </div>
         )}
@@ -155,16 +166,18 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
             {window.subcards.map((subcard) => (
               <div 
                 key={subcard.id} 
-                ref={(el) => subcardRefs.current[subcard.id] = el}
+                ref={(el) => {
+                  if (el) subcardRefs.current[subcard.id] = el;
+                }}
                 className="border rounded p-2 cursor-pointer hover:bg-gray-50"
                 onClick={() => toggleSubcard(subcard.id)}
               >
                 <div className="flex justify-between items-center mb-1">
                   <h3 className="font-semibold">{subcard.title}</h3>
-                  {openSubcardId === subcard.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  {openSubcardIds.has(subcard.id) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </div>
                 <p className="text-sm text-gray-600">{subcard.description}</p>
-                {openSubcardId === subcard.id && (
+                {openSubcardIds.has(subcard.id) && (
                   <div className="mt-2 space-y-2">
                     <div>
                       <h4 className="font-semibold text-sm">Problem:</h4>
@@ -305,7 +318,33 @@ export default function Page() {
             solution: 'Implemented dynamic contrast adjustment based on ambient light'
           },
           {
-            id: 'g2',
+            id: 'e2',
+            title: 'Animation System',
+            description: 'Fluid micro-interactions',
+            problem: 'Jerky transitions on low-end devices',
+            solution: 'Optimized animation pipeline for consistent performance across devices'
+          }
+        ],
+        width: 320,
+        height: 420,
+        expandedHeight: 420
+      },
+      {
+        id: '5',
+        title: 'Project Gamma',
+        githubLink: 'https://github.com/example/gamma',
+        screenshot: '/placeholder.svg?height=160&width=320',
+        description: 'Revolutionizing user interfaces with cutting-edge design.',
+        subcards: [
+          {
+            id: 'f1',
+            title: 'UI Component',
+            description: 'Adaptive color scheme',
+            problem: 'Poor accessibility in varying light conditions',
+            solution: 'Implemented dynamic contrast adjustment based on ambient light'
+          },
+          {
+            id: 'f2',
             title: 'Animation System',
             description: 'Fluid micro-interactions',
             problem: 'Jerky transitions on low-end devices',
@@ -334,7 +373,7 @@ export default function Page() {
     <div 
       ref={containerRef}
       className="relative w-full bg-gray-100 overflow-x-hidden overflow-y-auto"
-      style={{ minHeight: '100vh', height: `${maxHeight + SPACING}px` }}
+      style={{ minHeight: '10vh', height: `${maxHeight + SPACING}px` }}
     >
       {packedWindows.map((window) => (
         <WindowComponent 
