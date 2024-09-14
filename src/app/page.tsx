@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronDown, ChevronUp, Github } from 'lucide-react'
-import { debug } from 'console'
 
 type Subcard = {
   id: string
@@ -22,7 +21,6 @@ type Window = {
   subcards: Subcard[]
   width: number
   height: number
-  expandedHeight: number
 }
 
 type Position = {
@@ -39,7 +37,7 @@ function packWindows(windows: Window[], containerWidth: number): (Window & Posit
   windows.forEach((window) => {
     const bestPosition = findBestPosition(packedWindows, window, containerWidth)
     packedWindows.push({ ...window, ...bestPosition })
-    maxHeight = Math.max(maxHeight, bestPosition.y + (window.expandedHeight || window.height))
+    maxHeight = Math.max(maxHeight, bestPosition.y + window.height)
   })
 
   return packedWindows
@@ -73,8 +71,8 @@ function isValidPosition(packedWindows: (Window & Position)[], window: Window, p
       position.x < packedWindow.x + packedWindow.width + SPACING &&
       packedWindow.x < position.x + window.width + SPACING
     const verticalOverlap =
-      position.y < packedWindow.y + (packedWindow.expandedHeight || packedWindow.height) + SPACING &&
-      packedWindow.y < position.y + (window.expandedHeight || window.height) + SPACING
+      position.y < packedWindow.y + packedWindow.height + SPACING &&
+      packedWindow.y < position.y + window.height + SPACING
     return horizontalOverlap && verticalOverlap
   })
 }
@@ -86,27 +84,35 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
 
   const calculateExpandedHeight = useCallback(() => {
     if (!contentRef.current) return window.height;
-  
+
     const contentHeight = contentRef.current.scrollHeight;
-  
+
     // Ensure subcardRefs are properly defined and not undefined
     const subcardsTotalHeight = window.subcards.reduce((total, subcard) => {
       const subcardEl = subcardRefs.current[subcard.id];
-      // console.log(subcardEl)
-      console.log(subcardEl?.scrollHeight)
-      return total + (subcardEl ? subcardEl.scrollHeight : 0);
+      return total + (openSubcardIds.has(subcard.id) && subcardEl ? subcardEl.scrollHeight : 0);
     }, 0);
-  
+
     return Math.max(contentHeight, window.height) + subcardsTotalHeight + SPACING; // Adding spacing for clarity
   }, [window.height, window.subcards, openSubcardIds]);
 
   const toggleSubcards = () => {
     if (isExpanded) {
-      setOpenSubcardIds(new Set())
-      onExpand(window.id, window.height)
+      if (openSubcardIds.size > 0) {
+        // Collapse all subcards
+        setOpenSubcardIds(new Set())
+        onExpand(window.id, window.height)
+      } else {
+        // Expand all subcards
+        const newOpenSubcardIds = new Set(window.subcards.map(subcard => subcard.id))
+        setOpenSubcardIds(newOpenSubcardIds)
+        const expandedHeight = calculateExpandedHeight()
+        onExpand(window.id, expandedHeight)
+      }
     } else {
+      // Expand window and subcards
       const newOpenSubcardIds = new Set(window.subcards.map(subcard => subcard.id))
-      setOpenSubcardIds(new Set())
+      setOpenSubcardIds(newOpenSubcardIds)
       const expandedHeight = calculateExpandedHeight()
       onExpand(window.id, expandedHeight)
     }
@@ -126,10 +132,10 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
 
   useEffect(() => {
     if (isExpanded) {
-      const expandedHeight = calculateExpandedHeight()
+      const expandedHeight = calculateHeight()
       onExpand(window.id, expandedHeight)
     }
-  }, [isExpanded, openSubcardIds, calculateExpandedHeight, onExpand, window.id])
+  }, [isExpanded, openSubcardIds, calculateHeight, onExpand, window.id])
 
   return (
     <div
@@ -138,7 +144,7 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
         left: window.x,
         top: window.y,
         width: window.width,
-        height: isExpanded ? window.expandedHeight : window.height,
+        height: isExpanded ? 'auto' : window.height, // Set height based on expansion
       }}
     >
       <div className="p-2 bg-gray-200 border-b border-gray-300 flex justify-between items-center">
@@ -149,7 +155,7 @@ function WindowComponent({ window, onExpand, isExpanded }: { window: Window & Po
       </div>
       <div ref={contentRef} className="p-2">
         {window.screenshot && (
-          <div className="relative w-full h-4 mb-2">
+          <div className="relative w-full h-40 mb-2">
             <Image src={window.screenshot} alt={`Screenshot of ${window.title}`} layout="fill" objectFit="cover" />
           </div>
         )}
@@ -216,11 +222,11 @@ export default function Page() {
     return () => window.removeEventListener('resize', updateSize)
   }, [updateSize])
 
-  const handleExpand = useCallback((id: string, expandedHeight: number) => {
+  const handleExpand = useCallback((id: string, height: number) => {
     setPackedWindows((prevWindows) => {
       const updatedWindows = prevWindows.map((window) => {
         if (window.id === id) {
-          return { ...window, expandedHeight: expandedHeight }
+          return { ...window, height }
         }
         return window
       })
@@ -238,26 +244,13 @@ export default function Page() {
         title: 'Project Alpha',
         githubLink: 'https://github.com/example/alpha',
         screenshot: '/placeholder.svg?height=160&width=320',
-        description: 'A revolutionary project pushing the boundaries of technology.',
+        description: 'Description of Project Alpha',
         subcards: [
-          {
-            id: 'a1',
-            title: 'Feature 1',
-            description: 'Innovative AI integration',
-            problem: 'Slow processing of large datasets',
-            solution: 'Implemented distributed computing architecture'
-          },
-          {
-            id: 'a2',
-            title: 'Feature 2',
-            description: 'Real-time collaboration',
-            problem: 'High latency in multi-user environments',
-            solution: 'Optimized WebSocket connections and implemented efficient data syncing'
-          }
+          { id: 'a1', title: 'Subcard A1', description: 'Description of A1', problem: 'Problem A1', solution: 'Solution A1' },
+          { id: 'a2', title: 'Subcard A2', description: 'Description of A2', problem: 'Problem A2', solution: 'Solution A2' },
         ],
         width: 320,
         height: 400,
-        expandedHeight: 400
       },
       {
         id: '2',
@@ -274,8 +267,7 @@ export default function Page() {
           }
         ],
         width: 280,
-        height: 350,
-        expandedHeight: 350
+        height: 350+100,
       },
       {
         id: '3',
@@ -300,8 +292,7 @@ export default function Page() {
           }
         ],
         width: 320,
-        height: 420,
-        expandedHeight: 420
+        height: 420+100,
       },
       {
         id: '4',
@@ -326,8 +317,7 @@ export default function Page() {
           }
         ],
         width: 320,
-        height: 420,
-        expandedHeight: 420
+        height: 420+100,
       },
       {
         id: '5',
@@ -352,8 +342,7 @@ export default function Page() {
           }
         ],
         width: 320,
-        height: 420,
-        expandedHeight: 420
+        height: 420+100,
       }
     ]
 
@@ -367,20 +356,15 @@ export default function Page() {
     setPackedWindows(packWindows(adjustedWindows, containerWidth))
   }, [containerWidth])
 
-  const maxHeight = Math.max(...packedWindows.map(w => w.y + (w.expandedHeight || w.height)), 0)
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative w-full bg-gray-100 overflow-x-hidden overflow-y-auto"
-      style={{ minHeight: '10vh', height: `${maxHeight + SPACING}px` }}
-    >
+    <div ref={containerRef} className="relative w-full h-screen overflow-auto">
       {packedWindows.map((window) => (
-        <WindowComponent 
-          key={window.id} 
-          window={window} 
+        <WindowComponent
+          key={window.id}
+          window={window}
           onExpand={handleExpand}
-          isExpanded={window.expandedHeight > window.height}
+          isExpanded={window.height > 200}
         />
       ))}
     </div>
