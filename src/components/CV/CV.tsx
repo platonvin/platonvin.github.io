@@ -52,7 +52,7 @@ const CV: React.FC = () => {
             <li>Designed a real-time GI system utilizing a custom ray-tracing algorithm and acceleration structure, providing dynamic low-frequency light simulation</li>
             <li>Integrated full-res ray-traced reflections for real-time rendering of glossy surfaces</li>
             <li>Developed a dynamic quality screen-space volumetric renderer incorporating Lambert's law and 3D Perlin noise, resulting in realistic volumetric lighting effects with constant runtime</li>
-            <li>Created a GPU-accelerated foliage rendering system, capable of efficiently rendering hundreds of thouthands grass blades in hundreds of microseconds</li>
+            <li>Created a GPU-driven foliage rendering system, capable of efficiently rendering hundreds of thouthands grass blades in hundreds of microseconds</li>
             <li>Implemented a state-of-art A-trous spatio-temporal denoising algorithm for filtering GI, achieving noise reduction in &lt;1 spp path-traced scenes</li>
           </ul>
         </li>
@@ -89,12 +89,6 @@ const CV: React.FC = () => {
           </ul>
         </li>
         <li>
-          <strong>SL-Vec</strong> — <a className="alink" href="https://github.com/platonvin/sl-vector">Repository</a> (C23)
-          <ul>
-            <li>Ported GLSL syntax to C23 with macro-based solution</li>
-          </ul>
-        </li>
-        <li>
           <strong>Fractal Raymarcher</strong> — <a className="alink" href="https://github.com/platonvin/platonvin.github.io">Repository</a> | <a className="alink" href="https://platonvin.github.io/">Live Demo: click chevron on "Fractal Raymarcher"</a> (JavaScript)
           <ul>
             <li>Created a WebGL-based renderer for 4D Julia set fractals, utilizing different math-based techniques for distance field estimation, coloring and normals</li>
@@ -106,7 +100,7 @@ const CV: React.FC = () => {
         <strong>Applied Mathematics and Physics</strong> at Moscow Institute of Physics and Technology (MIPT), 2022 - 2023
       </p>
       <p>
-        <strong>International Al-Farghani Physics Olympiad</strong> - Gold Medal, 2021
+        Gold medal on <strong>IAFPHO (International Al-Farghani Physics Olympiad)</strong>, 2021
         <p>... and multiple internal Belarus physics contest 1st places and diplomas</p>
       </p>
       <style jsx>{`

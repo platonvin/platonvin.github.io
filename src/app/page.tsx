@@ -7,7 +7,6 @@ import { debug } from 'console'
 import { initFractalRenderer, stopFractalRenderer } from '@/lib/fractalRenderer'
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from 'framer-motion'
-import { cvContent } from "@/lib/cvContent"
 import { Subcard, Window, Position, windows } from "@/lib/windows"
 import CV from '../components/CV/CV';
 
