@@ -508,7 +508,7 @@ export default function Page() {
               }`}
           >
             <FileText className="mr-2 h-4 w-4" />
-            View my CV (short)
+            View my CV
           </Button>
           <Button
             onClick={() =>
@@ -523,7 +523,7 @@ export default function Page() {
               }`}
           >
             <Download className="mr-2 h-4 w-4" />
-            Download my CV (PDF, detailed)
+            Download my CV (PDF)
           </Button>
           <Button
             onClick={toggleTheme}
