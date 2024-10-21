@@ -51,7 +51,7 @@ const CV: React.FC = () => {
             <li>Implemented a subpass-based deferred rendering system, optimized for Tile-Based GPUs with advanced compression techniques, achieving significant performance gains in complex scenes in comparison with common methods</li>
             <li>Designed a real-time GI system utilizing a custom ray-tracing algorithm and acceleration structure, providing dynamic low-frequency light simulation</li>
             <li>Integrated full-res ray-traced reflections for real-time rendering of glossy surfaces</li>
-            <li>Developed a dynamic quality screen-space volumetric renderer incorporating Lambert's law and 3D Perlin noise, resulting in realistic volumetric lighting effects with constant runtime</li>
+            <li>Developed a dynamic quality screen-space volumetric renderer incorporating Lambert&apos;s law and 3D Perlin noise, resulting in realistic volumetric lighting effects with constant runtime</li>
             <li>Created a GPU-driven foliage rendering system, capable of efficiently rendering hundreds of thouthands grass blades in hundreds of microseconds</li>
             <li>Implemented a state-of-art A-trous spatio-temporal denoising algorithm for filtering GI, achieving noise reduction in &lt;1 spp path-traced scenes</li>
           </ul>
@@ -89,7 +89,7 @@ const CV: React.FC = () => {
           </ul>
         </li>
         <li>
-          <strong>Fractal Raymarcher</strong> — <a className="alink" href="https://github.com/platonvin/platonvin.github.io">Repository</a> | <a className="alink" href="https://platonvin.github.io/">Live Demo: click chevron on "Fractal Raymarcher"</a> (JavaScript)
+          <strong>Fractal Raymarcher</strong> — <a className="alink" href="https://github.com/platonvin/platonvin.github.io">Repository</a> | <a className="alink" href="https://platonvin.github.io/">Live Demo: click chevron on &quot;Fractal Raymarcher&quot;</a> (JavaScript)
           <ul>
             <li>Created a WebGL-based renderer for 4D Julia set fractals, utilizing different math-based techniques for distance field estimation, coloring and normals</li>
           </ul>

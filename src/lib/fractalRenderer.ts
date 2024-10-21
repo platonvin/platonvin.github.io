@@ -421,17 +421,17 @@ void main() {
     resizeCanvas();
 
     const startTime = Date.now();
-    let mouseX = 0, mouseY = 0;
-    let scrollY = 0;
+    // let mouseX = 0, mouseY = 0;
+    // let scrollY = 0;
 
-    window.addEventListener('mousemove', (e: MouseEvent) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
+    // window.addEventListener('mousemove', (e: MouseEvent) => {
+    //     mouseX = e.clientX;
+    //     mouseY = e.clientY;
+    // });
 
-    window.addEventListener('scroll', () => {
-        scrollY = window.scrollY;
-    });
+    // window.addEventListener('scroll', () => {
+    //     scrollY = window.scrollY;
+    // });
 
     if (animationFrameId)
         isRendering = true;

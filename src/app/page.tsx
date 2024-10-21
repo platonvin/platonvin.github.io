@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Image from 'next/image'
-import { ChevronDown, ChevronUp, Github, Sparkles, Download, FileText, X } from 'lucide-react'
-import { debug } from 'console'
+import { ChevronDown, ChevronUp, Github, /*Sparkles,*/ Download, FileText, X } from 'lucide-react'
+// import { debug } from 'console'
 import { initFractalRenderer, stopFractalRenderer } from '@/lib/fractalRenderer'
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from 'framer-motion'
-import { Subcard, Window, Position, windows } from "@/lib/windows"
+import { /*Subcard,*/ Window, Position, windows } from "@/lib/windows"
 import CV from '../components/CV/CV';
 
 const SPACING = +12
@@ -69,7 +69,7 @@ function WindowComponent({ window, onExpand, isExpanded, isDarkMode }: {
   isDarkMode: boolean;
 }) {
   const [openSubcardIds, setOpenSubcardIds] = useState<Set<number>>(new Set())
-  const [isImageHovered, setIsImageHovered] = useState(false)
+  // const [isImageHovered, setIsImageHovered] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
   const subcardRefs = useRef<{ [key: number]: HTMLDivElement | null }>({})
 
@@ -109,11 +109,11 @@ function WindowComponent({ window, onExpand, isExpanded, isDarkMode }: {
     // console.log("index", index)
 
     // console.log("PREV")
-    var expandedHeight = calculateExpandedHeight()
+    // var expandedHeight = calculateExpandedHeight()
     // console.log("expandedHeight", expandedHeight)
     // console.log("window.baseHeight", window.baseHeight)
     onExpand(window.id, Math.ceil(window.expandedHeight))
-    var expandedHeight = calculateExpandedHeight()
+    // var expandedHeight = calculateExpandedHeight()
     // console.log("expandedHeight", expandedHeight)
     // console.log("ENDPREV")
     // expandedHeight = calculateExpandedHeight()
@@ -132,7 +132,7 @@ function WindowComponent({ window, onExpand, isExpanded, isDarkMode }: {
 
   useEffect(() => {
     if (isExpanded) {
-      var expandedHeight = calculateExpandedHeight()
+      let expandedHeight = calculateExpandedHeight()
       onExpand(window.id, expandedHeight)
     }
   }, [isExpanded, openSubcardIds, calculateExpandedHeight, onExpand, window.id])
@@ -360,9 +360,9 @@ export default function Page() {
 
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const openFractalRenderer = () => {
-    setShowFractal(true)
-  }
+  // const openFractalRenderer = () => {
+  //   setShowFractal(true)
+  // }
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -470,7 +470,7 @@ export default function Page() {
     setPackedWindows(packWindows(adjustedWindows, containerWidth))
   }, [containerWidth])
 
-  const maxHeight = Math.max(...packedWindows.map(w => w.y + (w.expandedHeight || w.baseHeight)), 0)
+  // const maxHeight = Math.max(...packedWindows.map(w => w.y + (w.expandedHeight || w.baseHeight)), 0)
 
   return (
     <div
