@@ -132,7 +132,7 @@ function WindowComponent({ window, onExpand, isExpanded, isDarkMode }: {
 
   useEffect(() => {
     if (isExpanded) {
-      let expandedHeight = calculateExpandedHeight()
+      const expandedHeight = calculateExpandedHeight()
       onExpand(window.id, expandedHeight)
     }
   }, [isExpanded, openSubcardIds, calculateExpandedHeight, onExpand, window.id])
@@ -179,20 +179,20 @@ function WindowComponent({ window, onExpand, isExpanded, isDarkMode }: {
             <Image
               src={window.image}
               alt={`${window.title} preview`}
-              width={Math.ceil(window.baseWidth-30)}
-              height={Math.ceil(window.baseHeight-30)}
+              width={Math.ceil(window.baseWidth - 30)}
+              height={Math.ceil(window.baseHeight - 30)}
               quality={100}
               className="rounded-lg object-cover"
             />
           </div>
         )}
-        
+
         {window.video && (
           <div className="mb-4">
             <video
               // preload = {true}
-              width={Math.ceil(window.baseWidth-30)}
-              height={Math.ceil(window.baseHeight-30)}
+              width={Math.ceil(window.baseWidth - 30)}
+              height={Math.ceil(window.baseHeight - 30)}
               className="rounded-lg object-cover"
               // style={{ willChange: 'transform' }} // optimize
               autoPlay={true}
@@ -443,22 +443,22 @@ export default function Page() {
     })
   }, [containerWidth])
 
+  
   // const allWindows = windows
-  const allWindows = useMemo(() => [
-    ...windows,
-    { //unique one
-      id: windows.length + 1,
-      title: "Fractal Renderer",
-      description: "WebGL Julia Set renderer",
-      githubLink: 'https://github.com/platonvin/platonvin.github.io',
-      baseWidth: 602,
-      baseHeight: 151,
-      expandedHeight: 500,
-      subcards: [],
-    }
-  ], [])
-
   useEffect(() => {
+    const allWindows = useMemo(() => [
+      ...windows,
+      { //unique one
+        id: windows.length + 1,
+        title: "Fractal Renderer",
+        description: "WebGL Julia Set renderer",
+        githubLink: 'https://github.com/platonvin/platonvin.github.io',
+        baseWidth: 602,
+        baseHeight: 151,
+        expandedHeight: 500,
+        subcards: [],
+      }
+    ], [])
     if (containerWidth === 0) return
 
     const isMobile = containerWidth < 768
@@ -479,11 +479,11 @@ export default function Page() {
         ? "bg-gradient-to-br from-gray-900 via-purple-950 to-indigo-950 text-white"
         : "bg-gradient-to-br from-purple-100 via-pink-200 to-indigo-100 text-black"
         }`}
-        style={{
-          minHeight: "100%", // Allow the content to dynamically expand
-          display: "flex",
-          flexDirection: "column",
-        }}
+      style={{
+        minHeight: "100%", // Allow the content to dynamically expand
+        display: "flex",
+        flexDirection: "column",
+      }}
     >
       <motion.div
         className="flex p-3"
