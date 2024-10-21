@@ -92,6 +92,17 @@ html, body {
   overflow-x: hidden; /* disable horizontal scrolling */
 }
 
+ul {
+  list-style: inside;
+  padding-left: 20px;
+  margin-bottom: 30px;
+}
+
+li {
+  list-style: inside;
+  padding-left: 15px;
+}
+
 @layer base {
   * {
     @apply border-border;

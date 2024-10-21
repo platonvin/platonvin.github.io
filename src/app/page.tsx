@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from 'framer-motion'
 import { cvContent } from "@/lib/cvContent"
 import { Subcard, Window, Position, windows } from "@/lib/windows"
+import CV from '../components/CV/CV';
 
 const SPACING = +12
 const SCALE_GENERAL = 1.0;
@@ -508,7 +509,7 @@ export default function Page() {
               }`}
           >
             <FileText className="mr-2 h-4 w-4" />
-            View my CV
+            View my CV (short)
           </Button>
           <Button
             onClick={() =>
@@ -523,7 +524,7 @@ export default function Page() {
               }`}
           >
             <Download className="mr-2 h-4 w-4" />
-            Download my CV (PDF)
+            Download my CV (PDF, detailed)
           </Button>
           <Button
             onClick={toggleTheme}
@@ -612,8 +613,8 @@ export default function Page() {
                 <X className="h-6 w-6 " />
                 <span className="sr-only">Close</span>
               </Button>
-              <div className="p-8">
-                <div className="prose" dangerouslySetInnerHTML={{ __html: cvContent }} />
+              <div>
+                <CV />
               </div>
             </motion.div>
           </motion.div>

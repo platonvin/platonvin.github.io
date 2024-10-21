@@ -227,7 +227,7 @@ export const windows: Window[] = [
         id: 8,
         title: 'Circuli-Bellum ',
         githubLink: 'https://github.com/platonvin/Circuli-Bellum ',
-        description: 'ROUNDS clone',
+        description: 'C++ Vulkan ROUNDS clone',
         // image: "/image.png",
         video: "/cb.webm",
         baseWidth: 380,
