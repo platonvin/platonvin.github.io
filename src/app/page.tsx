@@ -457,6 +457,8 @@ export default function Page() {
       subcards: [],
     }
   ], [])
+  
+  const widthToFitEverything = Math.max(...allWindows.map((win) => win.baseWidth)) + SPACING;
 
   useEffect(() => {
     if (containerWidth === 0) return
@@ -481,6 +483,7 @@ export default function Page() {
         }`}
         style={{
           minHeight: "100%", // Allow the content to dynamically expand
+          minWidth: widthToFitEverything, // to fit windows
           display: "flex",
           flexDirection: "column",
         }}
