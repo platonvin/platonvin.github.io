@@ -601,7 +601,17 @@ export default function Page() {
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
-              className={`relative w-full max-w-4xl max-h-[90vh] overflow-auto backdrop-blur-3xl rounded-lg shadow-xl ${isDarkMode ? 'bg-white bg-opacity-10 text-slate-300' : 'bg-white bg-opacity-10 text-slate-950'
+              className={`relative w-full max-w-4xl 
+                  max-h-[120vh] 
+                  max-[320px]:max-h-[140vh] 
+                  max-[420px]:max-h-[125vh] 
+                  max-[520px]:max-h-[100vh] 
+                  max-[620px]:max-h-[90vh] 
+                  max-[720px]:max-h-[80vh] 
+                  max-[820px]:max-h-[80vh] 
+                  min-[820px]:max-h-[75vh] 
+                  
+                  overflow-auto backdrop-blur-3xl rounded-lg shadow-xl ${isDarkMode ? 'bg-white bg-opacity-10 text-slate-300' : 'bg-white bg-opacity-10 text-slate-950'
                 }`}
               onClick={(e) => e.stopPropagation()}
             >
