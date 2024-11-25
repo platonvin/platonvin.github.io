@@ -356,7 +356,7 @@ export default function Page() {
   const [containerWidth, setContainerWidth] = useState(0)
   const [showCV, setShowCV] = useState(false)
   const [showFractal, setShowFractal] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -449,7 +449,7 @@ export default function Page() {
     { //unique one
       id: windows.length + 1,
       title: "Fractal Renderer",
-      description: "WebGL Julia Set renderer",
+      description: "WebGL Julia Set renderer. Open me if you want to see some fractals. Requires decent gpu to run smoothly",
       githubLink: 'https://github.com/platonvin/platonvin.github.io',
       baseWidth: 602,
       baseHeight: 151,

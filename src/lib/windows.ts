@@ -250,8 +250,30 @@ export const windows: Window[] = [
             },
             {
                 title: 'Chromatic abberation',
-                solution: 'UV triangle offset when combining',
+                solution: 'UV triangle offset when combining final image',
             },
+        ]
+    },
+    {
+        id: 9,
+        title: 'Might and Chess ',
+        githubLink: 'https://github.com/platonvin/Might-and-Chess',
+        description: 'Chess with magic made in unity',
+        video: "/mightNchess.webm",
+        baseWidth: 280,
+        baseHeight: 320,
+        expandedHeight: 0,
+        subcards: [
+            {
+                title: 'My first unity experience',
+                // description: 'vec3 a = vec3(b).xxy',
+                problem: 'life is hard',
+                solution: 'Unity claims to simplify it (at least, for making games). Sadly they are very bad at it'
+            },
+            {
+                title: 'Animations',
+                solution: 'inverse kinematics. current = lerp (current, target, clamp01 (1 - exp(-deltaTime)))'
+            }
         ]
     },
 ]

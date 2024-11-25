@@ -44,10 +44,10 @@ const CV: React.FC = () => {
       <h3>Experience</h3>
       <ul>
         <li>
-          <strong>Lum Engine</strong> — <a className="alink" href="https://github.com/platonvin/lum">Repository</a> (C++17)
+          <strong>Lum Engine</strong> — <a className="alink" href="https://github.com/platonvin/lum">Repository</a> (C++23)
           <ul>
             <li>Developed a high-performance voxel renderer using Vulkan, delivering fully ray-traced real-time dynamic global illumination (GI)</li>
-            <li>Engineered a SIMD-optimized, multithreaded CPU raytracer for voxel scenes, designed for seamless integration into graphics engines, enhancing both visual fidelity and performance <a className="alink" href="https://github.com/platonvin/rave">Repository</a> (C99)</li>
+            <li>Engineered a SIMD-optimized, multithreaded CPU raytracer for voxel scenes, designed for seamless integration into graphics engines <a className="alink" href="https://github.com/platonvin/rave">Repository</a> (C99)</li>
             <li>Implemented a subpass-based deferred rendering system, optimized for Tile-Based GPUs with advanced compression techniques, achieving significant performance gains in complex scenes in comparison with common methods</li>
             <li>Designed a real-time GI system utilizing a custom ray-tracing algorithm and acceleration structure, providing dynamic low-frequency light simulation</li>
             <li>Integrated full-res ray-traced reflections for real-time rendering of glossy surfaces</li>
@@ -82,6 +82,13 @@ const CV: React.FC = () => {
             <li>Created GLTF loader for easy integration with modern 3D workflows</li>
           </ul>
         </li>
+        <li>
+          <strong>Might and Chess</strong> — <a className="alink" href="https://github.com/platonvin/pupchess">Repository</a> (Unity Game Engine)
+          <ul>
+              <li>Designed demo for mix of powerup-card-based game and classic chess</li>
+              <li>Implemented scalabable chess engine</li>
+          </ul>
+          </li>
         <li>
           <strong>Assembler</strong> — <a className="alink" href="https://github.com/platonvin/Assembler">Repository</a> (C99)
           <ul>

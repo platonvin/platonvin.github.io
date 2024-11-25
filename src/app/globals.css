@@ -84,8 +84,12 @@ body {
   }
 }
 
+/* body{
+} */
 html, body {
-  height: 100%; /* body and html elements [should] take the full viewport */
+  height: 200%; 
+  /* body and html elements [should] take the full viewport */
+  /* height: 200%;  */
   margin: 0;
   padding: 0;
   max-width: 100%;
