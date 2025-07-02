@@ -47,7 +47,11 @@ jobs:
         run: |
           mkdir deploy
           cp index.html deploy/
+          cp styles.css deploy/
           cp -r pkg deploy/
+          cp -r articles deploy/
+          cp -r media deploy/
+          cp -r projects deploy/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
