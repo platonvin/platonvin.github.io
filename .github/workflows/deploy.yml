@@ -1,5 +1,8 @@
 name: Build & Deploy to GitHub Pages
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -16,7 +19,7 @@ jobs:
       - name: Update apt cache
         run: sudo apt-get update
 
-      - name: Install glslc
+      - name: Install dep packages
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
           packages: glslc binaryen
