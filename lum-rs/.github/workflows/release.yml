@@ -1,0 +1,194 @@
+name: Build & Release
+
+on:
+  release:
+    types: [published]
+  # do we need it?
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_and_release_linux:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    # run when trigger is either a release event or manual dispatch
+    if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Maybe useful update
+        run: sudo apt update
+
+      - name: get APT packages
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          # gcc for Windows cross-compile, glslc for shaders
+          packages: glslc
+          execute_install_scripts: true
+
+      - name: Setup Rust
+        run: rustup component add rust-src
+      - name: Add Rust wasm target
+        run: |
+          rustup target add wasm32-unknown-unknown
+
+      - name: Build Linux Vulkan bin
+        run: |
+          cargo +nightly biv
+
+      - name: Build Linux WGPU bin
+        run: |
+          cargo +nightly biw
+
+      - name: Determine upload URL
+        id: get_upload_url
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Fetching upload URL for the latest release..."
+            UPLOAD_URL=$(
+              gh release view --repo "${{ github.repository }}" \
+                              --json uploadUrl \
+                              --jq .uploadUrl
+            )
+            if [[ -z "$UPLOAD_URL" || "$UPLOAD_URL" == "null" ]]; then
+              echo "Error: Could not find the latest release or its upload URL."
+              exit 1
+            fi
+            echo "Found upload URL: $UPLOAD_URL"
+            echo "url=$UPLOAD_URL" >> $GITHUB_OUTPUT
+          else
+            echo "Unsupported event: ${{ github.event_name }}"
+            exit 1
+          fi
+
+      - name: Upload Linux Vulkan binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.url }}
+          asset_path: target/distribution/demo_vk
+          asset_name: demo_vk-linux
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux WGPU binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.url }}
+          asset_path: target/distribution/demo_wgpu
+          asset_name: demo_wgpu-linux
+          asset_content_type: application/octet-stream
+
+  build_and_release_windows:
+    permissions: write-all
+    runs-on: windows-2025
+    # run when trigger is either a release event or manual dispatch
+    if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install glslc (Shaderc)
+        shell: pwsh
+        run: |
+          $badgeUrl = 'https://storage.googleapis.com/shaderc/badges/build_link_windows_vs2019_release.html'
+          Write-Host "Fetching badge page..."
+          $html = Invoke-WebRequest -Uri $badgeUrl
+
+          if ($html.Content -match 'url=([^"]+)') {
+            $zipUrl = $Matches[1]
+            Write-Host "Resolved ZIP URL: $zipUrl"
+          }
+          else {
+            Write-Error "Could not extract shaderc ZIP URL from badge HTML."
+            exit 1
+          }
+
+          $zipPath   = Join-Path $env:RUNNER_TEMP 'shaderc_install.zip'
+          $installDir = Join-Path $env:RUNNER_TEMP 'shaderc'
+
+          Write-Host "Downloading Shaderc ZIP..."
+          Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+
+          Write-Host "Extracting to $installDir..."
+          Expand-Archive -Path $zipPath -DestinationPath $installDir -Force
+
+          $binPath = Join-Path $installDir 'install\bin'
+          Write-Host "Adding to PATH: $binPath"
+          $env:PATH = "$binPath;$env:PATH"
+
+          Write-Host "glslc version check:"
+          glslc --version
+
+      - name: Setup Rust
+        run: rustup component add rust-src
+
+      - name: Build Windows Vulkan bin
+        run: |
+          $binPath = Join-Path $env:RUNNER_TEMP 'shaderc\install\bin'
+          $env:PATH = "$binPath;$env:PATH"
+          cargo +nightly biv
+        shell: pwsh
+
+      - name: Build Windows WGPU bin
+        run: |
+          $binPath = Join-Path $env:RUNNER_TEMP 'shaderc\install\bin'
+          $env:PATH = "$binPath;$env:PATH"
+          cargo +nightly biw
+        shell: pwsh
+
+      - name: Determine upload URL
+        id: get_upload_url
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Fetching upload URL for the latest release..."
+            UPLOAD_URL=$(
+              gh release view --repo "${{ github.repository }}" \
+                              --json uploadUrl \
+                              --jq .uploadUrl
+            )
+            if [[ -z "$UPLOAD_URL" || "$UPLOAD_URL" == "null" ]]; then
+              echo "Error: Could not find the latest release or its upload URL."
+              exit 1
+            fi
+            echo "Found upload URL: $UPLOAD_URL"
+            echo "url=$UPLOAD_URL" >> $GITHUB_OUTPUT
+          else
+            echo "Unsupported event: ${{ github.event_name }}"
+            exit 1
+          fi
+
+      - name: Upload Windows Vulkan binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.url }}
+          asset_path: target/distribution/demo_vk.exe
+          asset_name: demo_vk-windows.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
+
+      - name: Upload Windows WGPU binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.url }}
+          asset_path: target/distribution/demo_wgpu.exe
+          asset_name: demo_wgpu-windows.exe
+          asset_content_type: application/vnd.microsoft.portable-executable

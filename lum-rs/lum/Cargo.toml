@@ -1,0 +1,66 @@
+[package]
+name = "lum"
+version = { workspace = true }
+edition = { workspace = true }
+readme = { workspace = true }
+
+[lib]
+name = "lum"
+path = "src/lib.rs"
+
+[features]
+default = []
+vk_backend = ["lumal", "shaders/vk_backend"]
+wgpu_backend = ["wgpu", "futures", "shaders/wgpu_backend"]
+# these do nothing if wgpu_backend is not enabled
+wgpu_gl = []
+wgpu_vk = []
+wgpu_dx12 = []
+wgpu_web = []
+# controls wether Lum uses Lumal feature for validation layer names
+# TODO: same for wgpu with some sort of conditional?
+debug_validation_names = ["lumal/debug_validation_names"]
+
+[profile.dev]
+# enable debug names for validation_layers use in Lum
+# this gives unique readable labels to Vulkan objects for validation layers reports
+features = ["debug_validation_names"]
+
+
+[dependencies]
+# lumal is lum's abstraction layer over vulkan
+lumal = { path = "../lumal", optional = true }
+# crate with embedded into binary shader sources (SPIR-V / WGSL)
+shaders = { path = "../shaders" }
+# just containers - arenas, multidimensional arrays, etc.
+containers = { path = "../containers" }
+# bytemuck but not bytemuck
+as_u8_slice_derive = { path = "../as_u8_slice_derive" }
+# Vek casts
+qvek = { version = "^0.1.0" }
+# how tf there is no flag to ignore this?
+# qvek = { path = "../../qvek/qvek" }
+winit = "0.30.11"
+wgpu = { version = "25.0.2", optional = true }
+futures = { version = "0.3.31", optional = true }
+
+[dev-dependencies]
+criterion = "0.6.0"
+zarray = "1.3.0"
+rayon = "1"
+
+[[bench]]
+name = "arrays"
+harness = false
+
+[[bench]]
+name = "threads"
+harness = false
+
+[[bench]]
+name = "radiance"
+harness = false
+
+[[bench]]
+name = "hmap_vs_iter"
+harness = false

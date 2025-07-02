@@ -1,0 +1,77 @@
+cargo-features = ["profile-rustflags"]
+
+[workspace]
+resolver = "3"
+members = [
+    "lum",
+    "lumal",
+    "shaders",
+    "example/demo",
+    "example/assets",
+    "as_u8_slice_derive",
+    "containers",
+    "voxc",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+readme = "README.md"
+publish = false
+
+[profile.dev]
+opt-level = 0
+codegen-units = 12
+lto = false
+panic = "unwind"
+overflow-checks = true
+incremental = true
+debug = true
+
+[profile.dev.package.lum]
+opt-level = 0
+debug = true
+inline = "never"
+[profile.dev.package.lumal]
+opt-level = 0
+debug = true
+inline = "never"
+[profile.dev.package.wgpu]
+opt-level = 3
+debug = true
+
+# applies to all packages not listed above
+[profile.dev.package."*"]
+opt-level = 3
+debug = false
+
+[profile.release]
+opt-level = 3          # "s" is 5 times slower lol. TODO: investigate
+panic = "unwind"
+codegen-units = 16
+lto = false
+overflow-checks = true # TODO: unchecked math (UB on overflow)
+
+# TODO: multiverse cfg?
+# highest possible optimizations
+[profile.distribution]
+inherits = "release"
+opt-level = "s"
+codegen-units = 1
+lto = "fat"
+debug = false
+panic = "abort"
+overflow-checks = false
+strip = true
+debug-assertions = false
+
+[profile.native]
+inherits = "distribution"
+
+# dont forget to build std with the project
+# "z" is very slow, but to get the smallest binary...
+[profile.natsize]
+inherits = "distribution"
+opt-level = "z"
+# [profile.natsize.package."*"]
+# opt-level = "z"

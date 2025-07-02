@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "nolanderc.glsl-analyzer",
+        "rust-lang.rust-analyzer",
+    ]
+}

@@ -1,0 +1,14 @@
+[package]
+name = "containers"
+version = { workspace = true }
+edition = { workspace = true }
+readme = { workspace = true }
+
+[lib]
+name = "containers"
+path = "src/lib.rs"
+
+[dependencies]
+qvek = { version = "^0.1.0" }
+# how tf there is no flag to ignore this?
+# qvek = { path = "../../qvek/qvek" }

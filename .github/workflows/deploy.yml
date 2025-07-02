@@ -1,0 +1,53 @@
+name: Build & Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm bindgen
+        run: cargo install -f wasm-bindgen-cli
+
+      - name: Install binaryen
+        run: sudo apt-get update && sudo apt-get install -y binaryen
+
+      - name: Build
+        run: |
+          cd lum-rs
+          cargo +nightly build \
+            -Z build-std=std,panic_abort \
+            -p demo --lib \
+            --target wasm32-unknown-unknown \
+            --features wgpu_backend \
+            --release
+          cd ..
+          wasm-bindgen ./lum-rs/target/wasm32-unknown-unknown/release/demo_lib.wasm \
+            --out-dir pkg --target web
+          wasm-opt pkg/demo_lib_bg.wasm -O4 -o pkg/demo_lib_bg.wasm
+
+      - name: Prepare GitHub Page
+        run: |
+          mkdir deploy
+          cp index.html deploy/
+          cp -r pkg deploy/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy

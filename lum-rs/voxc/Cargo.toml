@@ -1,0 +1,8 @@
+[package]
+name = "voxc"
+version = { workspace = true }
+edition = { workspace = true }
+readme = { workspace = true }
+
+[dependencies]
+vek = "0.17"
