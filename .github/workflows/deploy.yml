@@ -13,31 +13,31 @@ jobs:
         with:
           submodules: "recursive"
 
-      - name: Setup Rust
+      - name: Update apt cache
+        run: sudo apt-get update
+
+      - name: Install glslc
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: glslc binaryen
+          execute_install_scripts: true
+
+      - name: Set up Rust (nightly)
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-          components: rustfmt, clippy, rust-src
+          components: rust-src
           targets: wasm32-unknown-unknown
 
-      - name: Install wasm bindgen
+      - name: Install wasm-bindgen-cli
         run: cargo install -f wasm-bindgen-cli
-
-      - name: Install binaryen
-        run: sudo apt-get update && sudo apt-get install -y binaryen
 
       - name: Build
         run: |
           cd lum-rs
-          cargo +nightly build \
-            -Z build-std=std,panic_abort \
-            -p demo --lib \
-            --target wasm32-unknown-unknown \
-            --features wgpu_backend \
-            --release
+          cargo +nightly build -Z build-std=std,panic_abort -p demo --lib --target wasm32-unknown-unknown --features wgpu_backend --profile distribution
           cd ..
-          wasm-bindgen ./lum-rs/target/wasm32-unknown-unknown/release/demo_lib.wasm \
-            --out-dir pkg --target web
+          wasm-bindgen ./lum-rs/target/wasm32-unknown-unknown/distribution/demo_lib.wasm --out-dir pkg --target web
           wasm-opt pkg/demo_lib_bg.wasm -O4 -o pkg/demo_lib_bg.wasm
 
       - name: Prepare GitHub Page
