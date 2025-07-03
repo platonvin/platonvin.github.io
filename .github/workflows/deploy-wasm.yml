@@ -1,0 +1,59 @@
+name: Build & Deploy WASM
+
+permissions:
+  contents: write
+
+on:
+  push:
+    paths:
+      - "lum-rs/**" # does it even work?
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install dep packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y glslc binaryen
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          components: rust-src
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-bindgen-cli
+        run: cargo install -f wasm-bindgen-cli
+
+      - name: Build WASM
+        run: |
+          cd lum-rs
+          cargo +nightly build -Z build-std=std,panic_abort \
+            -p demo --lib --target wasm32-unknown-unknown \
+            --features wgpu_backend --profile distribution
+          cd ..
+          wasm-bindgen \
+            ./lum-rs/target/wasm32-unknown-unknown/distribution/demo_lib.wasm \
+            --out-dir pkg --target web
+          wasm-opt pkg/demo_lib_bg.wasm -O4 -o pkg/demo_lib_bg.wasm
+
+      - name: Gather files
+        run: |
+          rm -rf deploy
+          mkdir deploy
+          cp -r pkg deploy/
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./deploy
+          keep_files: true

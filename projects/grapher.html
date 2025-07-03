@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>heightmap grapher</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        #grapher-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .controls {
+            width: 350px;
+            overflow-y: auto;
+            padding: 1rem;
+            box-shadow: var(--box-shadow-large);
+            background: var(--body-background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #canvas-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            background: transparent;
+        }
+
+        #glCanvas {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #glCanvas:active {
+            cursor: grabbing;
+        }
+
+        #canvas-wrapper .info {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--body-background-color);
+            color: var(--black);
+            padding: 0.3rem 0.8rem;
+            font-size: 1.2rem;
+            border: var(--border-small);
+            pointer-events: none;
+        }
+
+        /* .controls h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .controls p {
+            text-align: center;
+            font-size: 1.4rem;
+            color: var(--gray);
+            margin: 0 0 1rem;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        } */
+
+        select,
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            font-size: 1.6rem;
+            padding: 0.8rem 1rem;
+            background: var(--body-background-color);
+            border: var(--border-default);
+            font-family: var(--text-font);
+            margin-bottom: 1rem;
+        }
+
+        .function-input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .function-input-group input {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+
+        .function-input-group .presets-btn {
+            margin-left: 0.5rem;
+            padding: 0.5rem 0.8rem;
+            font-size: 1.2rem;
+            background: #fff;
+            color: #000;
+            border: var(--border-default);
+            cursor: pointer;
+            box-shadow: var(--border-default);
+        }
+
+        .function-input-group .presets-btn:hover {
+            background: var(--gray-light);
+        }
+
+        .slider-group {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: var(--border-small);
+        }
+
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type=range] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            height: 1rem;
+            margin: 0.5rem 0;
+            background: #ddd;
+            border-radius: 5px;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            background: var(--gray-light);
+            border: none;
+            height: 1rem;
+            border-radius: 5px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            margin-top: -0.5rem;
+            height: 2rem;
+            width: 2rem;
+            background: var(--black);
+            border: var(--border-small);
+            border-radius: 50%;
+            cursor: grab;
+        }
+
+        input[type=range]::-webkit-slider-thumb:active {
+            cursor: grabbing;
+        }
+
+        input[type=range]::-moz-range-track {
+            background: #ddd;
+            border: none;
+            height: 1rem;
+            border-radius: 5px;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            height: 2rem;
+            width: 2rem;
+            background: var(--black);
+            border: var(--border-small);
+            border-radius: 50%;
+            cursor: grab;
+        }
+
+        input[type=range]::-moz-range-thumb:active {
+            cursor: grabbing;
+        }
+
+        .slider-group input[type="number"] {
+            width: 80px;
+            margin-bottom: 0;
+            text-align: center;
+        }
+
+        .range-with-number {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .range-with-number input[type="number"] {
+            width: 4.5rem;
+        }
+
+        #errorMessage {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(114, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.4rem;
+            z-index: 100;
+            display: none;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="grapher-container">
+        <div id="errorMessage"></div>
+        <div class="controls">
+            <div class="header-content-vertical">
+                <h2>heightmap grapher</h2>
+                <p>still not GPU programming to be honest</p>
+            </div>
+            <div>
+                <label for="function">height: float func(x,y,t)</label>
+                <div class="function-input-group">
+                    <input type="text" id="function" value="sin(sqrt(x*x + y*y) - t)">
+                    <button id="toggle-presets" class="presets-btn" title="some presets - click to open">☰</button>
+                </div>
+                <select id="presets" style="display:none;">
+                    <option value="sin(sqrt(x*x + y*y) - t)">wave</option>
+                    <option value="exp(-(x*x+y*y)/10.0)*cos(3.0*sqrt(x*x+y*y)-t)">ripple</option>
+                    <option value="sin(x+t)*cos(y-t)">trigo waves</option>
+                    <option value="(x*x - y*y)/10.0">saddle</option>
+                    <option value="sin(5.0*x)*cos(5.0*y)/5.0">yoga mat</option>
+                </select>
+            </div>
+            <div>
+                <label for="colorFunc">color: vec4 func(normal, x, y, z, t)</label>
+                <input type="text" id="colorFunc" value="vec4(abs(normal), 1.0)">
+            </div>
+            <div class="slider-group">
+                <label for="xRangeInput">X domain:
+                    <input type="number" id="xRangeInput" class="numeric-input" min="1" max="50" value="10" step="0.5">
+                </label>
+                <input type="range" id="xRangeSlider" class="slider-only-input" min="1" max="50" value="10" step="0.5">
+            </div>
+            <div class="slider-group">
+                <label for="yRangeInput">Y domain:
+                    <input type="number" id="yRangeInput" class="numeric-input" min="1" max="50" value="10" step="0.5">
+                </label>
+                <input type="range" id="yRangeSlider" class="slider-only-input" min="1" max="50" value="10" step="0.5">
+            </div>
+            <div class="slider-group">
+                <label for="resolutionInput">resolution:
+                    <input type="number" id="resolutionInput" class="numeric-input" min="10" max="300" value="100" step="2">
+                </label>
+                <input type="range" id="resolution" class="slider-only-input" min="10" max="300" value="100" step="2">
+            </div>
+            <div class="slider-group">
+                <label for="speedInput">speed:
+                    <input type="number" id="speedInput" class="numeric-input" min="0" max="5" value="1.0" step="0.1">
+                </label>
+                <input type="range" id="speed" class="slider-only-input" min="0" max="5" value="1.0" step="0.1">
+            </div>
+            <button id="pauseButton">
+                <h4>pause animation</h4>
+            </button>
+        </div>
+
+        <div id="canvas-wrapper">
+            <canvas id="glCanvas"></canvas>
+            <div class="info">drag to rotate, scroll to zoom</div>
+        </div>
+    </div>
+
+    <script>
+        const vsSourceTemplate = `#version 300 es
+            precision mediump float;
+
+            uniform mat4 uProjectionMatrix;
+            uniform float uTime; 
+            uniform vec2 uDomainX;
+            uniform vec2 uDomainY;
+            uniform int uResolution;
+
+            out vec3 vNormal;
+            out vec3 vXYH;
+
+            float userFunction(float x, float y, float t) {
+                return {{FUNCTION_STRING}};
+            }
+
+            void main() {
+                int vertices_per_strip = uResolution + 2;
+
+                int strip_index = gl_VertexID / vertices_per_strip;
+                int vertex_in_strip_index = gl_VertexID % vertices_per_strip;
+
+                int x_raw = (vertex_in_strip_index) / 2;
+                int y_raw = strip_index + vertex_in_strip_index % 2;
+
+                float x_norm = float(x_raw) / (float(uResolution-2) / 2.0);
+                float y_norm = float(y_raw) / float(uResolution);
+
+                float x = uDomainX.x + x_norm * (uDomainX.y - uDomainX.x);
+                float y = uDomainY.x + y_norm * (uDomainY.y - uDomainY.x);
+                float t = uTime;
+
+                float z = userFunction(x, y, t);
+
+                if (vertex_in_strip_index >= uResolution) {
+                    // set to NaN to discard vertex - thats how we draw strips with a single drawcall. 
+                    // We could also use instanced rendering but i dont wanna read the docs
+                    z = 0.0/0.0; 
+                }
+
+
+                float epsilon = 0.001;
+                float z_dx = userFunction(x + epsilon, y, t);
+                float z_dy = userFunction(x, y + epsilon, t);
+                
+                vec3 tangent = normalize(vec3(epsilon, 0.0, z_dx - z));
+                vec3 bitangent = normalize(vec3(0.0, epsilon, z_dy - z));
+                
+                vNormal = cross(bitangent, tangent);
+
+                vXYH = vec3(x, y, z);
+
+                gl_Position = uProjectionMatrix * vec4(x, y, z, 1.0);
+            }
+        `;
+
+        const fsSourceTemplate = `#version 300 es
+            precision mediump float;
+            
+            in vec3 vNormal;
+            in vec3 vXYH;
+
+            uniform float uTime;
+            
+            out vec4 fragColor;
+            
+            vec4 userColorFunction(vec3 normal, float x, float y, float z, float t) {
+                return {{COLOR_FUNCTION_STRING}};
+            }
+
+            void main() {
+                fragColor = userColorFunction(vNormal, vXYH.x, vXYH.y, vXYH.z, uTime);
+            }
+        `;
+
+        let gl;
+        let shaderProgram;
+        let totalVertexCount = 0;
+
+        let rotation = { x: -0.7, y: 0.7 };
+        let zoom = 0.4;
+        let mouseDown = false, lastMouseX = 0, lastMouseY = 0;
+
+        let animationTime = 0;
+        let animationSpeed = 1.0;
+        let isPaused = false;
+        let gridResolution = 100;
+        let domainXRange = 10.0;
+        let domainYRange = 10.0;
+
+        let lastSuccessfulShaderProgram = null;
+        let errorMessageElement;
+
+        window.onload = () => {
+            initGL();
+            errorMessageElement = document.getElementById('errorMessage');
+            setupUIListeners();
+            calculateTotalVertexCount();
+            updateShaderAndPlot();
+            animate();
+        };
+
+        function initGL() {
+            const canvas = document.getElementById('glCanvas');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            gl = canvas.getContext('webgl2');
+            if (!gl) {
+                displayMessage("Your browser does not support WebGL2. Please find a different one");
+                return;
+            }
+
+            gl.enable(gl.DEPTH_TEST); // or we can render in proper order... But i dont care enough, sorry
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+
+            window.addEventListener('resize', () => {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+                render();
+            });
+        }
+
+        function compileShader(type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+            return shader;
+        }
+
+        function setupShaderProgram(funcStr, colorFuncStr) {
+            const finalVsSource = vsSourceTemplate.replace('{{FUNCTION_STRING}}', funcStr);
+            const finalFsSource = fsSourceTemplate.replace('{{COLOR_FUNCTION_STRING}}', colorFuncStr);
+
+            const vs = compileShader(gl.VERTEX_SHADER, finalVsSource);
+            const fs = compileShader(gl.FRAGMENT_SHADER, finalFsSource);
+
+            if (!vs || !fs) {
+                return false;
+            }
+
+            const newProgram = gl.createProgram();
+            gl.attachShader(newProgram, vs);
+            gl.attachShader(newProgram, fs);
+            gl.linkProgram(newProgram);
+
+            if (!gl.getProgramParameter(newProgram, gl.LINK_STATUS)) {
+                console.error('Shader program linking error:', gl.getProgramInfoLog(newProgram));
+                gl.deleteProgram(newProgram);
+                return false;
+            }
+
+            if (shaderProgram) {
+                lastSuccessfulShaderProgram = shaderProgram;
+            }
+            shaderProgram = newProgram;
+
+            shaderProgram.uProjectionMatrix = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
+            shaderProgram.uTime = gl.getUniformLocation(shaderProgram, 'uTime');
+            shaderProgram.uDomainX = gl.getUniformLocation(shaderProgram, 'uDomainX');
+            shaderProgram.uDomainY = gl.getUniformLocation(shaderProgram, 'uDomainY');
+            shaderProgram.uResolution = gl.getUniformLocation(shaderProgram, 'uResolution');
+
+            gl.deleteShader(vs);
+            gl.deleteShader(fs);
+
+            return true;
+        }
+
+        function updateShaderAndPlot() {
+            const funcStr = document.getElementById('function').value;
+            const colorFuncStr = document.getElementById('colorFunc').value;
+
+            if (setupShaderProgram(funcStr, colorFuncStr)) {
+                hideErrorMessage();
+            } else {
+                displayMessage("shader compilation failed. Check your functions syntax");
+            }
+        }
+
+        function calculateTotalVertexCount() {
+            totalVertexCount = gridResolution * (gridResolution + 2);
+        }
+
+        function render() {
+            gl.clearColor(0.0, 0.0, 0.0, 0.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            if (!shaderProgram) {
+                return;
+            }
+
+            gl.useProgram(shaderProgram);
+
+            const cameraMatrix = mat4Perspective(45, gl.canvas.width / gl.canvas.height, 0.1, 1000.0);
+            const modelViewMatrix = mat4Identity();
+            mat4Translate(modelViewMatrix, 0, 0, -30 / zoom);
+            mat4RotateX(modelViewMatrix, rotation.x);
+            mat4RotateY(modelViewMatrix, rotation.y);
+            var projectionMatrix = mat4Identity();
+            mat4Multiply(projectionMatrix, cameraMatrix, modelViewMatrix);
+
+            gl.uniformMatrix4fv(shaderProgram.uProjectionMatrix, false, projectionMatrix);
+
+            gl.uniform1f(shaderProgram.uTime, animationTime);
+            gl.uniform1i(shaderProgram.uResolution, gridResolution);
+
+            gl.uniform2f(shaderProgram.uDomainX, -domainXRange, domainXRange);
+            gl.uniform2f(shaderProgram.uDomainY, -domainYRange, domainYRange);
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, totalVertexCount);
+        }
+
+        function animate() {
+            if (!isPaused) {
+                animationTime += animationSpeed / 60.0;
+            }
+            render();
+            requestAnimationFrame(animate);
+        }
+
+
+        // function setupUIListeners() {
+        //     const canvas = document.getElementById('glCanvas');
+        //     canvas.addEventListener('mousedown', e => { mouseDown = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
+        //     canvas.addEventListener('mouseup', () => mouseDown = false);
+        //     canvas.addEventListener('mousemove', e => {
+        //         if (!mouseDown) return;
+        //         rotation.y += (e.clientX - lastMouseX) * 0.01;
+        //         rotation.x += (e.clientY - lastMouseY) * 0.01;
+        //         lastMouseX = e.clientX; lastMouseY = e.clientY;
+        //     });
+        //     canvas.addEventListener('wheel', e => {
+        //         e.preventDefault();
+        //         zoom *= e.deltaY > 0 ? 0.95 : 1.05;
+        //         zoom = Math.max(0.1, Math.min(10, zoom));
+        //     });
+
+        //     document.getElementById('function').addEventListener('input', onFunctionChange);
+        //     document.getElementById('colorFunc').addEventListener('input', onFunctionChange);
+
+        //     document.getElementById('pauseButton').addEventListener('click', () => {
+        //         isPaused = !isPaused;
+        //         const buttonH4 = document.querySelector('#pauseButton h4');
+        //         if (buttonH4) {
+        //             buttonH4.textContent = isPaused ? 'resume animation' : 'pause animation';
+        //         }
+        //     });
+        //     document.getElementById('toggle-presets').addEventListener('click', () => {
+        //         const presetsSelect = document.getElementById('presets');
+        //         presetsSelect.style.display = presetsSelect.style.display === 'none' ? 'block' : 'none';
+        //     });
+
+        //     document.getElementById('presets').addEventListener('change', e => {
+        //         document.getElementById('function').value = e.target.value;
+        //         onFunctionChange();
+        //     });
+
+        //     document.getElementById('resolution').addEventListener('input', e => {
+        //         gridResolution = parseInt(e.target.value, 10);
+        //         document.getElementById('resolutionValue').textContent = gridResolution;
+        //         calculateTotalVertexCount();
+        //     });
+
+        //     document.getElementById('speed').addEventListener('input', e => {
+        //         animationSpeed = parseFloat(e.target.value);
+        //         document.getElementById('speedValue').textContent = animationSpeed.toFixed(2);
+        //     });
+
+        //     document.getElementById('xRangeSlider').addEventListener('input', e => {
+        //         domainXRange = parseFloat(e.target.value);
+        //         document.getElementById('xRangeValue').textContent = domainXRange.toFixed(1);
+        //         onFunctionChange();
+        //     });
+
+        //     document.getElementById('yRangeSlider').addEventListener('input', e => {
+        //         domainYRange = parseFloat(e.target.value);
+        //         document.getElementById('yRangeValue').textContent = domainYRange.toFixed(1);
+        //         onFunctionChange();
+        //     });
+        // }
+
+        function setupUIListeners() {
+            const canvas = document.getElementById('glCanvas');
+            canvas.addEventListener('mousedown', e => { mouseDown = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
+            canvas.addEventListener('mouseup', () => mouseDown = false);
+            canvas.addEventListener('mousemove', e => {
+                if (!mouseDown) return;
+                rotation.y += (e.clientX - lastMouseX) * 0.01;
+                rotation.x += (e.clientY - lastMouseY) * 0.01;
+                lastMouseX = e.clientX; lastMouseY = e.clientY;
+            });
+            canvas.addEventListener('wheel', e => {
+                e.preventDefault();
+                zoom *= e.deltaY > 0 ? 0.95 : 1.05;
+                zoom = Math.max(0.1, Math.min(10, zoom));
+            });
+
+            document.getElementById('function').addEventListener('input', updateShaderAndPlot);
+            document.getElementById('colorFunc').addEventListener('input', updateShaderAndPlot);
+
+            document.getElementById('pauseButton').addEventListener('click', () => {
+                isPaused = !isPaused;
+                document.getElementById('pauseButton').textContent = isPaused ? 'Resume Animation' : 'Pause Animation';
+            });
+
+            document.getElementById('toggle-presets').addEventListener('click', () => {
+                const presetsSelect = document.getElementById('presets');
+                presetsSelect.style.display = presetsSelect.style.display === 'none' ? 'block' : 'none';
+            });
+
+            document.getElementById('presets').addEventListener('change', e => {
+                document.getElementById('function').value = e.target.value;
+                updateShaderAndPlot();
+            });
+
+            const resolutionSlider = document.getElementById('resolution');
+            const resolutionInput = document.getElementById('resolutionInput');
+
+            resolutionSlider.addEventListener('input', () => {
+                gridResolution = parseInt(resolutionSlider.value, 10);
+                resolutionInput.value = gridResolution;
+                calculateTotalVertexCount();
+            });
+            resolutionInput.addEventListener('change', () => {
+                let val = parseInt(resolutionInput.value, 10);
+                val = Math.max(parseInt(resolutionInput.min), Math.min(parseInt(resolutionInput.max), val));
+                resolutionInput.value = val;
+                resolutionSlider.value = val;
+                gridResolution = val;
+                calculateTotalVertexCount();
+            });
+
+
+            const speedSlider = document.getElementById('speed');
+            const speedInput = document.getElementById('speedInput');
+            speedSlider.addEventListener('input', () => {
+                animationSpeed = parseFloat(speedSlider.value);
+                speedInput.value = animationSpeed.toFixed(1);
+            });
+            speedInput.addEventListener('change', () => {
+                let val = parseFloat(speedInput.value);
+                val = Math.max(parseFloat(speedInput.min), Math.min(parseFloat(speedInput.max), val));
+                speedInput.value = val.toFixed(1);
+                speedSlider.value = val;
+                animationSpeed = val;
+            });
+
+            const xRangeSlider = document.getElementById('xRangeSlider');
+            const xRangeInput = document.getElementById('xRangeInput');
+            xRangeSlider.addEventListener('input', () => {
+                domainXRange = parseFloat(xRangeSlider.value);
+                xRangeInput.value = domainXRange.toFixed(1);
+                updateShaderAndPlot();
+            });
+            xRangeInput.addEventListener('change', () => {
+                let val = parseFloat(xRangeInput.value);
+                val = Math.max(parseFloat(xRangeInput.min), Math.min(parseFloat(xRangeInput.max), val));
+                xRangeInput.value = val.toFixed(1);
+                xRangeSlider.value = val;
+                domainXRange = val;
+                updateShaderAndPlot();
+            });
+
+            const yRangeSlider = document.getElementById('yRangeSlider');
+            const yRangeInput = document.getElementById('yRangeInput');
+            yRangeSlider.addEventListener('input', () => {
+                domainYRange = parseFloat(yRangeSlider.value);
+                yRangeInput.value = domainYRange.toFixed(1);
+                updateShaderAndPlot();
+            });
+            yRangeInput.addEventListener('change', () => {
+                let val = parseFloat(yRangeInput.value);
+                val = Math.max(parseFloat(yRangeInput.min), Math.min(parseFloat(yRangeInput.max), val));
+                yRangeInput.value = val.toFixed(1);
+                yRangeSlider.value = val;
+                domainYRange = val;
+                updateShaderAndPlot();
+            });
+        }
+
+        function mat4Identity() { return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]); }
+        function mat4Perspective(fov, aspect, near, far) {
+            const f = 1.0 / Math.tan(fov * Math.PI / 360);
+            const rangeInv = 1 / (near - far);
+            return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (near + far) * rangeInv, -1, 0, 0, near * far * rangeInv * 2, 0]);
+        }
+        function mat4Translate(m, x, y, z) {
+            m[12] += m[0] * x + m[4] * y + m[8] * z; m[13] += m[1] * x + m[5] * y + m[9] * z; m[14] += m[2] * x + m[6] * y + m[10] * z; m[15] += m[3] * x + m[7] * y + m[11] * z;
+        }
+        function mat4RotateX(m, angle) {
+            const c = Math.cos(angle), s = Math.sin(angle), mv1 = m[1], mv5 = m[5], mv9 = m[9];
+            m[1] = m[1] * c - m[2] * s; m[5] = m[5] * c - m[6] * s; m[9] = m[9] * c - m[10] * s;
+            m[2] = m[2] * c + mv1 * s; m[6] = m[6] * c + mv5 * s; m[10] = m[10] * c + mv9 * s;
+        }
+        function mat4RotateY(m, angle) {
+            const c = Math.cos(angle), s = Math.sin(angle), mv0 = m[0], mv4 = m[4], mv8 = m[8];
+            m[0] = c * m[0] + s * m[2]; m[4] = c * m[4] + s * m[6]; m[8] = c * m[8] + s * m[10];
+            m[2] = c * m[2] - s * mv0; m[6] = c * m[6] - s * mv4; m[10] = c * m[10] - s * mv8;
+        }
+
+        function mat4Multiply(out, a, b) {
+            const a00 = a[0],
+                a01 = a[1],
+                a02 = a[2],
+                a03 = a[3];
+            const a10 = a[4],
+                a11 = a[5],
+                a12 = a[6],
+                a13 = a[7];
+            const a20 = a[8],
+                a21 = a[9],
+                a22 = a[10],
+                a23 = a[11];
+            const a30 = a[12],
+                a31 = a[13],
+                a32 = a[14],
+                a33 = a[15];
+
+            let b0 = b[0],
+                b1 = b[1],
+                b2 = b[2],
+                b3 = b[3];
+            out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+            out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+            out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+            out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+            b0 = b[4];
+            b1 = b[5];
+            b2 = b[6];
+            b3 = b[7];
+            out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+            out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+            out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+            out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+            b0 = b[8];
+            b1 = b[9];
+            b2 = b[10];
+            b3 = b[11];
+            out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+            out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+            out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+            out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+            b0 = b[12];
+            b1 = b[13];
+            b2 = b[14];
+            b3 = b[15];
+            out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+            out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+            out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+            out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+            return out;
+        }
+
+        function displayMessage(message) {
+            if (errorMessageElement) {
+                errorMessageElement.textContent = message;
+                errorMessageElement.style.display = 'block';
+            }
+        }
+
+        function hideErrorMessage() {
+            if (errorMessageElement) {
+                errorMessageElement.style.display = 'none';
+                errorMessageElement.textContent = '';
+            }
+        }
+    </script>
+</body>
+
+</html>

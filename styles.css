@@ -81,6 +81,12 @@ main>* {
   gap: 1em;
 }
 
+.header-content-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 header {
   display: grid;
   grid-template-columns: 1fr;
@@ -489,6 +495,7 @@ button header {
 
   --black: #151414;
   --gray: #4c4847;
+  --gray-light: #6e6e6e;
   --white: #dad8d7;
   --color-1: #726c6a;
   --color-2: #2a2827;
