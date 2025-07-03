@@ -204,6 +204,42 @@
             text-align: center;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
+
+        @media (max-width: 768px) {
+            #grapher-container {
+                flex-direction: column;
+            }
+
+            .controls {
+                width: 100%;
+                height: auto;
+                max-height: 50vh;
+                order: 2;
+                box-shadow: none;
+                border-top: var(--border-small);
+            }
+
+            #canvas-wrapper {
+                flex: 1;
+                height: 100%;
+                min-height: 50vh;
+                order: 1;
+            }
+
+            .controls-toggle {
+                display: block;
+                width: 100%;
+                padding: 1rem;
+                text-align: center;
+                background: var(--body-background-color);
+                border-bottom: var(--border-small);
+                cursor: pointer;
+            }
+
+            .controls.hidden {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -247,15 +283,15 @@
             </div>
             <div class="slider-group">
                 <label for="resolutionInput">resolution:
-                    <input type="number" id="resolutionInput" class="numeric-input" min="10" max="300" value="100" step="2">
+                    <input type="number" id="resolutionInput" class="numeric-input" min="10" max="2048" value="512" step="2">
                 </label>
-                <input type="range" id="resolution" class="slider-only-input" min="10" max="300" value="100" step="2">
+                <input type="range" id="resolution" class="slider-only-input" min="10" max="2048" value="512" step="2">
             </div>
             <div class="slider-group">
                 <label for="speedInput">speed:
-                    <input type="number" id="speedInput" class="numeric-input" min="0" max="5" value="1.0" step="0.1">
+                    <input type="number" id="speedInput" class="numeric-input" min="0" max="10" value="1.0" step="0.1">
                 </label>
-                <input type="range" id="speed" class="slider-only-input" min="0" max="5" value="1.0" step="0.1">
+                <input type="range" id="speed" class="slider-only-input" min="0" max="10" value="1.0" step="0.1">
             </div>
             <button id="pauseButton">
                 <h4>pause animation</h4>
@@ -267,6 +303,8 @@
             <div class="info">drag to rotate, scroll to zoom</div>
         </div>
     </div>
+
+    <div class="controls-toggle" style="display: none;">Toggle Controls</div>
 
     <script>
         const vsSourceTemplate = `#version 300 es
@@ -349,8 +387,9 @@
         let totalVertexCount = 0;
 
         let rotation = { x: -0.7, y: 0.7 };
-        let zoom = 0.4;
+        let zoom = 0.69;
         let mouseDown = false, lastMouseX = 0, lastMouseY = 0;
+        let touchDown = false, lastTouchX = 0, lastTouchY = 0;
 
         let animationTime = 0;
         let animationSpeed = 1.0;
@@ -498,67 +537,6 @@
             requestAnimationFrame(animate);
         }
 
-
-        // function setupUIListeners() {
-        //     const canvas = document.getElementById('glCanvas');
-        //     canvas.addEventListener('mousedown', e => { mouseDown = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
-        //     canvas.addEventListener('mouseup', () => mouseDown = false);
-        //     canvas.addEventListener('mousemove', e => {
-        //         if (!mouseDown) return;
-        //         rotation.y += (e.clientX - lastMouseX) * 0.01;
-        //         rotation.x += (e.clientY - lastMouseY) * 0.01;
-        //         lastMouseX = e.clientX; lastMouseY = e.clientY;
-        //     });
-        //     canvas.addEventListener('wheel', e => {
-        //         e.preventDefault();
-        //         zoom *= e.deltaY > 0 ? 0.95 : 1.05;
-        //         zoom = Math.max(0.1, Math.min(10, zoom));
-        //     });
-
-        //     document.getElementById('function').addEventListener('input', onFunctionChange);
-        //     document.getElementById('colorFunc').addEventListener('input', onFunctionChange);
-
-        //     document.getElementById('pauseButton').addEventListener('click', () => {
-        //         isPaused = !isPaused;
-        //         const buttonH4 = document.querySelector('#pauseButton h4');
-        //         if (buttonH4) {
-        //             buttonH4.textContent = isPaused ? 'resume animation' : 'pause animation';
-        //         }
-        //     });
-        //     document.getElementById('toggle-presets').addEventListener('click', () => {
-        //         const presetsSelect = document.getElementById('presets');
-        //         presetsSelect.style.display = presetsSelect.style.display === 'none' ? 'block' : 'none';
-        //     });
-
-        //     document.getElementById('presets').addEventListener('change', e => {
-        //         document.getElementById('function').value = e.target.value;
-        //         onFunctionChange();
-        //     });
-
-        //     document.getElementById('resolution').addEventListener('input', e => {
-        //         gridResolution = parseInt(e.target.value, 10);
-        //         document.getElementById('resolutionValue').textContent = gridResolution;
-        //         calculateTotalVertexCount();
-        //     });
-
-        //     document.getElementById('speed').addEventListener('input', e => {
-        //         animationSpeed = parseFloat(e.target.value);
-        //         document.getElementById('speedValue').textContent = animationSpeed.toFixed(2);
-        //     });
-
-        //     document.getElementById('xRangeSlider').addEventListener('input', e => {
-        //         domainXRange = parseFloat(e.target.value);
-        //         document.getElementById('xRangeValue').textContent = domainXRange.toFixed(1);
-        //         onFunctionChange();
-        //     });
-
-        //     document.getElementById('yRangeSlider').addEventListener('input', e => {
-        //         domainYRange = parseFloat(e.target.value);
-        //         document.getElementById('yRangeValue').textContent = domainYRange.toFixed(1);
-        //         onFunctionChange();
-        //     });
-        // }
-
         function setupUIListeners() {
             const canvas = document.getElementById('glCanvas');
             canvas.addEventListener('mousedown', e => { mouseDown = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
@@ -573,6 +551,31 @@
                 e.preventDefault();
                 zoom *= e.deltaY > 0 ? 0.95 : 1.05;
                 zoom = Math.max(0.1, Math.min(10, zoom));
+            });
+
+            canvas.addEventListener('touchstart', e => {
+                e.preventDefault();
+                if (e.touches.length === 1) {
+                    touchDown = true;
+                    lastTouchX = e.touches[0].clientX;
+                    lastTouchY = e.touches[0].clientY;
+                }
+            });
+            canvas.addEventListener('touchend', () => {
+                touchDown = false;
+            });
+            canvas.addEventListener('touchmove', e => {
+                e.preventDefault();
+                if (touchDown && e.touches.length === 1) {
+                    const currentTouchX = e.touches[0].clientX;
+                    const currentTouchY = e.touches[0].clientY;
+
+                    rotation.y += (currentTouchX - lastTouchX) * 0.01;
+                    rotation.x += (currentTouchY - lastTouchY) * 0.01;
+
+                    lastTouchX = currentTouchX;
+                    lastTouchY = currentTouchY;
+                }
             });
 
             document.getElementById('function').addEventListener('input', updateShaderAndPlot);
