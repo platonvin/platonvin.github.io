@@ -13,27 +13,36 @@
 <body>
     <header> <a href="../index.html" class="nav-link">← back to main</a>
         <div class="header-content">
-            <h1 class="big-headline">My Experience with <code>Rust</code></h1>
+            <h1 class="big-headline">my experience with <code>Rust</code></h1>
         </div>
     </header>
+
+    <main>
+        <footer>
+            <i><b>it might look like too much highlighting for you, but it really increases accessability for some people
+            </i></b>
+        </footer>
+    </main>
     <main>
         <article>
             <p><em>Information is subjective.</em></p>
             <section>
                 <h2>Why</h2>
-                <p> One of my friends was actively pitching it as new shiny thing i should try. I did not really want to learn new language for nothing, but decided to try <code>Rust</code> after a week of attempts on using <code>C++23</code> modules (I just wanted faster compile times without headers), which failed completely - bugs literally everywhere, ICEs, documentation so bad that reading source was more useful, and I realized how much time I spend on <code>CMake</code> (and earlier <code>Make</code> - I love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe <code>Rust</code> could solve that </p>
+                <p>One of my friends was actively pitching it as new shiny thing i should try. I did not really want to learn new language for nothing, but decided to try <code>Rust</code> after a week of attempts on using <code>C++23</code> modules (I just wanted faster compile times without headers), which failed completely - bugs literally everywhere, ICEs, documentation so bad that reading source was more useful, and I realized how much time I spend on <code>CMake</code> (and earlier <code>Make</code> - I love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe <code>Rust</code> could solve that </p>
                 <p>So, the obvious thing to do was to port my entire C++ Vulkan renderer (<i>almost</i>) line by line without trying to run it once</p> <small>If you are experienced Rust dev, i would really appreciate code review of my <b><a href="https:/github.com/platonvin/lum-rs">renderer </a></b></small>
             </section>
             <section>
-                <h2>First impression</h2>
-                <p> <code>Cargo</code> is a build system that I don't think much about. Tooling is amazing: <code>rust-analyzer</code>, <code>clippy</code>, <code>fmt</code> (<code>Rust</code> is the only language where a formatter doesn't annoy me), plus community tools like <code>cargo-asm</code> and lots of others. </p>
-            </section>
+                <h2>first impression</h2>
+                <p><code>Cargo</code> is a build system that I don't think much about. Tooling is amazing: <code>rust-analyzer</code>, <code>clippy</code>, <code>fmt</code> (<code>Rust</code> is the only language where a formatter doesn't annoy me), plus community tools like <code>cargo-asm</code> and lots of others. </p>
+                <!-- </section>
             <section>
-                <h2>This language excites me</h2>
+                <h2>This language excites me</h2> -->
+                <hr />
+                <p>And <code>Rust</code> has a lot of nice features!</p>
                 <ul>
                     <li>Enums</li>
-                    <li> backtraces</li>
-                    <li> built-in checks (out-of-bounds, alignment, overflows / zero-div). I whish they were more optional though</li>
+                    <li>backtraces</li>
+                    <li>built-in checks (out-of-bounds, alignment, overflows / zero-div). I whish they were more optional though</li>
                     <li>No constructors (seriously, there are more constructors in <code>C++</code> than there are math subjects). <span><video autoplay muted loop playsinline width="60%">
                                 <source src="/media/cpp_constructors_meme.webm" type="video/webm" />
                             </video>
@@ -41,7 +50,7 @@
                     <li>Fast std containers</li>
                     <li>built-in tests &amp; benchmarks (<code>#![feature(test)]</code> + <code>black_box</code> makes it soooo easy).</li>
                     <li>Stack slices </li>
-                    <li> <code>include_bytes!()</code> (i wish it was auto-aligned)</li>
+                    <li><code>include_bytes!()</code> (i wish it was auto-aligned)</li>
                     <li>Simple web builds (though you do need <code>--target-cpu=mvp</code> now).</li>
                     <details>
                         <summary>
@@ -69,30 +78,29 @@
                 </ul>
             </section>
             <section>
-                <h2>Blazingly Fast… Sometimes</h2>
+                <h2>blazingly fast… sometimes</h2>
                 <p><strong>Performance-wise, <code>Rust</code> is truly a rocket. But not all <code>Rust</code>.</strong> </p>
-                <p> <code>C</code>-like* <code>Rust</code> is a beast. Sticking to references and simple struct hierarchy forces you into code that produces insane assembly. However, wrap everything in <code>Option</code>s, <code>Rc</code>s and <code>Box</code>es, <code>dyn trait</code>s and deep nested containers, and it's not so fast anymore. </p>
-                <p> So far, most <code>Rust</code> code I've seen sticks to one of those two extremes. And there's also a trend to trick the borrow checker - <code>Rc</code>s and <code>Vec[index]</code> as "virtual memory". Is it just me, or do some people praise the borrow checker but then subvert it? </p> <i class="note"> * - a question: am I missing something or is there no way to make math more C-like? I mean something like this but compiler-driven: <a href="https://github.com/platonvin/unsafe_math">https://github.com/platonvin/unsafe_math </a> </i>
+                <p><code>C</code>-like* <code>Rust</code> is a beast. Sticking to references and simple struct hierarchy forces you into code that produces insane assembly. However, wrap everything in <code>Option</code>s, <code>Rc</code>s and <code>Box</code>es, <code>dyn trait</code>s and deep nested containers, and it's not so fast anymore. </p>
+                <p>So far, most <code>Rust</code> code I've seen sticks to one of those two extremes. And there's also a trend to trick the borrow checker - <code>Rc</code>s and <code>Vec[index]</code> as "virtual memory". Is it just me, or do some people praise the borrow checker but then subvert it? </p> <i class="note"> * - a question: am I missing something or is there no way to make math more C-like? I mean something like this but compiler-driven: <a href="https://github.com/platonvin/unsafe_math">https://github.com/platonvin/unsafe_math </a> </i>
             </section>
             <section>
-                <h2>Some real info</h2>
+                <h2>some real info</h2>
                 <ul>
-                    <li> my binary sizes went from ~600 KB to ~700 KB - likely due to stack slices (which is good: why heap-allocate if the stack suffices?). </li>
-                    <li> Performance-wise nothing really changed: <code>Rust</code> is faster at low opt-levels (precompiled std?), and on highest opt-levels the gap narrows. </li>
-                    <li> Compile times actually improved, though both <code>C++</code> and <code>Rust</code> compile times still hurt iteration speed. </li>
+                    <li>my binary sizes went from ~600 KB to ~700 KB - likely due to stack slices (which is good: why heap-allocate if the stack suffices?). </li>
+                    <li>performance-wise nothing really changed: <code>Rust</code> is faster at low opt-levels (precompiled std?), and on highest opt-levels the gap narrows. </li>
+                    <li>compile times actually improved, though both <code>C++</code> and <code>Rust</code> compile times still hurt iteration speed. </li>
                 </ul>
             </section>
             <section>
-                <h2>Libraries: The Weak Link</h2>
-                <p> This is kind of a point of failure for me in the <code>Rust</code> ecosystem - there just aren't that many great libraries. initializing OpenGL with winit (whose examples use deprecated code cause they change API every second) and glow is harder than with assembly. Algebra libraries are written by people who dont seem to code at all. Peak frustration was when I couldn't figure out the MagicaVoxel (.vox) parser docs and ended up porting the <code>C++</code> parser instead (spent less time on that, huh). </p>
-                <p> In <code>Rust</code> you don't spend a day trying to make a library compile - you spend a day looking for one that doesn't suck. Crates refactor every few months and break APIs for no practical reason. Documentation is often useless (says a lot, explains nothing), and reading source is unreasonably hard because logic is smeared acros dozeon layers of tiny functions (std has better docs (i still dont understand cells, pin and leak()) but sufffers from unreadable source even more. Maybe its just experience, but i feel relatively comfortable reading sources of C/C++ libraries). </p>
+                <h2>libraries: the weak link</h2>
+                <p>This is kind of a point of failure for me in the <code>Rust</code> ecosystem - there just aren't that many great libraries. Initializing OpenGL with winit (whose examples use deprecated code cause they change API every second) and glow is harder than with assembly. Algebra libraries are written by people who dont seem to code at all. Peak frustration was when I couldn't figure out the MagicaVoxel (.vox) parser docs and ended up porting the <code>C++</code> parser instead (spent less time on that, huh). </p>
+                <p>In <code>Rust</code> you don't spend a day trying to make a library compile - you spend a day looking for one that doesn't suck. Crates refactor every few months and break APIs for no practical reason. Documentation is often useless (says a lot, explains nothing), and reading source is unreasonably hard because logic is smeared acros dozen layers of tiny functions (std has better docs (i still dont understand cells, pin and leak()) but sufffers from unreadable source more. Maybe its just experience, but i feel relatively comfortable reading sources of C/C++ libraries). </p>
             </section>
             <section>
-                <h2>Whats next?</h2>
-                <p> Overall, I'm going to use <code>Rust</code> for a while. I don't any other language* offering significant improvements that'd make me switch (but who knows). </p>
-                <p> I'd like "safe" to be more optional, nicer syntax for "unsafe", first-class SIMD, much faster compile times, and more importantly - simplicity as a language idea, whith library authors aware of it.</p>
-                <p> I will probably depend less on external crates in future for simplicity. </p>
-                <p> *I tried Zig, did not like it at all. Maybe I'll like Jonathan Blow language, but my project is not complicated enough to ask for an access. </p>
+                <h2>whats next?</h2>
+                <p>overall, I'm going to use <code>Rust</code> for a while. I don't any other language* offering significant improvements that'd make me switch (but who knows). </p>
+                <p>I'd like "safe" to be more optional, nicer syntax for "unsafe", first-class SIMD, much faster compile times, and more importantly - simplicity as a language idea, whith library authors aware of it.</p>
+                <p>I will probably depend less on external crates in future for simplicity and perfomance (btw, by just removing anyhow, i got rif of ~100kb) </p>
             </section>
         </article>
     </main>
