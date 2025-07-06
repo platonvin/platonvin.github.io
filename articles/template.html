@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="$lang$" xml:lang="$lang$">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$title$</title>
+    $if(googlefonts)$
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    $endif$
+    $for(css)$
+    <link rel="stylesheet" href="$css$" />
+    $endfor$
+    $header-includes$
+</head>
+
+<body>
+    <header>
+        $if(backlink)$<a href="$backlink$" class="nav-link">← back to main</a>$endif$
+        <div class="header-content">
+            $if(headline)$<h1 class="big-headline">$headline$</h1>$else$<h1 class="big-headline">$title$</h1>$endif$
+        </div>
+    </header>
+
+    <main>
+        $if(intro_footer)$
+        <footer>
+            $intro_footer$
+        </footer>
+        $endif$
+        <article>
+            $body$
+        </article>
+    </main>
+    $for(after_body_script)$
+    <script src="$after_body_script$"></script>
+    $endfor$
+    $for(inline_script)$
+    <script type="module">
+        $inline_script$
+    </script>
+    $endfor$
+</body>
+
+</html>

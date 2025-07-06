@@ -11,3 +11,20 @@ build: setup
 
 run:
 	microserver.exe . -i index.html -p 8080
+
+ARTICLE_MD_FILES = $(wildcard articles/*.md)
+ARTICLE_HTML_FILES = $(patsubst articles/%.md,articles/%.html,$(ARTICLE_MD_FILES))
+
+build_articles: $(ARTICLE_HTML_FILES) ## Convert all markdown articles to HTML
+	@echo "All articles built."
+
+articles/%.html: articles/%.md templates/article_template.html styles.css
+	@echo "Converting $< to $@"
+	pandoc $< \
+	  --standalone \
+	  --template=templates/article_template.html \
+	  --css=../styles.css \
+	  --output=$@ \
+	  --section-divs
+	  # If you decided to use the Lua filter:
+	  # --lua-filter=filters/section_filter.lua
