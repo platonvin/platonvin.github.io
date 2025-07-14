@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>platonvin: Lum</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+    <header>
+        <a href="../index.html" class="nav-link">← back to main</a>
+    </header>
+
+    <main>
+        <article>
+            <div class="project-window">
+                <div class="lum-canvas-container">
+                    <canvas class="lum-canvas" id="lum_canvas"></canvas>
+                </div>
+                <div><b>THIS IS NOT A VIDEO!</b> if it does not render anything, check WebGPU support</div>
+
+                <div class="project-preview">
+                    <script type="module">
+                        import init from '/../pkg/demo_lib.js';
+                        async function start_lum() {
+                            try {
+                                await init('/../pkg/demo_lib_bg.wasm');
+
+                                const canvas = document.getElementById('lum_canvas');
+                                if (canvas) {
+                                    // what a terrible name for focus controls
+                                    canvas.blur();
+                                }
+                            } catch (e) {
+                                console.error("Failed to init WASM:", e);
+                            }
+                        }
+                        start_lum();
+                    </script>
+                </div>
+
+                <div class="window-content">
+                    $body$
+
+                    <div class="project-links">
+                        <a href="https://github.com/platonvin/lum-rs" target="_blank">view on github</a>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </main>
+</body>
+
+</html>
