@@ -36,11 +36,25 @@ build_lum_readme:
 # projects/%.html: sources/projects/%.md
 # 	pandoc $< $(PROJECTS_PANDOC_ARGS) --output=$@
 
-build_cv: cv.pdf
+build_cv: cv.pdf cv_ru.pdf
 
-cv.pdf: sources/cv.html
+cv.pdf: sources/cv.html sources/cv.css
 	pandoc \
-	  --variable mainfont="DejaVu Sans" \
 	  --variable geometry="margin=0.2in" \
+	  --pdf-engine=xelatex \
 	  --variable fontsize=11pt \
+	  --css=sources/cv.css \
+	  -V colorlinks=true \
+	  -V linkcolor=blue \
 	  sources/cv.html -o cv.pdf
+
+cv_ru.pdf: sources/cv_ru.html sources/cv_ru.css
+	pandoc \
+	  --variable geometry="margin=0.2in" \
+	  --pdf-engine=xelatex \
+	  --variable fontsize=11pt \
+	  --css=sources/cv_ru.css \
+	  -V colorlinks=true \
+	  -V linkcolor=blue \
+	  -V mainfont="Segoe UI" \
+	  sources/cv_ru.html -o cv_ru.pdf

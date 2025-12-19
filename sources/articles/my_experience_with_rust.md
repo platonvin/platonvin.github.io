@@ -12,7 +12,8 @@ intro_footer: |
 
 ## why?
 
-A friend of mine was actively pitching `Rust` as new shiny thing i should try. I am always in search for a better language for my gamedev needs, and after a week of attempts on integrating `C++23` modules into my renderer (for faster compile times without headers), which totally failed - bugs, ICEs, docs so bad that reading source is more useful, - i realized how much time I spend on `CMake` (and earlier `Make` - I love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe `Rust` - which is praised for tooling - could solve that
+A friend of mine was actively pitching `Rust` as new shiny thing i should try. I am always in search for a better language for my gamedev needs, and after a week of attempts on integrating `C++23` modules into my renderer (for faster compile times without headers), which totally failed - bugs, ICEs, docs so bad that reading source is more useful*, - i realized how much time I spend on `CMake` (and earlier `Make` - I love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe `Rust` - which is praised for tooling - could solve that
+*for the purpose of corectness, i revisited it and actually moved to modules - this time successfully
 
 So, i ported my C++ Vulkan renderer to `Rust` 
 
@@ -81,8 +82,9 @@ And `Rust` has a lot of nice features!
 ## some real info
 
 * my binary sizes went from ~600 KB to ~700 KB (compared to `C++`) - likely due to stack slices (which is good: why heap-allocate if the stack suffices?). *btw, just removing thiserror and anyhow cut ~100kb*
-* performance-wise nothing really changed: `Rust` is faster at low opt-levels (~2x faster (not precompiled std, i checked)), and on highest opt-levels the gap narrows (with gcc being slightly faster for C++).
-* compile times are almost the same (~4.5s -> ~4.4s for similar dev build, but i cant really tell since im unable to build my C++ anymore and dont want to go through pain of fixing CMake again), both `C++` and `Rust` compile times hurt iteration speed (i developed a habit of basically not running my code at all for a very long time. But lsps compensate it).
+* performance-wise nothing really changed: `Rust` is faster at low opt-levels (~2x faster (not precompiled std, i checked)), and on highest opt-levels the gap narrows (with gcc being slightly faster for `C++`).
+* (incremental) compile times are ~4s for both languages for similar dev (some optimizations) build (hard to really compare, project strucutres are different), both noticably hurt iteration speed (i developed a habit of basically not running my code at all for a very long time. But lsps compensate it).
+For debug build, `Rust` can recompile in around a second, while `C++` (even with modules) might take from 3~8 seconds, depending on a change
 
 ## blazingly fast
 
