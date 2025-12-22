@@ -581,6 +581,21 @@ button header {
   content: "\f06a";
 }
 
+.giscus-container {
+  grid-column: 4;
+  border: var(--border-default);
+  box-shadow: var(--box-shadow-large);
+  padding: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+  background-color: var(--body-background-color);
+}
+
+/* so iframe doesn't overflow on small screens??? TODO: */
+.giscus-container iframe {
+  width: 100% !important;
+}
+
 @font-face {
   font-family: 'DM Serif Display';
   font-style: italic;

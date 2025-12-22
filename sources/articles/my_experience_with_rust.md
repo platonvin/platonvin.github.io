@@ -8,16 +8,18 @@ headline: my experience with `Rust`
 intro_footer: |
     <p><em>might look like too much highlighting for you - but it helps with readability for some people</em></p>
     <p><em>information is subjective. Treat it as a story about experience</em></p>
+comments: true
 ---
 
 ## why?
 
-A friend of mine was actively pitching `Rust` as new shiny thing i should try. I am always in search for a better language for my gamedev needs, and after a week of attempts on integrating `C++23` modules into my renderer (for faster compile times without headers), which totally failed - bugs, ICEs, docs so bad that reading source is more useful*, - i realized how much time I spend on `CMake` (and earlier `Make` - I love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe `Rust` - which is praised for tooling - could solve that
+A friend of mine was actively pitching `Rust` as new shiny thing i should try. I am always in search for a better language for gamedev, and after a week of attempts on integrating `C++20` modules (faster compile and no headers), which totally failed* - bugs, ICEs, docs so bad that reading source is more useful, - i realized how much time i spend on `CMake` (and earlier `Make` - I love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe `Rust` - which is praised for tooling - could solve that
 *for the purpose of corectness, i revisited it and actually moved to modules - this time successfully
 
-So, i ported my C++ Vulkan renderer to `Rust` 
+So, i ported my C++ Vulkan renderer to `Rust` (and some more)
 
-<small>If you are a `Rust` dev, i would really appreciate code review of [it (link)](https://github.com/platonvin/lum-rs). Suggestions about compile times are especially welcome.</small>
+<!-- not anymore LOL. Khm, you can still do it if you want. But i dont badly need it now -->
+<!-- <small>If you are a `Rust` dev, i would really appreciate code review of [it (link)](https://github.com/platonvin/lum-rs). Suggestions about compile times are especially welcome.</small> -->
 
 ## (first impression) positives
 
@@ -106,3 +108,77 @@ I really miss C libraries where you go to function source and immediately unders
 `Rust` seems like a solid language choice - all the listed problems are not that big compared to what language has to offer for me. It is something like local maximum for its "language idea". I dont like most libraries and i might need to rewrite Rust with a lot of proc_macro for nicer syntax, but i enjoy it, and my code works first try more often, and project structure feels more correct (i like to imagine that my code is like a "opus magnum" (game) solution, multiple small robotic peaces, moving and modifying data in a perfect tandem, except its far from perfect). Hope that one day it finally clicks
 <br/>
 I think i'll also try language on the other end of the complexity spectrum - something closer to C, likely `Odin` - more optional "safe", nicer syntax for "unsafe", first-class SIMD, much faster compile times, and more importantly - simplicity as a language idea, which library authors are aware of. I suspect that `Rust` is still going to be a better tradeoff for me, but why not give other languages a try?
+
+
+1001 problems:
+you cant trivially overwrite cargo crate (you need to trick cargo into thinking its a different source)
+dynamic linking is kinda a thing but every crate you want to link dynamically needs to opt in
+windows toolchain dependency
+
+basically this:
+{ // perfectly fine, we DO support partial borrows!
+    let borrowed_field_1 = &mut self.field_1;
+    let borrowed_field_2 = &mut self.field_2;
+}
+
+{ // Fuck You!
+    let borrowed_field_1 = self.get_field_1();
+    // Error: first mutable borrow occures in a line above
+    let borrowed_field_2 = self.get_field_2();
+}
+Code structure for graphics programming tends to get easier for me when i can have megastructs, which are not compatible with rust borrowing rules
+expect functions with 10+ arguments. Or restructure your code every 10 minutes after you change the smallest thing because now you have to move everything to other sub/structs
+
+
+compilation model:
+    i am 100% willing to sacrifice circular references in order to get rebuilds at the speed of C 
+
+sometimes i feel like people have joined a cult of "no unsafe code"
+no unsafe != what you dream about code doing. Unsafe != incorrect. Unsafe is just a fucking marker that requires explicit notion.
+good lucking turning off integer zero division checks. Or forcing -ffast-math. Or turning asserts into debug_assert
+someone literally decided "oh thats too unsafe our users are idiots we should not even have this as opt-in option"
+
+
+you will have a problem, and there will be 3 crates with zero comparison between them, 10 flags each, no examples and documentation like 
+/// A struct representing an apple
+struct Appple {
+    /// Seeds of this apple
+    seeds: Vec<Seed> 
+}
+and you will dive through entirety of docs.rs and understand NOTHING. Same feeling after reading Vulkan spec and realising you remember everything but understand nothing
+would be cool to see language that has **warning or recommendations** with Rust borrow checker tech where above would be expressable
+
+Hyper abstraction. I literally ported a C magicavoxel parser cause i cant fucking understand how to use most popular (the only one) Rust version i found
+
+rust is gonna eat your disk alive
+
+libraries tend to have a lot of asserts (bounds checking, unwraps, etc.) that are not disableable. Each assert is truly nothing, but having them everywhere prevents compiler from reordering and "cancelling out" code
+
+there are many "language features". You are not gonna know about them since the only place they are mentioned is "Unstable features - The rustdoc book". Googling "all rust features" will not land you there btw
+
+80% of public Rust is for web, but web people do not bother telling you about that right away. They also have a very special measure of perfomance
+
+there is nalgebra. And glam. And vek. And some custom solution somewhere.
+Linear algebra vectors map closely to hw. But we do not have builtin types for them somehow?? - oh but not every CPU has SIMD - yes they do, even your browser like requires at least SSE4 to run. And we had floats before ieee754.
+Imagine if every Rust crate implemented floats manually. There would be floats with usize, with u32, with different endians, and some would be generic over this, some would be generated in build script while others generate in proc/declarative macro, or are written manually. Some would do inline assembly, some would be purely safe, ... Imagine that hell. That is what is going on with vectors
+Its also pain to do as u32 as usize as u64 all the time... Serialize as u32, usize for perfomance, u64 for GAPI
+
+Rust build system is truly easy to start and requires only a few lines for most features... It is, however, one of the most complicated build systems out there. Go read a book (or 10) on Cargo (from capital letter, since... f you, Cargo developers just like Cargo.toml) 
+quote from hn: `cargo is pretty straightforward for 95% of the cases, inconvenient for 3% of the cases, too limited for 1% of the cases, and extremely frustrating for the remaining cases`
+
+1001 features:
+design by commetee is really powerful. But only when language sparks joy and people DO want to be commetee and design a language
+
+proc macros are less readable then declarative macros (since syntax for pasted words is same as code that pastes them you cant immideately see the difference. Fixable by changing code that colors it in my editor, but...)
+
+containers are fast.
+
+enums (tagged unions) are imo best drop-in inheritance replacement. If you want very C++ style, it is faster than C++ version - <dyn Trait> will be (*Struct, *virtual functions table), and calling a function from table is dereferencing one pointer, unlike C++, where it is two
+
+stack traces
+
+cross compilation to wasm
+
+everything-from-source as build system idea (and static linking)
+
+MIRI. And UB preconditions. Asserts are everywhere, and i mean non-trivial ones (like go try to cast 8-aligned pointer to 32-aligned struct pointer)

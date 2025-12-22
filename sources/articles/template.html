@@ -32,6 +32,14 @@
         <article>
             $body$
         </article>
+
+        $if(comments)$
+        <!-- so this is how i do comments. I dont have to pay for hosting, yay! -->
+        <section class="giscus-container">
+            <script src="https://giscus.app/client.js" data-repo="platonvin/platonvin.github.io" data-repo-id="R_kgDOMWEwPg" data-category="Announcements" data-category-id="DIC_kwDOMWEwPs4C0BKp" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light_high_contrast" data-lang="en" data-loading="lazy" crossorigin="anonymous" async>
+            </script>
+        </section>
+        $endif$
     </main>
     $for(after_body_script)$
     <script src="$after_body_script$"></script>

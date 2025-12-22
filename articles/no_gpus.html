@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+            <link rel="stylesheet" href="../styles.css">
+        
+</head>
+
+<body>
+    <header>
+        
+        <div class="header-content">
+            <h1 class="big-headline"></h1>
+        </div>
+    </header>
+
+    <main>
+                <article>
+            <p>Some Graphics API</p>
+            <p>I would love it if we got faster, simpler, smaller, more crossplatform, backward compatible way to program GPUs. Reading Sebastian article <a href="" title="https://www.sebastianaaltonen.com/blog/no-graphics-api">0</a> is recommended since this is a response.</p>
+            <p>I have no cs<on_hover cs is for counter strike> degree or "industry insider" friends to bake this (since noone even knows i exist).If you think i am wrong - please, correct me. <small>i have an excuse - im like 20</small></p>
+            <p>Existence of specialized hardware is a problem - it takes chip space, makes APIs clunky for marginal gains, when most of work is in a generic compute. We can go further. If we are willing to break backward compatibility to fix the software, why stop there?</p>
+            <p>If we removed the silicon area dedicated to rasterizers (TODO: enumerate), we could fit more general cores. Rasterization is not the bottleneck anyways. * UE5 does software raster for small triangles [2]. * CUDA raster implementations are 1.5~3 times slower [3]</p>
+            <p>so kinda like Larrabee [4] - there were ideas! But this time, we know more</p>
+            <p>Modern game data rarely fits "textures &amp; samplers". Trees, hash tables; how often are you using linear sampling VS cubic, min/max, custom weighting (e.g. radiance probes)? You can still have morton indexing or compression, or even pick one that fits your case better than what driver offers. Or just stay simple.</p>
+            <p>Drivers act as a JIT compilers, rebuilding every shader for every specific card.</p>
+            <p>There would be no "PSO creation" step at runtime if all GPUs had same instruction set and architecture. You could <strong>actually</strong> precompile and pre-optimize your shaders. we would not need pipeline caches</p>
+            <p>If the hardware gets standardized, there is less variable features to worry about. Over time we would get more and more extensions, like with x86</p>
+            <p>This effectively trades peak theoretical efficiency (hardware specialized for this year's specific workload) for software stability and developer sanity. And you know what? Open any modern game in a profiler (e.g. Nvidia Nsight) and look at average throughput. Do you see anything remotely close to 100%? How much work is actual raster, vertex fetch, ROP &amp; CROP, and how much is in compute shaders?</p>
+            <p>The proposed memory model is we just "write pointers" and magic happens. Afaik Resizable BAR (ReBAR) lets the CPU map more, the PCIe is still high latency &amp; low bandwidth. There must be a clear, not automatic management of when memory is in visible to CPU place and when it is internal to GPU. That, ofcourse, relates to separate GPU units, not SoCs. If we could somehow get SoC architecture that everyone agrees to use that would be even better. Basically standartize integrated GPUs?</p>
+            <p>Traditionally, GPUs dont really offer "true function calls". Im not sure what is going on with new RTX hw, but even then i suppose having no function calls with register dumps is a lot faster (since it is way simpler) If you want recursion, turn it into a loop. Turn code into data - not 100 shaders for different materials, but some PBR formula, where reflectiveness is just a variable, computed in single shader</p>
+            <p>I agree on barriers - in my tests, "full memory read / write" barriers were not any different in perfomance from precise ones. We could go further: "offensive" synchronization, where barriers are "full read/write" unless specified</p>
+            <p>Similarly, image layouts are somewhat outdated for desktop GPUs. Using VK_IMAGE_LAYOUT_GENERAL for everything works. You will use it for complicated workloads anyways (since other layouts are not compatible with wide range of operations a lot of optimizations require). In fact, Nvidia states that they completely ignore specified layout and manage it automatically <a href="%60On%20NVIDIA%20GPUs%20image%20layouts%20are%20irrelevant">1</a>.</p>
+            <p>In defense of Subpasses: I might be dumb here, but subpasses give way more useful context for drivers compared to "fbo fetches" instructions. And they are not desktop specific - Nvidia is also doing some memory magic with subpasses [5] SoC would probably do subpasses.</p>
+            <p>If we removed the fixed-function texture units, we would force a "Software Sampling" standard. It would be slower for simple bilinear lookups, but it would be infinitely more flexible. We could implement any filtering kernel, any addressing mode, and any compression format we wanted, without waiting for a hardware vendor to add support in "DirectX 14." Well, we kinda can now, but everything (e.g. cache) is based around the idea that textures are stored as textures</p>
+            <p>Personally, i dont think Vulkan API is much broken - seems to cover reasonable number of devices with great flexability (RTX)</p>
+            <p>Just leave images in the VK_IMAGE_LAYOUT_GENERAL layout<code>- https://developer.nvidia.com/sites/default/files/akamai/gameworks/VulkanDevDaypdaniel.pdf [2]:</code>For very small triangles, Nanite uses a Software Rasterization Path parallelized by the GPU per triangle cluster, which is more efficient and precise at such sizes` - https://dev.epicgames.com/community/learning/tutorials/rp92/unreal-engine-unpacking-ue5-toolbox-part-1-nanite [3]: https://research.nvidia.com/sites/default/files/pubs/2011-08_High-Performance-Software-Rasterization/laine2011hpg_paper.pdf [4]: https://en.wikipedia.org/wiki/Larrabee_(microarchitecture) [5]: https://www.youtube.com/watch?v=Nc6R1hwXhL8)</p>
+        </article>
+
+            </main>
+        </body>
+
+</html>
