@@ -14,7 +14,7 @@ comments: true
 ## why?
 
 A friend of mine was actively pitching `Rust` as new shiny thing i should try. I am always in search for a better language for gamedev, and after a week of attempts on integrating `C++20` modules (faster compile and no headers), which totally failed* - bugs, ICEs, docs so bad that reading source is more useful, - i realized how much time i spend on `CMake` (and earlier `Make` - I love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe `Rust` - which is praised for tooling - could solve that
-*for the purpose of corectness, i revisited it and actually moved to modules - this time successfully
+*for the purpose of correctness, i revisited it and actually moved to modules - this time successfully
 
 So, i ported my C++ Vulkan renderer to `Rust` (and some more)
 
@@ -76,8 +76,8 @@ And `Rust` has a lot of nice features!
 ## (first impression) negatives
 
 * I'm not sure if it clicked or not. I frequently wonder if im still missing a fundamental piece of `Rust` philosophy
-* Sometimes i cant find any good examples. I thought i understood something and tried to utilize move semantics only to get mistmatch between drop (which takes `&mut` and not `mut`) and the fact that i need to take out a thing from a struct. I had to either wrap it in `Option<_>` or use `MaybeUninit`
-* `Rust` is not really good with math - you need big libraries for basic quaternions and matrices, and syntax is still ugly (i have some plans on improving it with a bunch of proc_macro trics, but... it could have been just integrated into langauge, like slices.)
+* Sometimes i cant find any good examples. I thought i understood something and tried to utilize move semantics only to get mismatch between drop (which takes `&mut` and not `mut`) and the fact that i need to take out a thing from a struct. I had to either wrap it in `Option<_>` or use `MaybeUninit`
+* `Rust` is not really good with math - you need big libraries for basic quaternions and matrices, and syntax is still ugly (i have some plans on improving it with a bunch of proc_macro tricks, but... it could have been just integrated into language, like slices.)
 * Gamedev needs safe code that does not fall under safe `Rust` quite often. And vice versa, actually - gamedev writes "unsafe" code that falls under safe `Rust` - there's a trend to trick the borrow checker using `Vec[index]` as "virtual memory" (effectively disabling a borrow checker)
 * Sometimes, you are not given control over things - other people decided you should not have it, and now you need to come up with weird solutions (for problems that could have not existed!). You cannot just disable slice bound checks for a scope - rewriting ops with proc_macro wont modify called functions, custom wrapper is ugly and has the same problem, replacing panic hook with unreachable breaks panics everywhere (not just for desired scope). Again, it is absolutely possible to have fine-grain control in `Rust` - its just ugly, verbose and unreadable. 
 
@@ -85,7 +85,7 @@ And `Rust` has a lot of nice features!
 
 * my binary sizes went from ~600 KB to ~700 KB (compared to `C++`) - likely due to stack slices (which is good: why heap-allocate if the stack suffices?). *btw, just removing thiserror and anyhow cut ~100kb*
 * performance-wise nothing really changed: `Rust` is faster at low opt-levels (~2x faster (not precompiled std, i checked)), and on highest opt-levels the gap narrows (with gcc being slightly faster for `C++`).
-* (incremental) compile times are ~4s for both languages for similar dev (some optimizations) build (hard to really compare, project strucutres are different), both noticably hurt iteration speed (i developed a habit of basically not running my code at all for a very long time. But lsps compensate it).
+* (incremental) compile times are ~4s for both languages for similar dev (some optimizations) build (hard to really compare, project structures are different), both noticeably hurt iteration speed (i developed a habit of basically not running my code at all for a very long time. But lsps compensate it).
 For debug build, `Rust` can recompile in around a second, while `C++` (even with modules) might take from 3~8 seconds, depending on a change
 
 ## blazingly fast
@@ -100,7 +100,7 @@ So far, most `Rust` code i've seen sticks to one of those two extremes - and peo
 
 There is just not that many great libraries. Initializing OpenGL with winit and glow is harder than with assembly. Algebra libraries are written by people who dont seem to code at all (compile times, syntax, hello?). Vulkan wrappers changing API and names dealt me even more pain than gltf loader (which is more complicated than thermodynamics). Peak frustration was when I couldn't figure out the MagicaVoxel (.vox) parser docs and ended up porting the `C++` parser instead (spent less time on that, huh).
 
-In `Rust` you don't spend a day trying to make a library compile & link - you spend a day looking for one that doesn't suck. Crates refactor every few months and break APIs for no practical reason (semantic versioning helps). Documentation is often useless (says a lot, explains nothing), and logic is smeared acros dozen layers of tiny functions (std has better docs, but sufffers from unreadable source more).\
+In `Rust` you don't spend a day trying to make a library compile & link - you spend a day looking for one that doesn't suck. Crates refactor every few months and break APIs for no practical reason (semantic versioning helps). Documentation is often useless (says a lot, explains nothing), and logic is smeared across dozen layers of tiny functions (std has better docs, but suffers from unreadable source more).\
 After reading docs, even when i feel like i understand most parts of the system, i usually have no idea how they connect to each other. Like std::random - i spent way to much time for something i would type in a minute in C. RandomSource? Great, i understand it. Distribution? Sure. How they connect? No idea. Feels like Rust libraries are written for people who understand the problem library is trying to solve. But this is why i use a library in the first place - if i understood the problem well, i would not need a library.\
 I really miss C libraries where you go to function source and immediately understand what it is doing. And libraries pull dozens of dependencies (which is not a problem by itself, but ...). 
 
@@ -123,7 +123,7 @@ basically this:
 
 { // Fuck You!
     let borrowed_field_1 = self.get_field_1();
-    // Error: first mutable borrow occures in a line above
+    // Error: first mutable borrow occurs in a line above
     let borrowed_field_2 = self.get_field_2();
 }
 Code structure for graphics programming tends to get easier for me when i can have megastructs, which are not compatible with rust borrowing rules
@@ -141,12 +141,12 @@ someone literally decided "oh thats too unsafe our users are idiots we should no
 
 you will have a problem, and there will be 3 crates with zero comparison between them, 10 flags each, no examples and documentation like 
 /// A struct representing an apple
-struct Appple {
+struct Apple {
     /// Seeds of this apple
     seeds: Vec<Seed> 
 }
-and you will dive through entirety of docs.rs and understand NOTHING. Same feeling after reading Vulkan spec and realising you remember everything but understand nothing
-would be cool to see language that has **warning or recommendations** with Rust borrow checker tech where above would be expressable
+and you will dive through entirety of docs.rs and understand NOTHING. Same feeling after reading Vulkan spec and realizing you remember everything but understand nothing
+would be cool to see language that has **warning or recommendations** with Rust borrow checker tech where above would be expressible
 
 Hyper abstraction. I literally ported a C magicavoxel parser cause i cant fucking understand how to use most popular (the only one) Rust version i found
 
@@ -156,20 +156,20 @@ libraries tend to have a lot of asserts (bounds checking, unwraps, etc.) that ar
 
 there are many "language features". You are not gonna know about them since the only place they are mentioned is "Unstable features - The rustdoc book". Googling "all rust features" will not land you there btw
 
-80% of public Rust is for web, but web people do not bother telling you about that right away. They also have a very special measure of perfomance
+80% of public Rust is for web, but web people do not bother telling you about that right away. They also have a very special measure of performance
 
 there is nalgebra. And glam. And vek. And some custom solution somewhere.
 Linear algebra vectors map closely to hw. But we do not have builtin types for them somehow?? - oh but not every CPU has SIMD - yes they do, even your browser like requires at least SSE4 to run. And we had floats before ieee754.
 Imagine if every Rust crate implemented floats manually. There would be floats with usize, with u32, with different endians, and some would be generic over this, some would be generated in build script while others generate in proc/declarative macro, or are written manually. Some would do inline assembly, some would be purely safe, ... Imagine that hell. That is what is going on with vectors
-Its also pain to do as u32 as usize as u64 all the time... Serialize as u32, usize for perfomance, u64 for GAPI
+Its also pain to do as u32 as usize as u64 all the time... Serialize as u32, usize for performance, u64 for GAPI
 
 Rust build system is truly easy to start and requires only a few lines for most features... It is, however, one of the most complicated build systems out there. Go read a book (or 10) on Cargo (from capital letter, since... f you, Cargo developers just like Cargo.toml) 
 quote from hn: `cargo is pretty straightforward for 95% of the cases, inconvenient for 3% of the cases, too limited for 1% of the cases, and extremely frustrating for the remaining cases`
 
 1001 features:
-design by commetee is really powerful. But only when language sparks joy and people DO want to be commetee and design a language
+design by committee is really powerful. But only when language sparks joy and people DO want to be committee and design a language
 
-proc macros are less readable then declarative macros (since syntax for pasted words is same as code that pastes them you cant immideately see the difference. Fixable by changing code that colors it in my editor, but...)
+proc macros are less readable then declarative macros (since syntax for pasted words is same as code that pastes them you cant immediately see the difference. Fixable by changing code that colors it in my editor, but...)
 
 containers are fast.
 

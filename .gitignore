@@ -3,3 +3,5 @@ temp
 drafts
 **/target
 /.env
+*.xml
+*.py

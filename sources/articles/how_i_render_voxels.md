@@ -21,7 +21,7 @@ I am not an artist, and Lum embraces that - you are expected to reuse assets (in
 : Array of materials. Currently, limited by 255 (256, but first one is never accessed and represent "air")
 
 `Voxel`
-: An index into a material palette (so, data of voxel is its material). Represented by single `u8`. `0` means "air" - emtpy voxelz
+: An index into a material palette (so, data of voxel is its material). Represented by single `u8`. `0` means "air" - empty voxelы
 
 `Model`
 : A free-form, self-aligned (so not world-aligned) voxel mesh of any size (up to 255x255x255 to fit in `u8`).
@@ -72,7 +72,7 @@ Also, for better culling, we don't actually store the contour as a single triang
 
 *if you are wondering why rasterization and not raytracing - rasterization IS raytracing - it is optimization of specialized case of raytracing*
 
-At this point, the lightmap command buffers are done (ofcourse, we execute them before shading).
+At this point, the lightmap command buffers are done (of course, we execute them before shading).
 
 ---
 
@@ -121,7 +121,7 @@ As optimization, for tracing probe rays, instead of doing it until hit / out-of-
 ---
 
 ## Shading
-Modern games think that rendering in full-res is slow, so they shade in low-res and then upscale. However, upscaling can be costly (and looks terrible, and then you need neural networks and even more temporal accumulation with complicated algorithmg to fix it), while subpasses allow a lot of optimizations, so this tradeoff is almost never worth it. All of Lum's shading happens in a single render pass, and that is a key reason why it can run on laptops. The frame image we render to potentially never even leaves the GPU's on-chip memory.
+Modern games think that rendering in full-res is slow, so they shade in low-res and then upscale. However, upscaling can be costly (and looks terrible, and then you need neural networks and even more temporal accumulation with complicated algorithms to fix it), while subpasses allow a lot of optimizations, so this tradeoff is almost never worth it. All of Lum's shading happens in a single render pass, and that is a key reason why it can run on laptops. The frame image we render to potentially never even leaves the GPU's on-chip memory.
 
 The shading render pass order is:<br />
 `"diffuse" light shading` → `ambient occlusion` → `glossy reflections` → `volumetrics` → `tonemapping to swapchain`.
