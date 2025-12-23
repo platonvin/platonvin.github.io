@@ -58,3 +58,6 @@ cv_ru.pdf: sources/cv_ru.html sources/cv_ru.css
 	  -V linkcolor=blue \
 	  -V mainfont="Segoe UI" \
 	  sources/cv_ru.html -o cv_ru.pdf
+
+postcss:
+	npx postcss styles.css -o styles.min.css

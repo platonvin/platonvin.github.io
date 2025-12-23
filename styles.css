@@ -6,10 +6,10 @@ h5,
 h6 {
   font-family: var(--title-font);
   font-weight: 700;
+  line-height: normal;
   margin-bottom: .75rem;
   margin-top: 0;
-  text-align: center;
-  line-height: initial;
+  text-align: center
 }
 
 h1 {
@@ -48,8 +48,8 @@ h4 {
 h1>a:active,
 h1>a:focus,
 h1>a:hover {
-  text-decoration: none;
-  color: inherit
+  color: inherit;
+  text-decoration: none
 }
 
 main {
@@ -62,34 +62,34 @@ main>* {
 }
 
 .header-content {
-  display: flex;
   align-items: center;
-  gap: 1em;
+  display: flex;
+  gap: 1em
 }
 
 .header-content-vertical {
-  display: flex;
-  flex-direction: column;
   align-items: center;
+  display: flex;
+  flex-direction: column
 }
 
 header {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto;
-  padding-top: 1em;
-  padding-bottom: 1em
+  padding-bottom: 1em;
+  padding-top: 1em
 }
 
 header :is(h1, h2, h3, h4, h5, h6, section) {
-  width: fit-content;
+  grid-column: -1/1;
   justify-self: center;
-  grid-column: -1/1
+  width: fit-content
 }
 
 header>* {
-  justify-content: center;
-  align-items: center
+  align-items: center;
+  justify-content: center
 }
 
 header>p {
@@ -97,17 +97,17 @@ header>p {
 }
 
 article {
-  display: grid;
-  grid-template-columns: min-content minmax(33%, 1fr) min-content;
-  grid-column: 4;
   border: var(--border-default);
   box-shadow: var(--box-shadow-large);
-  padding: 1rem;
-  margin-bottom: 1em
+  display: grid;
+  grid-column: 4;
+  grid-template-columns: min-content minmax(33%, 1fr) min-content;
+  margin-bottom: 1em;
+  padding: 1rem
 }
 
 article * {
-  grid-column: 1/-1;
+  grid-column: 1/-1
 }
 
 article :is(p:first-of-type, p:last-of-type) {
@@ -116,10 +116,10 @@ article :is(p:first-of-type, p:last-of-type) {
 }
 
 article+h2 {
-  margin-top: 1rem;
   background-color: var(--body-background-color);
-  width: fit-content;
-  justify-self: center
+  justify-self: center;
+  margin-top: 1rem;
+  width: fit-content
 }
 
 article.biography {
@@ -138,8 +138,8 @@ article.biography p {
 
 ul.posts {
   list-style-type: none;
-  padding-inline-start: 0;
-  margin: 0
+  margin: 0;
+  padding-inline-start: 0
 }
 
 ul.posts li {
@@ -149,61 +149,61 @@ ul.posts li {
 }
 
 ul.posts li>small {
+  color: var(--black);
   justify-self: end;
-  text-transform: uppercase;
-  color: var(--black)
+  text-transform: uppercase
 }
 
 ul.posts li>a {
-  grid-column: 1/-1;
-  color: var(--black)
+  color: var(--black);
+  grid-column: 1/-1
 }
 
 ul.posts li>a:active,
 ul.posts li>a:focus,
 ul.posts li>a:hover {
-  text-decoration: inherit;
-  color: var(--link-color-hover)
+  color: var(--link-color-hover);
+  text-decoration: inherit
 }
 
 ul.icons {
   display: flex;
+  gap: 1rem;
   grid-column: 1/-1;
   justify-content: center;
   list-style: none;
-  padding-left: 0;
-  margin-top: 0;
   margin-bottom: 1rem;
-  gap: 1rem;
+  margin-top: 0;
+  padding-left: 0
 }
 
 ul.icons li {
   display: inline;
-  font-size: 2em;
+  font-size: 2em
 }
 
 ul.icons a {
-  height: 4rem;
-  width: 4rem;
-  padding: .2em .35em;
+  align-items: center;
   border: var(--border-default);
   box-shadow: var(--box-shadow-default);
-  font-size: 1em;
   display: inline-flex;
-  align-items: center;
+  font-size: 1em;
+  height: 4rem;
   justify-content: center;
+  padding: .2em .35em;
   text-decoration: none;
+  width: 4rem
 }
 
 ul.icons a:hover {
-  color: var(--link-color-hover);
   box-shadow: none;
+  color: var(--link-color-hover)
 }
 
 ul.icons .icon {
-  width: 2rem;
-  height: 2rem;
   fill: currentColor;
+  height: 2rem;
+  width: 2rem
 }
 
 a {
@@ -211,23 +211,23 @@ a {
 }
 
 a[class*=icon-] {
-  height: 4rem;
-  width: 4rem;
-  padding: .2em .35em;
+  align-items: center;
   border: var(--border-default);
   box-shadow: var(--box-shadow-default);
-  font-size: 1em;
   display: inline-flex;
-  align-items: center;
-  justify-content: center
+  font-size: 1em;
+  height: 4rem;
+  justify-content: center;
+  padding: .2em .35em;
+  width: 4rem
 }
 
 a[class*=icon-]:hover {
-  color: var(--link-color-hover);
-  box-shadow: none
+  box-shadow: none;
+  color: var(--link-color-hover)
 }
 
-a[class*=icon-]::before {
+a[class*=icon-]:before {
   vertical-align: middle
 }
 
@@ -246,15 +246,15 @@ footer p {
   margin-top: .5ch
 }
 
-footer p.icon-copyright::before {
-  vertical-align: middle;
-  padding-right: .2em
+footer p.icon-copyright:before {
+  padding-right: .2em;
+  vertical-align: middle
 }
 
 footer nav {
+  align-items: center;
   display: flex;
   justify-content: center;
-  align-items: center;
   margin-bottom: 1em;
   margin-top: 1em
 }
@@ -270,17 +270,17 @@ p a {
 }
 
 code {
-  display: inline-block;
   background-color: var(--code-background-color);
-  color: var(--code-foreground-color);
   border: var(--border-small);
   box-shadow: var(--box-shadow-xsmall);
+  color: var(--code-foreground-color);
+  display: inline-block;
+  font-family: var(--code-font);
+  font-size: .9em;
   line-height: 1.2;
   margin-left: .2rem;
   margin-right: .2rem;
-  padding: .1rem .2rem;
-  font-family: var(--code-font);
-  font-size: .9em;
+  padding: .1rem .2rem
 }
 
 code::selection {
@@ -289,27 +289,26 @@ code::selection {
 }
 
 pre {
-  margin: 1rem 0;
+  margin: 1rem 0
 }
 
 pre code {
-  display: block;
-  padding: 0.5rem;
   background-color: var(--gray-lighterer);
   box-shadow: var(--box-shadow-large);
-  /* font-size: 0.7em; */
+  display: block;
+  padding: .5rem
 }
 
 pre code::selection {
   background-color: var(--white);
-  color: var(--color-2);
+  color: var(--color-2)
 }
 
 section {
-  border: var(--border-default);
-  padding: 1rem;
-  margin-bottom: 2rem;
   background: var(--body-background-color);
+  border: var(--border-default);
+  margin-bottom: 2rem;
+  padding: 1rem
 }
 
 section>h4 {
@@ -317,32 +316,30 @@ section>h4 {
   font-size: 2.4rem;
   margin: 0 0 1rem;
   text-align: center;
-  text-shadow: 1px 1px 1px var(--black-transparent);
+  text-shadow: 1px 1px 1px var(--black-transparent)
 }
 
 section dl {
-  margin: 0;
-  margin-top: 1rem;
-  padding-left: 1.5rem;
   border-left: var(--border-default);
+  margin: 1rem 0 0;
+  padding-left: 1.5rem
 }
 
 section dt {
   font-family: var(--title-font);
-  font-weight: 700;
   font-size: 2rem;
-  margin-top: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.5rem
 }
 
 section dd {
-  margin: 0.5rem 0 0 1rem;
   line-height: 1.4;
+  margin: .5rem 0 0 1rem
 }
 
 section dt:first-of-type {
-  margin-top: 0;
+  margin-top: 0
 }
-
 
 html {
   font-size: 62.5%;
@@ -350,29 +347,29 @@ html {
 }
 
 body {
-  font-optical-sizing: auto;
-  font-family: var(--text-font);
-  font-size: 1.6em;
-  background-color: var(--body-background-color);
   background-image: radial-gradient(#000 1px, transparent 0);
-  background-size: 40px 40px;
   background-position: -15px -15px;
+  background-size: 40px 40px;
+  font-family: var(--text-font);
+  font-optical-sizing: auto;
+  font-size: 1.6em;
   letter-spacing: normal;
   line-height: 1.45em;
   margin: 0;
   padding: 0
 }
 
-article {
-  background-color: var(--body-background-color);
+article,
+body {
+  background-color: var(--body-background-color)
 }
 
 span img {
+  box-shadow: none;
   display: block;
-  max-width: 40%;
   height: auto;
   margin: 1rem auto;
-  box-shadow: none;
+  max-width: 40%
 }
 
 @media screen and (max-width:768px) {
@@ -393,82 +390,74 @@ span img {
   }
 
   h5 {
-    font-size: 1.6rem
-  }
-
-  h5 {
+    font-size: 1.6rem;
     font-size: 1.5rem
   }
 }
 
 header section {
+  box-shadow: var(--box-shadow-large);
+  color: var(--black);
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  border: var(--border-default);
-  color: var(--black);
-  box-shadow: var(--box-shadow-large);
+  padding: 1rem
+}
+
+button,
+header section {
+  border: var(--border-default)
 }
 
 button {
-  padding: 0;
-  margin-left: 1rem;
-  font-size: 2.1rem;
-  white-space: nowrap;
-
   background-color: var(--caution-text-bg);
-  color: var(--caution-text-fg);
-  border: var(--border-default);
   box-shadow: var(--box-shadow-default);
+  color: var(--caution-text-fg);
+  font-size: 2.1rem;
+  margin-left: 1rem;
+  padding: 0;
+  white-space: nowrap
 }
 
 button:hover {
-  color: var(--link-color-hover);
   box-shadow: none;
+  color: var(--link-color-hover)
 }
 
 .tight {
-  margin-left: .1rem;
-  margin-right: .1rem;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin: 0 .1rem
 }
 
 button header {
-  display: flex;
   background-color: var(--caution-header-background);
+  display: flex;
   margin: 0;
-  padding: 0;
+  padding: 0
 }
 
-/* to make project clickable without link styling */
 .header-content-link {
-  text-decoration: none;
   color: inherit;
   display: block;
+  text-decoration: none
 }
 
-
+.lum-canvas,
 .lum-canvas-container {
-  width: 100%;
   border: none;
+  width: 100%
 }
 
 .lum-canvas {
-  width: 100%;
-  aspect-ratio: 1920.0/1080.0;
+  aspect-ratio: 1920/1080;
   background: #333;
-  border: none;
   box-shadow: none;
-  margin: auto;
-  /*i could just ignore input in demo, but this works too*/
-  pointer-events: none;
   cursor: not-allowed;
+  margin: auto;
+  pointer-events: none
 }
 
 *,
-::after,
-::before {
+:after,
+:before {
   box-sizing: inherit
 }
 
@@ -477,11 +466,11 @@ button header {
 }
 
 :root {
+  box-sizing: border-box;
+  color-scheme: only light;
   font-family: var(--text-font);
   font-feature-settings: "liga" 1, "calt" 1;
   scroll-behavior: smooth;
-  color-scheme: only light;
-  box-sizing: border-box;
   -webkit-text-size-adjust: none;
   -moz-text-size-adjust: none;
   text-size-adjust: none;
@@ -489,52 +478,42 @@ button header {
   --title-font: "DM Serif Display", serif;
   --text-font: "Inter", sans-serif;
   --code-font: "JetBrains Mono", monospace;
-
   --border-color: var(--black);
   --border-width-md: 3px;
   --border-radius-round: 2em;
   --border-small: 1px solid var(--border-color);
   --border-default: var(--border-width-md) solid var(--border-color);
-
   --black: #151414;
   --gray: #4c4847;
   --gray-light: #6e6e6e;
   --gray-lighter: #8a8887;
   --gray-lighterer: #c6c5c5;
-
   --white: #dad8d7;
   --color-1: #726c6a;
   --color-2: #2a2827;
-
   --box-shadow-color: var(--black);
   --box-shadow-small: 2px 2px var(--box-shadow-color);
   --box-shadow-default: 4px 4px var(--box-shadow-color);
   --box-shadow-large: 7px 7px var(--box-shadow-color);
-
   --body-background-color: var(--white);
   --selection-color: var(--color-1);
-
   --link-color-hover: var(--gray);
-
   --code-background-color: var(--white);
   --code-foreground-color: var(--black);
-
   --important-header-background: var(--white);
   --important-header-foreground: var(--white);
   --important-text-background: var(--white);
   --important-text-foreground: var(--white);
   --important-icon: var(--icon-exclamation-square-fill);
-
   --caution-header-background: var(--white);
   --caution-header-foreground: var(--white);
   --caution-text-background: var(--white);
   --caution-text-foreground: var(--black);
   --caution-icon: var(--icon-exclamation-circle-fill);
-
   --note-header-background: var(--white);
   --note-header-foreground: var(--black);
   --note-text-background: var(--white);
-  --note-text-foreground: var(--black);
+  --note-text-foreground: var(--black)
 }
 
 @supports (font-variation-settings:normal) {
@@ -548,11 +527,11 @@ button header {
 }
 
 .giscus-container {
-  grid-column: 4;
+  background-color: var(--body-background-color);
   border: var(--border-default);
   box-shadow: var(--box-shadow-large);
-  padding: 2rem;
-  margin-top: 2rem;
+  grid-column: 4;
   margin-bottom: 4rem;
-  background-color: var(--body-background-color);
+  margin-top: 2rem;
+  padding: 2rem
 }

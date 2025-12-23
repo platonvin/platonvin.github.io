@@ -5,3 +5,6 @@ drafts
 /.env
 *.xml
 *.py
+/node_modules
+# LOL
+node_modules
