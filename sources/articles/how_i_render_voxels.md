@@ -21,7 +21,7 @@ I am not an artist, and Lum embraces that - you are expected to reuse assets (in
 : Array of materials. Currently, limited by 255 (256, but first one is never accessed and represent "air")
 
 `Voxel`
-: An index into a material palette (so, data of voxel is its material). Represented by single `u8`. `0` means "air" - empty voxelы
+: An index into a material palette (so, data of voxel is its material). Represented by single `u8`. `0` means "air" - empty voxels
 
 `Model`
 : A free-form, self-aligned (so not world-aligned) voxel mesh of any size (up to 255x255x255 to fit in `u8`).
@@ -44,7 +44,7 @@ I am not an artist, and Lum embraces that - you are expected to reuse assets (in
 `Radiance field`
 : A 3D grid of lighting probes, one per block, representing corresponding (per-block) ligting
 
----
+
 
 ## Rendering pipeline
 Before renderer even starts, "render requests" are collected from user code. Render request is a "command" to renderer that looks like `{draw this block id at this position}` or `{draw this model with this rotation and this translation}`. Then, the pipeline looks something like this:
@@ -55,7 +55,7 @@ Before renderer even starts, "render requests" are collected from user code. Ren
 * Compute: Updates all lighting state (radiance fields) and builds voxel representations of models in out world.
 * Shading: Actually draws stuff on screen (*mostly* from GBuffer) - diffuse & glossy, ambient occlusion, reflections, volumetrics, tonemapping and outputting into swapchain image
 
----
+
 
 ## Lightmaps
 *(believe me, this boring part is necessary for an interesting one after)*<br />
@@ -74,7 +74,7 @@ Also, for better culling, we don't actually store the contour as a single triang
 
 At this point, the lightmap command buffers are done (of course, we execute them before shading).
 
----
+
 
 ## GBuffer
 Lum is a "deferred" renderer, and in this stage, we determine the voxel material and normal for each pixel.
@@ -99,7 +99,7 @@ There are some small visual features that I just really wanted to implement, so 
 * Liquids: We could do a DFT/FFT for some big resolution, but it's too slow. Instead, we do a "fake/manual" FFT, where we compute a few separate small DFTs and combine them with different scales and amplitudes (I call them LOD levels). The height at a point `p` is `∑ᵢ Lodᵢ(p) * Scaleᵢ`.
   *If you are wondering where is actual liquid sim - im building renderer for games, not simulation. Faking visuals is enough*
 
----
+
 
 ## Compute
 There is not much Lum does in compute workload - updating data structure to represent models, radiance field lighting and grass & water states.
@@ -118,7 +118,7 @@ Details about actual material light processing don't really matter - it's just a
 
 As optimization, for tracing probe rays, instead of doing it until hit / out-of-bounds, we do it for a fixed distance, and if not a hit, "inherit" light from end point - I call it light propagation (it is another way to accumulate over time/space). It also creates cool effect of visible light waves.
 
----
+
 
 ## Shading
 Modern games think that rendering in full-res is slow, so they shade in low-res and then upscale. However, upscaling can be costly (and looks terrible, and then you need neural networks and even more temporal accumulation with complicated algorithms to fix it), while subpasses allow a lot of optimizations, so this tradeoff is almost never worth it. All of Lum's shading happens in a single render pass, and that is a key reason why it can run on laptops. The frame image we render to potentially never even leaves the GPU's on-chip memory.
@@ -127,12 +127,12 @@ The shading render pass order is:<br />
 `"diffuse" light shading` → `ambient occlusion` → `glossy reflections` → `volumetrics` → `tonemapping to swapchain`.
 
 * diffuse reads the GBuffer (also potentially loaded only once - its subpass input), samples radiance field + sun lightmaps and produces "diffuse" shading color of pixel
----
+
 * ambient occlusion samples depth buffer of pixels nearby (so it's not purely subpass input sadly, since we need adjacent pixels. But it's filled in previous renderpass, so we can safely do it) and darkens pixel for "corners"
----
+
 * glossy reflections shader uses same technique as radiance field updater, but with slightly different settings (and it is culled with cheap shader marking pixels for processing in stencil mask as an optimization. Because even if you immediately discard in expensive shader, it means that this thread will just idle while expensive computations happen - it is much better to not even start expensive shaders. Alternative is dynamically redistribute work with shared memory, but this is way too complicated)
   This is enhanced by a little bit of screen-space raymarching to preserve some of the non-grid-aligned details
----
+
 * volumetrics sample 3D perlin noise as density and traversal thickness of volumetric in corresponding pixel to calculate total obfuscation, and then blend using it as alpha. No shiny raymarching towards light sources. They are culled in a similar to glossy way, but their stencil mask is setten by the same shader that determines thickness (just rasterizing volumetric shape into far&near depth images - this also means that it cant detect overlapping volumetrics and treats them as a single very thick one)
----
+
 * tonemap does all per-pixel color processing - remapping color range, some filters, and outputs directly to swapchain image (we dont render to swapchain immediately because we need slightly higher color range)

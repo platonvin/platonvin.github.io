@@ -1,17 +1,3 @@
-/* i separate some content for devs/hrs*/
-.hr-only,
-.dev-only {
-  display: none;
-}
-
-body.hr-mode .hr-only {
-  display: block;
-}
-
-body.dev-mode .dev-only {
-  display: block;
-}
-
 h1,
 h2,
 h3,
@@ -68,7 +54,7 @@ h1>a:hover {
 
 main {
   display: grid;
-  grid-template-columns: 1fr 1fr var(--gap) minmax(1em, 55em) var(--gap) 1fr 1fr
+  grid-template-columns: 1fr 1fr var(--gap) minmax(1em, 70em) var(--gap) 1fr 1fr
 }
 
 main>* {
@@ -121,8 +107,7 @@ article {
 }
 
 article * {
-  grid-column-start: -1;
-  grid-column-end: 1;
+  grid-column: 1/-1;
 }
 
 article :is(p:first-of-type, p:last-of-type) {
@@ -285,23 +270,39 @@ p a {
 }
 
 code {
+  display: inline-block;
   background-color: var(--code-background-color);
   color: var(--code-foreground-color);
   border: var(--border-small);
   box-shadow: var(--box-shadow-xsmall);
   line-height: 1.2;
-  margin-left: 1px;
-  margin-right: 2px;
+  margin-left: .2rem;
+  margin-right: .2rem;
   padding: .1rem .2rem;
   font-family: var(--code-font);
   font-size: .9em;
-  white-space: break-spaces;
-  overflow-wrap: anywhere;
 }
 
 code::selection {
   background-color: var(--code-foreground-color);
   color: var(--code-background-color)
+}
+
+pre {
+  margin: 1rem 0;
+}
+
+pre code {
+  display: block;
+  padding: 0.5rem;
+  background-color: var(--gray-lighterer);
+  box-shadow: var(--box-shadow-large);
+  /* font-size: 0.7em; */
+}
+
+pre code::selection {
+  background-color: var(--white);
+  color: var(--color-2);
 }
 
 section {
@@ -498,6 +499,9 @@ button header {
   --black: #151414;
   --gray: #4c4847;
   --gray-light: #6e6e6e;
+  --gray-lighter: #8a8887;
+  --gray-lighterer: #c6c5c5;
+
   --white: #dad8d7;
   --color-1: #726c6a;
   --color-2: #2a2827;
@@ -543,8 +547,6 @@ button header {
   background-color: var(--selection-color)
 }
 
-
-
 .giscus-container {
   grid-column: 4;
   border: var(--border-default);
@@ -553,13 +555,4 @@ button header {
   margin-top: 2rem;
   margin-bottom: 4rem;
   background-color: var(--body-background-color);
-}
-
-/* so iframe doesn't overflow on small screens??? TODO: */
-.giscus-container iframe {
-  width: 100% !important;
-}
-
-body {
-  --google-font-color-notocoloremoji: colrv1;
 }
