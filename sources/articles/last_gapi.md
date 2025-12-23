@@ -5,18 +5,17 @@ headline: "Last Graphics API"
 comments: true
 ---
 
-## The Spark
 tl;dr: 1 arch to make it even simpler. Bindless plays nicely with pointers.
 
 This is textual representation of what sparked in my brain after i read [Sebastian Aaltonen article](https://www.sebastianaaltonen.com/blog/no-graphics-api). If you think i am wrong - please, correct me (gotta learn somehow). I likely fucked something up.
 
-lets just lock ISA (and some other details). GPUs are still "evolving", but their architecture has not fundamentally changed and is somewhat similar across vendors.
-
-Following is reflections on "what if..."
 
 ---
 
-## A Common Instruction Set
+## lets just lock ISA 
+(and some other details). GPUs are still "evolving", but their architecture has not fundamentally changed and is somewhat similar across vendors.
+Following is reflections on "what if..."
+
 Drivers currently act like JIT compilers for IR. If we had same instruction set everyone agrees on, this problem would vanish*. You would be able to **actually** compile and optimize your shaders. No pipeline caches.
 drawback: we will get microcode-like thing then. Currently, drivers compile shaders into actual instructions, and they get directly executed. However, one could argue microcode can actually be an optimization for more compact instructions and simpler internals.
 In any way, microcode does not run expensive optimization passes or run CPU code in runtime :)
@@ -30,7 +29,6 @@ If the hardware gets standardized, there is less variable features to worry abou
 
 ---
 
-## Pointers and Memory
 I very much liked the idea of making things pointers. I do not believe automatic "is memory visible to CPU" management and "GPU memory magically behaves like CPU memory" is right choice tho - even with ReBAR (which is just Resizable BAR) PCIe latency & bandwidth are still a problem. I would like to manage what goes to "fast, internal GPU memory" and what stays in "small, visible to CPU area" myself, otherwise there must be something managing it for me __in runtime__, or extra transistors wiring all memory to PCIe
 If we could somehow get SoC architecture that everyone agrees on that would be even better. Basically standardize integrated GPUs? That would smooth out **so many** skill issues - just look at Apple
 
@@ -83,8 +81,6 @@ want to have 2 buffers? Allocate memory for 2 and pass with offset
 
 ---
 
-## Simplifying the API
-
 Vulkan has concept of push constant. Vulkan also has vkCmdUpdateBuffer. I ditch them as you can see above, and they are just memory in what is bound to shader. Key part of push constants is very easy update from CPU by embedding their data directly in command buffer.
 
 Lets keep that (for faster prototyping, and as fast way to deliver small blobs of data), and expand to any memory:
@@ -109,8 +105,6 @@ Image tiling is not controlled by you. Since we agree on compression/pixels layo
 
 ---
 
-## Other Considerations
-
 I have nothing to say on fences & semaphores.
 Queues are cool but afaik they are only used for async compute in a way that could be expressed as just better barriers* (no need of API concept for that)
 * this currently does **not** work this way, but i believe it is possible to express through synchronization. Alternatively, we could represent current hw - have 3 distinct queues - compute, transfer and raster.
@@ -122,8 +116,6 @@ I might be dumb here, but subpasses give way more useful context for drivers com
 SoC would probably do subpasses.
 
 ---
-
-## Impact
 
 All this does not go against having normal Vulkan/DX12 drivers. If anything, such hardware would support a lot of extensions.
 

@@ -59,5 +59,7 @@ cv_ru.pdf: sources/cv_ru.html sources/cv_ru.css
 	  -V mainfont="Segoe UI" \
 	  sources/cv_ru.html -o cv_ru.pdf
 
-postcss:
-	npx postcss styles.css -o styles.min.css
+purge_css: purgecss
+
+purgecss:
+	purgecss --css styles.css --content index.html articles/*.html projects/*.html -o styles.css
