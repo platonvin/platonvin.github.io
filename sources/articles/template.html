@@ -5,10 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$title$</title>
-    $if(googlefonts)$
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    $endif$
     $for(css)$
     <link rel="stylesheet" href="$css$">
     $endfor$
@@ -18,6 +16,7 @@
 <body>
     <header>
         $if(backlink)$<a href="$backlink$" class="nav-link">← back to main</a>$endif$
+        <button id="toggle-code-outline-btn" title="Toggle code highlight">turn outlines off</button>
         <div class="header-content">
             $if(headline)$<h1 class="big-headline">$headline$</h1>$else$<h1 class="big-headline">$title$</h1>$endif$
         </div>
@@ -41,14 +40,22 @@
         </section>
         $endif$
     </main>
-    $for(after_body_script)$
-    <script src="$after_body_script$"></script>
-    $endfor$
-    $for(inline_script)$
-    <script type="module">
-        $inline_script$
+    $if(after_body_script)$
+    $after_body_script$
+    $endif$
+    <script>
+        const btn = document.getElementById('toggle-code-outline-btn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const no_outlines = document.body.classList.toggle('no-code-outline');
+                if (no_outlines) {
+                    btn.textContent = 'turn outlines on';
+                } else {
+                    btn.textContent = 'turn outlines off';
+                }
+            });
+        }
     </script>
-    $endfor$
 </body>
 
 </html>

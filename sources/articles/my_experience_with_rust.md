@@ -1,12 +1,11 @@
 ---
 title: My Experience with Rust
 lang: 
-css: ../styles.css
 backlink: ../index.html
-googlefonts: true
 headline: my experience with `Rust`
 intro_footer: <p><em>information is subjective. Treat it as a story about experience</em></p>
 comments: true
+after_body_script: <script type="module"> import init from '../pkg/demo_lib.js'; async function start_lum() { try { await init('../pkg/demo_lib_bg.wasm'); const canvas = document.getElementById('lum_canvas'); if (canvas) { canvas.blur(); }} catch (e) {console.error('Failed to init WASM:', e);}} start_lum(); </script>
 ---
 
 ## why i tried it
