@@ -26,37 +26,47 @@
             </p>
         </footer>
                 <article>
-            <section id="why" class="level2">
-            <h2>why?</h2>
-            <p>A friend of mine was actively pitching <code>Rust</code> as new shiny thing i should try. I am always in search for a better language for gamedev, and after a week of attempts on integrating <code>C++20</code> modules (faster compile and no headers), which totally failed* - bugs, ICEs, docs so bad that reading source is more useful, - i realized how much time i spend on <code>CMake</code> (and earlier <code>Make</code> - I love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe <code>Rust</code> - which is praised for tooling - could solve that *for the purpose of correctness, i revisited it and actually moved to modules - this time successfully</p>
-            <p>So, i ported my C++ Vulkan renderer to <code>Rust</code> (and some more)</p>
-            <!-- not anymore LOL. You can still do it if you want. But i dont super-badly need it now -->
+            <section id="why-i-tried-it" class="level2">
+            <h2>why i tried it</h2>
+            <p>A friend of mine was actively pitching <code>Rust</code> as new shiny thing i should try. I am always in search for a better language for gamedev, and after a week of attempts on integrating <code>C++20</code> modules (faster compile and no headers), which totally failed* - bugs, ICEs, docs so bad that reading source is more useful, - i realized how much time i spend on <code>CMake</code> (and earlier <code>Make</code> - i love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe <code>Rust</code> - which is praised for tooling - could solve that.</p>
+            <p>* <em>for the purpose of correctness, i revisited it and actually moved to modules - this time successfully</em></p>
+            <blockquote>
+            <p>NOTE: i do gamedev/GPUs. Web <code>Rust</code> is different. Kernel <code>Rust</code> is different.</p>
+            </blockquote>
+            <!-- NOTE: not anymore. You can still do it if you want. But i don't super-badly need it now -->
             <!-- <small>If you are a `Rust` dev, i would really appreciate code review of [it (link)](https://github.com/platonvin/lum-rs). Suggestions about compile times are especially welcome.</small> -->
             </section>
-            <section id="first-impression-positives" class="level2">
-            <h2>(first impression) positives</h2>
-            <p><code>Cargo</code> is a build system that I don’t think much about (i like that). Tooling is amazing: <code>rust-analyzer</code>, <code>clippy</code>, <code>fmt</code> (<code>Rust</code> is the only language where a formatter almost does not annoy me), plus community tools like <code>cargo-asm</code> and lots of others.</p>
+            <section id="first-impressions-positives" class="level2">
+            <h2>first impressions/ positives</h2>
+            <p><code>Cargo</code> is a build system that i don’t think much about (I like that). Tooling is amazing: <code>rust-analyzer</code>, <code>clippy</code>, <code>fmt</code> (<code>Rust</code> is the only language where a formatter almost does not annoy me), plus community tools like <code>cargo-asm</code> and lots of others.</p>
             <hr />
             <p>And <code>Rust</code> has a lot of nice features!</p>
             <ul>
-            <li>Enums</li>
-            <li>backtraces (i basically dont use a debugger)</li>
+            <li>enums</li>
+            <li>stack traces (i basically don’t use a debugger)</li>
             <li>built-in checks (out-of-bounds, alignment, overflows / zero-div). I wish they were more optional though</li>
-            <li>No constructors (seriously, there are more constructors in <code>C++</code> than there are math subjects).
+            <li>No constructors (seriously, there are more constructors in <code>C++</code> than there are math subjects).<br />
+
             <details>
             <summary>
-            Click to see C++ constructors meme
+            Click to see C++ constructors meme<br />
+
             </summary>
-            <span><video autoplay muted loop playsinline width="60%"> <source src="/media/cpp_constructors_meme.webm" type="video/webm" /> </video> </span>
+            <span><video autoplay muted loop playsinline width="60%"><br />
+            <source src="/media/cpp_constructors_meme.webm" type="video/webm" /><br />
+            </video><br />
+            </span>
             </details></li>
             <li>built-in tests, benchmarks (<code>#![feature(test)]</code> + <code>black_box</code> makes it soooo easy) and docs (fn arg docs when?)</li>
             <li>stack slices with nice syntax, default trait functions, associated types, delegation - a lot of qol stuff</li>
-            <li><code>include_bytes!()</code> (i wish it was auto-aligned)</li>
-            <li>proc_macro let you rewrite language if something is missing</li>
-            <li>simple wasm builds (though you do need some extra tooling (and <code>--target-cpu=mvp</code> now)).
+            <li><code>include_bytes!()</code> (I wish it was auto-aligned)</li>
+            <li><code>#[proc_macro]</code> let you rewrite language if something is missing</li>
+            <li>simple wasm builds (though you do need some extra tooling (and <code>--target-cpu=mvp</code> now)).<br />
+
             <details>
             <summary>
-            Click to see my renderer running in web! (right here)
+            Click to see my renderer running in web! (right here)<br />
+
             </summary>
             <div class="lum-canvas-container">
             <pre><code>  &lt;canvas class=&quot;lum-canvas&quot; id=&quot;lum_canvas&quot;&gt;&lt;/canvas&gt;</code></pre>
@@ -80,100 +90,109 @@
             </div>
             </details></li>
             </ul>
-            <hr />
             </section>
-            <section id="first-impression-negatives" class="level2">
-            <h2>(first impression) negatives</h2>
+            <section id="real-info" class="level2">
+            <h2>real info</h2>
             <ul>
-            <li>I’m not sure if it clicked or not. I frequently wonder if im still missing a fundamental piece of <code>Rust</code> philosophy</li>
-            <li>Sometimes i cant find any good examples. I thought i understood something and tried to utilize move semantics only to get mismatch between drop (which takes <code>&amp;mut</code> and not <code>mut</code>) and the fact that i need to take out a thing from a struct. I had to either wrap it in <code>Option&lt;_&gt;</code> or use <code>MaybeUninit</code></li>
-            <li><code>Rust</code> is not really good with math - you need big libraries for basic quaternions and matrices, and syntax is still ugly (i have some plans on improving it with a bunch of proc_macro tricks, but… it could have been just integrated into language, like slices.)</li>
-            <li>Gamedev needs safe code that does not fall under safe <code>Rust</code> quite often. And vice versa, actually - gamedev writes “unsafe” code that falls under safe <code>Rust</code> - there’s a trend to trick the borrow checker using <code>Vec[index]</code> as “virtual memory” (effectively disabling a borrow checker via virtual memory)</li>
-            <li>Sometimes, you are not given control over things - other people decided you should not have it, and now you need to come up with weird solutions (for problems that could have not existed!). You cannot just disable slice bound checks for a scope - rewriting ops with proc_macro wont modify called functions, custom wrapper is ugly and has the same problem, replacing panic hook with unreachable breaks panics everywhere (not just for desired scope). Again, it is absolutely possible to have fine-grain control in <code>Rust</code> - its just ugly, verbose and unreadable. You want “-ffast-math” in function? Good luck! You cant change it for dependencies, and ONLY option is to use intrinsics, which are ugly. Is it possible? Sure, but you better off code it in <code>C</code> and link with LTO.</li>
-            </ul>
-            <hr />
-            </section>
-            <section id="some-real-info" class="level2">
-            <h2>some real info</h2>
-            <ul>
-            <li>my binary sizes went from ~600 KB to ~700 KB (compared to <code>C++</code>). <em>btw, just removing thiserror and anyhow cut like ~100kb</em></li>
+            <li>my binary sizes went from ~600 KB to ~700 KB (compared to <code>C++</code>). Likely, due to a lot of implicit assertions<br />
+            <em>btw, just removing thiserror and anyhow cut like ~100kb</em></li>
             <li>performance-wise nothing really changed: <code>Rust</code> is faster at low opt-levels (~2x faster (not precompiled std, i checked)), and on highest opt-levels the gap narrows (with gcc being slightly faster for <code>C++</code>).</li>
-            <li>(incremental) compile times are ~4s for both languages for similar dev (some optimizations) build (hard to really compare, project structures are different), both noticeably hurt iteration speed (i developed a habit of basically not running my code at all for a very long time. But lsps compensate it). For debug build, <code>Rust</code> can recompile in around a second, while <code>C++</code> (even with modules) might take from 3~8 seconds, depending on a change</li>
+            <li>(incremental) compile times are ~4s for both languages for similar dev (some optimizations) build (hard to really compare, project structures are different), both noticeably hurt iteration speed (i developed a habit of basically not running my code at all for a very long time. But lsps compensate it).<br />
+            For debug build, <code>Rust</code> can recompile in around a second, while <code>C++</code> (even with modules) might take from 3~8 seconds, depending on a change</li>
             </ul>
             <hr />
-            </section>
-            <section id="blazingly-fast" class="level2">
-            <h2>blazingly fast</h2>
             <p><strong>Performance-wise, <code>Rust</code> is truly a rocket. But not all <code>Rust</code>.</strong></p>
-            <p><code>C</code>-like* <code>Rust</code> is a beast. Simple references and struct hierarchy forces you into code that produces insane assembly. Enums for polymorphism are just regular functions. However, wrap everything in <code>Option</code>s, <code>Rc</code> <code>Cell</code>s and <code>Box</code>es, <code>dyn trait</code>s and deep nested containers, and it’s not so fast anymore.</p>
-            <p>So far, most <code>Rust</code> code i’ve seen sticks to one of those two extremes - and people dont feel like telling you right away which one it is for a specific library. Seems like what happened is web people who are not aware of systems programming got into Rust.</p>
-            <p>Libraries also tend to have not optional runtime validation, which is really weird. Why not give me a choice?</p>
-            <hr />
+            <p><code>C</code>-like <code>Rust</code> is a beast. Simple references and struct hierarchy forces you into code that produces insane assembly. Enums for polymorphism are just regular functions. However, wrap everything in <code>Option</code>s, <code>Rc</code> <code>Cell</code>s and <code>Box</code>es, <code>dyn trait</code>s, hashtables to fight borrow checker, and it’s not so fast anymore.</p>
             </section>
-            <section id="libraries" class="level2">
-            <h2>libraries</h2>
-            <p>There is just not that many great libraries. Initializing OpenGL with winit and glow is harder than with GLFW (i literally spent few hours figuring it out). Algebra libraries are written by people who dont seem to code at all (compile times, syntax, hello?). Vulkan wrappers changing API and names dealt me even more pain than gltf loader (which, in its turn, is more complicated than thermodynamics). Peak frustration was when I couldn’t figure out the MagicaVoxel (.vox) parser docs and ended up porting the <code>C</code> parser instead (spent less time on that, huh).</p>
-            <p>In <code>Rust</code> you don’t spend a day trying to make a library compile &amp; link - you spend a day looking for one that doesn’t suck. Crates refactor every few months and break APIs for no practical reason (semantic versioning - 1.0.0 - should help, but most crates are 0.0.12345215). Documentation is often useless (says a lot, explains nothing), and logic is smeared across dozen layers of tiny functions (std has better docs, but suffers from unreadable source more).<br />
-            After reading docs, even when i feel like i understand most parts of the system, i usually have no idea how they connect to each other. Like std::random - i spent way too much time for something i would type in a minute in C. RandomSource? Great, i understand it. Distribution? Sure. How they connect? No idea. Feels like <code>Rust</code> libraries are written for people who understand the problem library is trying to solve. But this is why i use a library in the first place - if i understood the problem well, i would not need a library.<br />
-            I really miss C libraries where you go to function source and immediately understand what it is doing. And libraries pull dozens of dependencies (which is not a problem by itself, but …).</p>
+            <section id="negatives" class="level2">
+            <h2>negatives</h2>
+            <p>Not sure if it clicked or not. I frequently wonder if I’m still missing a fundamental piece of <code>Rust</code> philosophy<br />
+            I thought i understood move semantics and tried to utilize it only to get mismatch between drop (which takes <code>&amp;mut</code> and not <code>mut</code>) and the fact that i want to take out a thing from a struct. I had to either wrap it in <code>Option&lt;_&gt;</code> or use <code>MaybeUninit</code></p>
             <hr />
+            <p>Gamedev needs safe code that does not fall under safe <code>Rust</code> quite often. And vice versa, actually - gamedev writes “unsafe” code that falls under safe <code>Rust</code> - there’s a trend to trick the borrow checker using <code>Vec[index]</code> as “virtual memory” (effectively disabling a borrow checker via virtual memory)</p>
+            <hr />
+            <p>You are not always given control over things - other people decided you should <strong>not</strong> have it, and now you have a problem. You cannot just disable slice bound checks for a scope - rewriting ops with <code>proc_macro</code> wont modify called functions, custom wrapper is ugly and has the same scope problem, replacing <code>#[panic_hook]</code> with <code>unreachable_unchecked!()</code> is insanity.<br />
+            It is absolutely possible to have fine-grain control in <code>Rust</code> - its just ugly, verbose and unreadable. You want “-ffast-math” in function? Good luck! You cant change it for dependencies, and have to use intrinsics*. Is it possible? Sure, but you better off code it in <code>C</code> and link with LTO. Or just code in <code>C</code>.<br />
+            * not literally intrinsics, but methods that call intrinsics. They are not overloaded.<br />
+            <br />
+            Sometimes i feel like people have joined a cult of “no unsafe <strike>code</strike>”<br />
+            no unsafe != what you dream about code doing. Unsafe != incorrect. Unsafe is just a marker that demands explicit acknowledgement.<br />
+            good luck turning off integer zero division checks. Or forcing <code>-ffast-math</code>. Or turning asserts into debug_assert<br />
+            someone literally decided “oh thats too unsafe, <code>Rust</code> programmers are idiots and we should not even have this as opt-in option”. It is probably fixable with a custom MIR pass.</p>
+            <hr />
+            <p><code>Rust</code> is not really good with math - you need big libraries for basic quaternions and matrices, and syntax is still ugly.<br />
+            There is <a href="https://crates.io/crates/nalgebra"><code>nalgebra</code></a>. And <a href="https://crates.io/crates/glam"><code>glam</code></a>. And <a href="https://crates.io/crates/vek"><code>vek</code></a>. And <a href="https://crates.io/crates/cgmath"><code>cgmath</code></a>. And dozen more libraries. And custom vector solutions everywhere.<br />
+            Linear algebra vectors map closely to hw. But we do not have builtin types for them somehow?? - oh but not every CPU has SIMD - yes they do, your browser likely requires at least SSE2 to run. Just to read this sentence. And we had floats before <code>ieee754</code>!</p>
+            <p>Imagine if every <code>Rust</code> crate implemented floats manually. There would be floats with usize, with u32, with different endians, and some would be generic over this, some would be generated in build script while others generate in proc/declarative macro, or are written manually. Some would do inline assembly, some would be purely safe, … Imagine that hell. That is what is going on with vectors.</p>
+            <p>Its also pain to do as u32 as usize as u64 as isize … all the time. Serialize as u32, usize for performance, u64 for GAPI</p>
             </section>
-            <section id="generic-problems-i-came-up-with-in-an-hour-of-thinking" class="level2">
-            <h2>Generic problems i came up with in an hour of thinking:</h2>
-            <ul>
-            <li><p>you cant trivially overwrite cargo crate (you need to trick cargo into thinking its a different source). Updating Bevy is pain.</p></li>
-            <li><p>dynamic linking is kinda a thing but every crate you want to link dynamically needs to opt in</p></li>
-            <li><p>windows toolchain dependency on windows</p></li>
-            <li><p>basically this:</p>
-            <div class="sourceCode" id="cb3"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="co">// perfectly fine, we DO support partial borrows!</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_1<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_1 <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">.</span>field_1<span class="op">;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_2<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_2 <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">.</span>field_2<span class="op">;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="co">// Fuck You!</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_1<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_1 <span class="op">=</span> <span class="kw">self</span><span class="op">.</span>mut_field_1()<span class="op">;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Error: first mutable borrow occurs in a line above</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_2<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_2 <span class="op">=</span> <span class="kw">self</span><span class="op">.</span>mut_field_2()<span class="op">;</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-            <p>You can fight this do some degree by generating declarative macro in proc/declarative macro, but this has to be done explicitly (someone super-smart decided that you shall not be able to declare macro in impl)</p>
-            <p><em>would be cool to see language that has <strong>warning or recommendations</strong> with <code>Rust</code> borrow checker tech where above would be expressible</em></p>
-            <p>Code structure for graphics programming tends to get easier for me when i can have megastructs, which are not compatible with <code>Rust</code> borrowing rules You NEED functions with 10+ arguments. Or restructure your code every 10 minutes after you change the smallest thing because now you have to move everything to other sub/structs. I DO like how result usually looks like, but i wish i could just remove restriction on partial borrows TODO:</p></li>
-            <li><p>compilation model &amp; build system: i am 100% willing to sacrifice circular references in order to get rebuilds at the speed of C It would also be cool if we could do Odin-like thing where we paste directories with .rs files and they are treated like dependencies. I would 100% use it.</p></li>
-            <li><p>sometimes i feel like people have joined a cult of “no unsafe code” no unsafe != what you dream about code doing. Unsafe != incorrect. Unsafe is just a fucking marker that demands explicit acknowledgement. good luck turning off integer zero division checks. Or forcing -ffast-math. Or turning asserts into debug_assert someone literally decided “oh thats too unsafe, <code>Rust</code> programmers are idiots and we should not even have this as opt-in option”. It is probably fixable with a custom MIR pass.</p></li>
-            <li><p>you will have a problem, and there <strong>will</strong> be 3 crates with zero comparison between them, 10 feature flags each, no examples and documentation like</p>
+            <section id="libraries-ecosystem" class="level2">
+            <h2>libraries &amp; ecosystem</h2>
+            <p>There is just not that many great libraries. Initializing <code>OpenGL</code> with <code>winit</code> and <code>glow</code> is harder than with <code>GLFW</code> (I literally spent few hours figuring it out). Algebra libraries are written by people who don’t seem to code at all (compile times, syntax, hello?). <code>Vulkan</code> wrappers changing API and names dealt me pain. A popular <code>gltf</code> loader is more complicated than thermodynamics. I couldn’t figure out the <code>MagicaVoxel (.vox)</code> parser docs and ended up porting the <code>C</code> parser instead (spent less time on that, huh).</p>
+            <p>In <code>Rust</code> you don’t spend a day trying to make a library compile &amp; link - you spend a day looking for one that doesn’t suck. Crates refactor every few months and break APIs for no practical reason (semantic versioning - 1.0.0 - should help, but most crates are never gonna reach it). Documentation is often useless (says a lot, explains nothing), and logic is smeared across dozen layers of tiny functions (std has better docs, but suffers from unreadable source more).</p>
+            <p>After reading docs, even when i feel like i understand most parts of the system, i usually have no idea how they connect to each other. Like std::random - i spent way too much time for something i would type in a minute in C. RandomSource? Great, i understand it. Distribution? Sure. How they connect? No idea. Feels like <code>Rust</code> libraries are written for people who understand the problem library is trying to solve. But this is why i use a library in the first place - if i understood the problem well, i would not need a library.<br />
+            I really miss <code>C</code> libraries where you go to function source and immediately understand what it is doing. And libraries pull dozens of dependencies (which is not a problem by itself, but …).</p>
+            <hr />
+            <p>You will have a problem, and there <strong>will</strong> be 3 crates with zero comparison between them, 10 feature flags each, no examples and with documentation like</p>
             <pre><code>/// A struct representing an apple
 struct Apple {
     /// Seeds of this apple
     seeds: Vec&lt;Seed&gt; 
 }</code></pre>
-            <p>and you will dive through entirety of docs.rs and understand NOTHING. Same feeling after reading Vulkan spec and have seen everything but have zero understanding</p></li>
-            <li><p><code>Rust</code> is gonna eat your disk alive. Go try modern <code>Rust</code> async web frameworks. My game will likely be smaller than their release builds.</p></li>
-            <li><p>libraries tend to have a lot of asserts (bounds checking, unwraps, etc.) that are not disableable. Each assert is truly nothing, but having them everywhere prevents compiler from reordering and “cancelling out” code</p></li>
-            <li><p>there are many “language features”. You are not gonna know about them since the only place they are mentioned is “Unstable features - The rustdoc book”. Googling “all <code>Rust</code> features” will not get you there btw</p></li>
-            <li><p>80% of public <code>Rust</code> is for web, but web people do not bother telling you about that right away. They also have a very specific measure of performance</p></li>
-            <li><p>there is nalgebra. And glam. And vek. And dozen more libraries. And custom solutions everywhere. Linear algebra vectors map closely to hw. But we do not have builtin types for them somehow?? - oh but not every CPU has SIMD - yes they do, your browser like requires at least SSE4 to run. Just to read this sentence. And we had floats before ieee754. Imagine if every <code>Rust</code> crate implemented floats manually. There would be floats with <code>usize</code>, with <code>u32</code>, with different endians, and some would be generic over this, some would be generated in build script while others generate in proc/declarative macro, or are written manually. Some would do inline assembly, some would be purely safe, … Imagine that hell. That is what is going on with vectors Its also pain to do as <code>u32</code> as <code>usize</code> as <code>u64</code> all the time… Serialize as <code>u32</code>, <code>usize</code> for performance, <code>u64</code> for GAPI</p></li>
-            <li><p><code>Rust</code> build system is truly easy to start and requires only a few lines for most features… It is, however, one of the most complicated build systems out there. Go read a book (or 10) on Cargo (from capital letter, since… f you, Cargo developers just like Cargo.toml)<br />
-            &gt; quote from hn: <code>cargo is pretty straightforward for 95% of the cases, inconvenient for 3% of the cases, too limited for 1% of the cases, and extremely frustrating for the remaining cases</code> I once tried linking my C code to not port it, and ended up unable to pass linker arguments to <code>rustc</code> (Cargo was stripping them from extra compiler arguments. Without notice). I ended up implementing <code>libm</code> functions in inline assembly.</p></li>
-            <li><p>proc macros are less readable then declarative macros (since syntax for pasted words is same as code that pastes them you cant immediately see the difference. Fixable by changing code that colors it in my editor, but…)</p></li>
-            </ul>
-            <hr />
+            <p>and you will dive through entirety of docs.rs and understand NOTHING</p>
+            <p>Libraries tend to have a lot of asserts that are not disableable. Each one is truly nothing, but having them everywhere prevents compiler from reordering and “cancelling out” code. And also bloats your binaries.</p>
+            <p>Lots of public <code>Rust</code> is for web, but web people do not bother telling you about that right away. They also have a very specific measure of performance</p>
             </section>
-            <section id="generic-cool-things" class="level2">
-            <h2>Generic cool things:</h2>
+            <section id="deeper-issues" class="level2">
+            <h2>deeper issues</h2>
+            <p>basically this:</p>
+            <div class="sourceCode" id="cb4"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="co">// perfectly fine, we DO support partial borrows!</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_1<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_1 <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">.</span>field_1<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_2<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_2 <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">.</span>field_2<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="co">// Not across function boundaries tho</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_1<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_1 <span class="op">=</span> <span class="kw">self</span><span class="op">.</span>mut_field_1()<span class="op">;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Error: first mutable borrow occurs in a line above</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_2<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_2 <span class="op">=</span> <span class="kw">self</span><span class="op">.</span>mut_field_2()<span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+            <p>You can fight this to some degree by generating declarative macro in proc/declarative macro, but this is ugly and incomplete.</p>
+            <p><em>would be cool to see memory-oriented language that has <strong>warning or recommendations</strong> with <code>Rust</code> borrow checker tech where above would be expressible</em></p>
+            <p>Code structure for graphics programming tends to get easier for me when i can have megastructs, which are not compatible with <code>Rust</code> borrowing rules.<br />
+            You NEED functions with 10+ arguments. Or restructure your code every 10 minutes after you change the smallest thing because now you have to move everything to other sub/structs.<br />
+            i like how result usually looks like, but i wish i could just remove restriction on partial borrows.<br />
+            <br />
+            </p>
+            <ul>
+            <li><p>Orphan rule wants you to wrap everything.</p></li>
+            <li><p>there are many “language features”. You are not gonna know about them since the only place they are mentioned is “Unstable features - The rustdoc book”. Googling “all <code>Rust</code> features” will not get you there btw</p></li>
+            <li><p><code>Rust</code> is gonna eat your disk alive. Modern <code>Rust</code> async web frameworks builds are larger than lots of games.</p></li>
+            <li><p>dynamic linking is kind of a thing but every crate you want to link dynamically needs to opt in</p></li>
+            <li><p>windows toolchain dependency on windows</p></li>
+            <li><p><code>Cargo</code> is complicated<br />
+            &gt; quote from hn : <strong>“cargo is pretty straightforward for 95% of the cases, inconvenient for 3% of the cases, too limited for 1% of the cases, and extremely frustrating for the remaining cases”</strong></p>
+            <p>i once tried linking my <code>C</code> code to not port it, and ended up unable to pass linker arguments to <code>rustc</code> (<code>Cargo</code> was stripping them from extra compiler arguments. Without notice). I ended up implementing <code>libm</code> functions in inline assembly.</p></li>
+            <li><p>proc macros are less readable than declarative macros (since syntax for pasted words is same as code that pastes them you cant immediately see the difference. Fixable by changing code that colors it in my editor, but…)</p></li>
+            <li><p>i am 100% willing to sacrifice circular references in order to get rebuilds at the speed of <code>C</code></p></li>
+            <li><p>It would also be cool if we could do <code>Odin</code>-like thing where we paste directories with .rs files and they are treated like dependencies. I would 100% use it.</p></li>
+            </ul>
+            </section>
+            <section id="cool-aspects" class="level2">
+            <h2>cool aspects</h2>
             <ul>
             <li><p>design by committee is really powerful. But only when language sparks joy and people DO want to be committee and design a language. You can expect <code>Rust</code> to be very polished. Unbelievably polished sometimes.</p></li>
             <li><p>default containers are fast, checked, and free from a lot of problems.</p></li>
-            <li><p>enums (tagged unions) are imo best drop-in inheritance replacement. If you want very C++ style, it is faster than C++ version - <dyn Trait> will be (<em>Struct, </em>virtual functions table), and calling a function from table is dereferencing one pointer, unlike C++, where it is two</p></li>
-            <li><p>stack traces</p></li>
-            <li><p>cross compilation to wasm</p></li>
+            <li><p>enums (tagged unions) are also imo best drop-in inheritance replacement. If you want dynamic dispatch, it is faster than <code>C++</code> version - <code>&lt;dyn Trait&gt;</code> will be (<em>struct, </em>virtual functions table), and getting a function pointer from table is one level of indirection, unlike <code>C++</code>, where it is two (vtable ptr stored in class memory)</p></li>
             <li><p>everything-from-source as build system idea (and static linking)</p></li>
-            <li><p>MIRI. And UB preconditions. Asserts are everywhere, and i mean non-trivial ones (like go try to cast 8-aligned pointer to 32-aligned struct pointer)</p></li>
+            <li><p>MIRI (Interpreter for Rust with runtime UB checks) . And UB preconditions. Asserts are everywhere, and i mean non-trivial ones (like casting 8-aligned pointer to 32-aligned *struct)</p></li>
             </ul>
-            <hr />
             </section>
-            <section id="overall" class="level2">
-            <h2>overall</h2>
-            <p><code>Rust</code> seems close to local maximum for its “language ideas” (that are slowly changing). I enjoy it, my code usually works first try, project structure feels better (i like to imagine that my code is like an “opus magnum” (game) solution, multiple small robotic pieces, moving and modifying data in a perfect tandem, except its far from perfect). Rust fits you better if you “prototype” in your head, and only code “final” solutions. <br/></p>
+            <section id="the-end" class="level2">
+            <h2>the end</h2>
+            <p><code>Rust</code> fits you better if you “prototype” in your head, and only code “final” solutions.</p>
+            <p><code>Rust</code> seems close to local maximum for its “language ideas” (that are slowly changing). I enjoy it, my code usually works first try, project structure feels better (I like to imagine that my code is like an “opus magnum” (game) solution, multiple small robotic pieces, moving and modifying data in a perfect tandem, except its far from perfect).</p>
+            <!-- If you think i can only complain - im in the process of trying to fix those issues. -->
+            <p>:)</p>
             </section>
         </article>
 

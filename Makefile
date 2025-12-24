@@ -1,11 +1,12 @@
 # you need so much settings to just pandoc to not fuck up your data, love this
-ARTICLE_PANDOC_ARGS = -f markdown+raw_html+raw_attribute+backtick_code_blocks -t html --wrap=none --standalone --template=sources/articles/template.html --css=../styles.css --section-divs --highlight-style=kate --shift-heading-level-by 0
+
+# ARG_LINE_BREAKS = --wrap=preserve
+ARG_LINE_BREAKS = --wrap=none
+# ARG_LINE_BREAKS = 
+
+ARTICLE_PANDOC_ARGS = -f markdown+raw_html+raw_attribute+backtick_code_blocks+hard_line_breaks $(ARG_LINE_BREAKS) -t html --standalone --template=sources/articles/template.html --css=../styles.css --highlight-style=kate --section-divs --shift-heading-level-by 0 
 ARTICLE_MD_FILES = $(wildcard sources/articles/*.md)
 ARTICLE_HTML_FILES = $(patsubst sources/articles/%.md,articles/%.html,$(ARTICLE_MD_FILES))
-
-# PROJECTS_PANDOC_ARGS = -f markdown+raw_html+raw_attribute -t html --standalone --template=sources/projects/template.html --css=../styles.css --shift-heading-level-by 0
-# PROJECT_MD_FILES = $(wildcard sources/projects/*.md)
-# PROJECT_HTML_FILES = $(patsubst sources/projects/%.md,projects/%.html,$(PROJECT_MD_FILES))
 
 default: run
 

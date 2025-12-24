@@ -1,1 +1,3 @@
 bg color to remove dots under text
+bring inline wasm back (likely pandoc option i removed)
+button to disable all `code` highlighting
