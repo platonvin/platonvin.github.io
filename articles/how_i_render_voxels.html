@@ -5,13 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>platonvin: Voxels</title>
-            <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="../styles.css">
         
 </head>
 
 <body>
     <header>
         <a href="../index.html" class="nav-link">← back to main</a>
+        <button id="toggle-code-outline-btn" title="Toggle code highlight">turn outlines off</button>
         <div class="header-content">
             <h1 class="big-headline">how Lum works</h1>
         </div>
@@ -19,321 +22,144 @@
 
     <main>
                 <article>
+            <section id="why-is-this-an-article" class="level2">
+            <h2>Why is this an article?</h2>
+            <p>Really, just in hopes it makes GPUs "click" for someone. You are free to ask (literally any amount of any) questions (anywhere)</p>
+            </section>
             <section id="what" class="level2">
             <h2>What?</h2>
-            <p>Lum is a voxel renderer i develop to power some of my
-            future games. It is not an extendable general purpose
-            engine, rather fast and simple library.</p>
-            <p>I am not an artist, and Lum embraces that - you are
-            expected to reuse assets, program animations and draw some
-            things with shaders.</p>
+            <p>Lum is a voxel renderer i develop to power some of my future games. It is not an extendable general purpose engine, rather fast and simple library.</p>
+            <p>I am not an artist, and Lum embraces that - you are expected to reuse assets (in a form of blocks), program animations and draw some things with shaders.</p>
             </section>
             <section id="key-structures" class="level2">
             <h2>key structures</h2>
             <dl>
             <dt><code>Material</code></dt>
             <dd>
-            Represent type of voxel by its properties, such as color,
-            roughness, emittance, etc.
+            Represent type of voxel by its properties, such as color, roughness, emittance, etc.
             </dd>
             <dt><code>Material palette</code></dt>
             <dd>
-            Array of materials. Currently, limited by 255 (256, but
-            first one is never accessed and represent "air")
+            Array of materials. Currently, limited by 255 (256, but first one is never accessed and represent "air")
             </dd>
             <dt><code>Voxel</code></dt>
             <dd>
-            An index into a material palette (so, data of voxel is its
-            material). Represented by single <code>u8</code>.
-            <code>0</code> means "air" - emtpy voxelz
+            An index into a material palette (so, data of voxel is its material). Represented by single <code>u8</code>. <code>0</code> means "air" - empty voxels
             </dd>
             <dt><code>Model</code></dt>
             <dd>
-            A free-form, self-aligned (so not world-aligned) voxel mesh
-            of any size (up to 255x255x255 to fit in <code>u8</code>).
+            A free-form, self-aligned (so not world-aligned) voxel mesh of any size (up to 255x255x255 to fit in <code>u8</code>).<br />
             Each model's voxels live in its own 3D image.
             </dd>
             <dt><code>Block</code></dt>
             <dd>
-            A grid-aligned voxel mesh, exactly 16x16x16 in size. Blocks
-            voxel data lives in block palette
+            A grid-aligned voxel mesh, exactly 16x16x16 in size. Blocks voxel data lives in block palette
             </dd>
             <dt><code>Block palette</code></dt>
             <dd>
-            a large 3D image storing many 16^3 sub-blocks (we use an
-            image cause hw sampling &amp; tiling, but anything would do
-            the job). * Blocks in block palette come in two flavors: *
-            Static - immutable assets, e.g. loaded from files * Dynamic
-            - ones that are [created and modified] every frame to
-            represent some dynamic changes. When a model needs to be
-            placed in the world, we want to represent its voxels in our
-            data structure, but we cant modify the blocks it occupies -
-            their data is origin for multiple instances. Instead, a new
-            "dynamic" blocks are allocated in the palette, the original
-            static blocks data is copied into it, and the world grid's
-            "pointer" is updated to this new (mutable) copy. This is
-            effectively a <code>Cow</code> - Copy-on-write * Note: code
-            that reads a block "pointer" doesn't care whether it's
-            static or dynamic - all processing is identical.
+            a large 3D image storing many 16^3 sub-blocks<br />
+            (we use an image cause hw sampling &amp; tiling, but anything would do the job).<br />
+            * Blocks in block palette come in two flavors:<br />
+            * Static - immutable assets, e.g. loaded from files<br />
+            * Dynamic - ones that are [created and modified] every frame to represent some dynamic changes. When a model needs to be placed in the world, we want to represent its voxels in our data structure, but we cant modify the blocks it occupies - their data is origin for multiple instances. Instead, a new "dynamic" blocks are allocated in the palette, the original static blocks data is copied into it, and the world grid's "pointer" is updated to this new (mutable) copy. This is effectively a <code>Cow</code> - Copy-on-write<br />
+            * Note: code that reads a block "pointer" doesn't care whether it's static or dynamic - all processing is identical.
             </dd>
             <dt><code>World</code></dt>
             <dd>
-            A 3D grid of block "pointers" (indices into that block
-            palette).
+            A 3D grid of block "pointers" (indices into that block palette).
             </dd>
             <dt><code>Radiance field</code></dt>
             <dd>
-            A 3D grid of lighting probes, one per block, representing
-            corresponding (per-block) ligting
+            A 3D grid of lighting probes, one per block, representing corresponding (per-block) ligting
             </dd>
             </dl>
-            <hr />
             </section>
             <section id="rendering-pipeline" class="level2">
             <h2>Rendering pipeline</h2>
-            <p>Before renderer even starts, "render requests" are
-            collected from user code. Render request is a "command" to
-            renderer that looks like
-            <code>{draw this block id at this position}</code> or
-            <code>{draw this model with this rotation and this translation}</code>.
-            Then, the pipeline looks something like this:</p>
+            <p>Before renderer even starts, "render requests" are collected from user code. Render request is a "command" to renderer that looks like <code>{draw this block id at this position}</code> or <code>{draw this model with this rotation and this translation}</code>. Then, the pipeline looks something like this:</p>
             <ul>
-            <li>CPU preparation: Some regular GAPI-related CPU work. We
-            also sort requests by depth (for Vulkan) / state (for WGPU),
-            update per-frame GPU data and figure out which radiance
-            probes need to be updated this frame (any block with a
-            non-empty neighbor. btw this is current bottleneck) and
-            upload their positions to the GPU</li>
-            <li>Lightmaps: Sun lightmaps for blocks and models, nothing
-            special</li>
-            <li>GBuffer Pass: Lum is a "deferred" renderer, this stage
-            determines voxel material and normal for each pixel</li>
-            <li>Compute: Updates all lighting state (radiance fields)
-            and builds voxel representations of models in out
-            world.</li>
-            <li>Shading: Actually draws stuff on screen (<em>mostly</em>
-            from GBuffer) - diffuse &amp; glossy, ambient occlusion,
-            reflections, volumetrics, tonemapping and outputting into
-            swapchain image</li>
+            <li>CPU preparation: Some regular GAPI-related CPU work. We also sort requests by depth (for Vulkan) / state (for WGPU), update per-frame GPU data and figure out which radiance probes need to be updated this frame (any block with a non-empty neighbor. btw this is current bottleneck) and upload their positions to the GPU</li>
+            <li>Lightmaps: Sun lightmaps for blocks and models, nothing special</li>
+            <li>GBuffer Pass: Lum is a "deferred" renderer, this stage determines voxel material and normal for each pixel</li>
+            <li>Compute: Updates all lighting state (radiance fields) and builds voxel representations of models in out world.</li>
+            <li>Shading: Actually draws stuff on screen (<em>mostly</em> from GBuffer) - diffuse &amp; glossy, ambient occlusion, reflections, volumetrics, tonemapping and outputting into swapchain image</li>
             </ul>
-            <hr />
             </section>
             <section id="lightmaps" class="level2">
             <h2>Lightmaps</h2>
-            <p><em>(believe me, this boring part is necessary for an
-            interesting one after)</em><br /> We start by generating
-            lightmaps for blocks and models. Lightmaps are a classic
-            approach, and for this, we don't need voxel materials (until
-            I implement transparency one day). We just need the geometry
-            "contour" - vertices that define its silhouette.</p>
-            <p>To render this contour, we bind its vertex buffer and use
-            push constants to pass in data for each draw call.</p>
+            <p><em>(believe me, this boring part is necessary for an interesting one after)</em><br /><br />
+            We start by generating lightmaps for blocks and models. Lightmaps are a classic approach, and for this, we don't need voxel materials (until I implement transparency one day). We just need the geometry "contour" - vertices that define its silhouette.</p>
+            <p>To render this contour, we bind its vertex buffer and use push constants to pass in data for each draw call.</p>
             <ul>
-            <li>for blocks, which are grid-aligned, this is just their
-            position</li>
+            <li>for blocks, which are grid-aligned, this is just their position</li>
             <li>for models, it's rotation and translation</li>
             </ul>
-            <p>Since we only need model-space position for vertices, and
-            models are not expected to be large, and vertices of a voxel
-            are snapped to its corners, each vertex position can be a
-            tiny <code>i8vec3</code> - just 3 bytes (in fact, model
-            sizes are limit to 255 to fit into u8).</p>
-            <p>Also, for better culling, we don't actually store the
-            contour as a single triangle mesh. We abuse the fact that
-            voxel sides are grid-aligned and only have 6 possible
-            normals. The mesh is divided into 6 sections, one for each
-            normal, and we cull them separately against the camera
-            direction (btw some big games also use it, but it works best
-            for voxels).</p>
-            <p><em>if you are wondering why rasterization and not
-            raytracing - rasterization IS raytracing - it is
-            optimization of specialized case of raytracing</em></p>
-            <p>At this point, the lightmap command buffers are done
-            (ofcourse, we execute them before shading).</p>
-            <hr />
+            <p>Since we only need model-space position for vertices, and models are not expected to be large, and vertices of a voxel are snapped to its corners, each vertex position can be a tiny <code>i8vec3</code> - just 3 bytes (in fact, model sizes are limit to 255 to fit into u8).</p>
+            <p>Also, for better culling, we don't actually store the contour as a single triangle mesh. We abuse the fact that voxel sides are grid-aligned and only have 6 possible normals. The mesh is divided into 6 sections, one for each normal, and we cull them separately against the camera direction (btw some big games also use it, but it works best for voxels).</p>
+            <p><em>if you are wondering why rasterization and not raytracing - rasterization IS raytracing - it is optimization of specialized case of raytracing</em></p>
+            <p>At this point, the lightmap command buffers are done (of course, we execute them before shading).</p>
             </section>
             <section id="gbuffer" class="level2">
             <h2>GBuffer</h2>
-            <p>Lum is a "deferred" renderer, and in this stage, we
-            determine the voxel material and normal for each pixel.</p>
-            <p>This is where things get interesting. We actually don't
-            need a second mesh - the <code>contour</code> we used for
-            lightmapping is enough.</p>
-            <p>Since we render the 6 sides of the contour separately,
-            they all have the same normal, which we just pass in push
-            constants.</p>
-            <p>What about the material though? In the past, Lum encoded
-            it into the vertex data (obvious thing to do). This required
-            a lot of vertices (16x16 side of a block with random
-            material voxels would generate a lot of vertices since they
-            all have different material, unlike for contour, which can
-            merge them) and Lum was (as you might have guessed from
-            experience), vertex-bound.</p>
-            <p>The fix was to move this work into the pixel shader
-            (individual voxel was 18 vertices, and resulted into few
-            dozens of pixels - not a good ratio. right?). The vertex
-            shader passes the interpolated model-space position of the
-            vertex into the fragment shader. And as it turns out, that
-            is enough to determine the material! We just fetch the voxel
-            material at that position.</p>
+            <p>Lum is a "deferred" renderer, and in this stage, we determine the voxel material and normal for each pixel.</p>
+            <p>This is where things get interesting. We actually don't need a second mesh - the <code>contour</code> we used for lightmapping is enough.</p>
+            <p>Since we render the 6 sides of the contour separately, they all have the same normal, which we just pass in push constants.</p>
+            <p>What about the material though? In the past, Lum encoded it into the vertex data (obvious thing to do). This required a lot of vertices (16x16 side of a block with random material voxels would generate a lot of vertices since they all have different material, unlike for contour, which can merge them) and Lum was (as you might have guessed from experience), vertex-bound.</p>
+            <p>The fix was to move this work into the pixel shader (individual voxel was 18 vertices, and resulted into few dozens of pixels - not a good ratio. right?). The vertex shader passes the interpolated model-space position of the vertex into the fragment shader. And as it turns out, that is enough to determine the material! We just fetch the voxel material at that position.</p>
             <ul>
-            <li>For blocks, their voxel data is in the
-            <code>block palette</code>, and the current (one that we are
-            drawing) block's index in that palette is passed via push
-            constants.</li>
-            <li>For models, we store their voxel data each as a separate
-            3D image and bind them for every model draw call (or once
-            for WGPU backend and batched drawcall).</li>
+            <li>For blocks, their voxel data is in the <code>block palette</code>, and the current (one that we are drawing) block's index in that palette is passed via push constants.</li>
+            <li>For models, we store their voxel data each as a separate 3D image and bind them for every model draw call (or once for WGPU backend and batched drawcall).</li>
             </ul>
-            <p>At this point, we have rasterized all blocks and models
-            into our GBuffer.</p>
-            <p>There are some small visual features that I just really
-            wanted to implement, so here we are:</p>
+            <p>At this point, we have rasterized all blocks and models into our GBuffer.</p>
+            <p>There are some small visual features that I just really wanted to implement, so here we are:</p>
             <ul>
-            <li>Foliage: I thought that since the intention is to
-            construct the world out of blocks, same can work for foliage
-            - we don't need to store positions of individual foliage
-            <em>objects</em>. So, foliage is generated entirely by
-            shaders (mostly the vertex shader). We drawcall N instances
-            of M vertices, where <code>n ⊂ (0...N)</code> corresponds to
-            an index of a blade, and <code>m ⊂ (0..M)</code> corresponds
-            to the index of a vertex in that blade.<br /> Actually, 1
-            instance of <code>(M+1)*N</code> vertices is enough - we
-            render blades as a triangle strip(s) (to do work only once
-            per vertex), and we could insert <code>NaN</code> vertex
-            between strips to prevent the GPU from rendering triangles
-            connecting them, but we might as well use GPU built-in
-            instances - just saves GPU few thrown away NaN
-            triangles.</li>
-            <li>Liquids: We could do a DFT/FFT for some big resolution,
-            but it's too slow. Instead, we do a "fake/manual" FFT, where
-            we compute a few separate small DFTs and combine them with
-            different scales and amplitudes (I call them LOD levels).
-            The height at a point <code>p</code> is
-            <code>∑ᵢ Lodᵢ(p) * Scaleᵢ</code>. <em>If you are wondering
-            where is actual liquid sim - im building renderer for games,
-            not simulation. Faking visuals is enough</em></li>
+            <li>Foliage: I thought that since the intention is to construct the world out of blocks, same can work for foliage - we don't need to store positions of individual foliage <em>objects</em>. So, foliage is generated entirely by shaders (mostly the vertex shader). We drawcall N instances of M vertices, where <code>n ⊂ (0...N)</code> corresponds to an index of a blade, and <code>m ⊂ (0..M)</code> corresponds to the index of a vertex in that blade.<br /><br />
+            Actually, 1 instance of <code>(M+1)*N</code> vertices is enough - we render blades as a triangle strip(s) (to do work only once per vertex), and we could insert <code>NaN</code> vertex between strips to prevent the GPU from rendering triangles connecting them, but we might as well use GPU built-in instances - just saves GPU few thrown away NaN triangles.</li>
+            <li>Liquids: We could do a DFT/FFT for some big resolution, but it's too slow. Instead, we do a "fake/manual" FFT, where we compute a few separate small DFTs and combine them with different scales and amplitudes (I call them LOD levels). The height at a point <code>p</code> is <code>∑ᵢ Lodᵢ(p) * Scaleᵢ</code>.<br />
+            <em>If you are wondering where is actual liquid sim - im building renderer for games, not simulation. Faking visuals is enough</em></li>
             </ul>
-            <hr />
             </section>
             <section id="compute" class="level2">
             <h2>Compute</h2>
-            <p>There is not much Lum does in compute workload - updating
-            data structure to represent models, radiance field lighting
-            and grass &amp; water states.</p>
-            <p>At this point, all CPU parts of "Copy-on-write" happened
-            - we "allocated" (which is just memorizing which indices are
-            free and which are taken) temporary dynamic blocks on CPU.
-            Now we actually copy data from static blocks to allocated
-            dynamic ones (and for empty (air) blocks too, but for
-            performance we "clear" (memset) corresponding subimages with
-            0). After that, for every requested model draw, we submit
-            compute dispatch, that reads model-space voxel and writes it
-            to corresponding world voxel - determines in which block it
-            happens (reads world data), then indexes into block palette
-            and determines actual voxel (previously we made sure all
-            blocks that are occupied by models have been allocated, so
-            we are guaranteed to not write static blocks).</p>
-            <p>Now, with updated data structure, it's time to update
-            radiance field.</p>
-            <p>Radiance is per-block lighting probes, which describe
-            luminance in every direction with some encoding (currently
-            for performance tuning there is no direction, LOL). For
-            shading a pixel, we interpolate between multiple adjacent
-            probes to estimate light coming from all directions to this
-            pixel (note, that we don't really care for it to be
-            ReAlIsTiC, we only need it to look good).</p>
-            <p>So, we submit a compute shader, <code>NxMx1</code>, where
-            N is number of radiance update requests, and M is number of
-            rays per request. Currently, M is 64 (double warp size for
-            swap, you know this). In each thread, we send a ray into
-            random (uniform with some randomness) direction, raytrace it
-            and downsample result to store in radiance probes (currently
-            it has no direction, so just average across threads. When
-            I'll make it 6-directional, there will be mixing to 6
-            different directions) and mix it with what is currently in
-            radiance field (accumulating across time).</p>
-            <p>My raytracing is actually ray marching - making small
-            steps and checking collisions. I tried "precise" raymarchers
-            ("based" on famous paper from 1987), in multiple different
-            variations (branches/masks/partially unrolled/), I tried
-            distance fields, I tried bit arrays instead of voxel for
-            "checking" if voxel is non-empty, but the fastest good
-            looking solution turned out to be simple fixed-step
-            raymarching with rollback on collision for precise hit
-            processing (and with manual "jumps" over air (empty)
-            blocks).</p>
-            <p>Details about actual material light processing don't
-            really matter - it's just a visual thing, you can use
-            whatever you want. I like primitive shading model with
-            roughness, color and emmitance.</p>
-            <p>As optimization, for tracing probe rays, instead of doing
-            it until hit / out-of-bounds, we do it for a fixed distance,
-            and if not a hit, "inherit" light from end point - I call it
-            light propagation (it is another way to accumulate over
-            time/space). It also creates cool effect of visible light
-            waves.</p>
-            <hr />
+            <p>There is not much Lum does in compute workload - updating data structure to represent models, radiance field lighting and grass &amp; water states.</p>
+            <p>At this point, all CPU parts of "Copy-on-write" happened - we "allocated" (which is just memorizing which indices are free and which are taken) temporary dynamic blocks on CPU. Now we actually copy data from static blocks to allocated dynamic ones (and for empty (air) blocks too, but for performance we "clear" (memset) corresponding subimages with 0). After that, for every requested model draw, we submit compute dispatch, that reads model-space voxel and writes it to corresponding world voxel - determines in which block it happens (reads world data), then indexes into block palette and determines actual voxel (previously we made sure all blocks that are occupied by models have been allocated, so we are guaranteed to not write static blocks).</p>
+            <p>Now, with updated data structure, it's time to update radiance field.</p>
+            <p>Radiance is per-block lighting probes, which describe luminance in every direction with some encoding (currently for performance tuning there is no direction, LOL). For shading a pixel, we interpolate between multiple adjacent probes to estimate light coming from all directions to this pixel (note, that we don't really care for it to be ReAlIsTiC, we only need it to look good).</p>
+            <p>So, we submit a compute shader, <code>NxMx1</code>, where N is number of radiance update requests, and M is number of rays per request. Currently, M is 64 (double warp size for swap, you know this). In each thread, we send a ray into random (uniform with some randomness) direction, raytrace it and downsample result to store in radiance probes (currently it has no direction, so just average across threads. When I'll make it 6-directional, there will be mixing to 6 different directions) and mix it with what is currently in radiance field (accumulating across time).</p>
+            <p>My raytracing is actually ray marching - making small steps and checking collisions. I tried "precise" raymarchers ("based" on famous paper from 1987), in multiple different variations (branches/masks/partially unrolled/), I tried distance fields, I tried bit arrays instead of voxel for "checking" if voxel is non-empty, but the fastest good looking solution turned out to be simple fixed-step raymarching with rollback on collision for precise hit processing (and with manual "jumps" over air (empty) blocks).</p>
+            <p>Details about actual material light processing don't really matter - it's just a visual thing, you can use whatever you want. I like primitive shading model with roughness, color and emmitance.</p>
+            <p>As optimization, for tracing probe rays, instead of doing it until hit / out-of-bounds, we do it for a fixed distance, and if not a hit, "inherit" light from end point - I call it light propagation (it is another way to accumulate over time/space). It also creates cool effect of visible light waves.</p>
             </section>
             <section id="shading" class="level2">
             <h2>Shading</h2>
-            <p>Modern games think that rendering in full-res is slow, so
-            they shade in low-res and then upscale. However, upscaling
-            can be costly (and looks terrible, and then you need neural
-            networks and even more temporal accumulation with
-            complicated algorithmg to fix it), while subpasses allow a
-            lot of optimizations, so this tradeoff is almost never worth
-            it. All of Lum's shading happens in a single render pass,
-            and that is a key reason why it can run on laptops. The
-            frame image we render to potentially never even leaves the
-            GPU's on-chip memory.</p>
-            <p>The shading render pass order is:<br />
-            <code>"diffuse" light shading</code> →
-            <code>ambient occlusion</code> →
-            <code>glossy reflections</code> → <code>volumetrics</code> →
-            <code>tonemapping to swapchain</code>.</p>
+            <p>Modern games think that rendering in full-res is slow, so they shade in low-res and then upscale. However, upscaling can be costly (and looks terrible, and then you need neural networks and even more temporal accumulation with complicated algorithms to fix it), while subpasses allow a lot of optimizations, so this tradeoff is almost never worth it. All of Lum's shading happens in a single render pass, and that is a key reason why it can run on laptops. The frame image we render to potentially never even leaves the GPU's on-chip memory.</p>
+            <p>The shading render pass order is:<br /><br />
+            <code>"diffuse" light shading</code> → <code>ambient occlusion</code> → <code>glossy reflections</code> → <code>volumetrics</code> → <code>tonemapping to swapchain</code>.</p>
             <ul>
-            <li><h2
-            id="diffuse-reads-the-gbuffer-also-potentially-loaded-only-once---its-subpass-input-samples-radiance-field-sun-lightmaps-and-produces-diffuse-shading-color-of-pixel">diffuse
-            reads the GBuffer (also potentially loaded only once - its
-            subpass input), samples radiance field + sun lightmaps and
-            produces "diffuse" shading color of pixel</h2></li>
-            <li><h2
-            id="ambient-occlusion-samples-depth-buffer-of-pixels-nearby-so-its-not-purely-subpass-input-sadly-since-we-need-adjacent-pixels.-but-its-filled-in-previous-renderpass-so-we-can-safely-do-it-and-darkens-pixel-for-corners">ambient
-            occlusion samples depth buffer of pixels nearby (so it's not
-            purely subpass input sadly, since we need adjacent pixels.
-            But it's filled in previous renderpass, so we can safely do
-            it) and darkens pixel for "corners"</h2></li>
-            <li>glossy reflections shader uses same technique as
-            radiance field updater, but with slightly different settings
-            (and it is culled with cheap shader marking pixels for
-            processing in stencil mask as an optimization. Because even
-            if you immediately discard in expensive shader, it means
-            that this thread will just idle while expensive computations
-            happen - it is much better to not even start expensive
-            shaders. Alternative is dynamically redistribute work with
-            shared memory, but this is way too complicated) This is
-            enhanced by a little bit of screen-space raymarching to
-            preserve some of the non-grid-aligned details ---</li>
-            <li><h2
-            id="volumetrics-sample-3d-perlin-noise-as-density-and-traversal-thickness-of-volumetric-in-corresponding-pixel-to-calculate-total-obfuscation-and-then-blend-using-it-as-alpha.-no-shiny-raymarching-towards-light-sources.-they-are-culled-in-a-similar-to-glossy-way-but-their-stencil-mask-is-setten-by-the-same-shader-that-determines-thickness-just-rasterizing-volumetric-shape-into-farnear-depth-images---this-also-means-that-it-cant-detect-overlapping-volumetrics-and-treats-them-as-a-single-very-thick-one">volumetrics
-            sample 3D perlin noise as density and traversal thickness of
-            volumetric in corresponding pixel to calculate total
-            obfuscation, and then blend using it as alpha. No shiny
-            raymarching towards light sources. They are culled in a
-            similar to glossy way, but their stencil mask is setten by
-            the same shader that determines thickness (just rasterizing
-            volumetric shape into far&amp;near depth images - this also
-            means that it cant detect overlapping volumetrics and treats
-            them as a single very thick one)</h2></li>
-            <li>tonemap does all per-pixel color processing - remapping
-            color range, some filters, and outputs directly to swapchain
-            image (we dont render to swapchain immediately because we
-            need slightly higher color range)</li>
+            <li><p>diffuse reads the GBuffer (also potentially loaded only once - its subpass input), samples radiance field + sun lightmaps and produces "diffuse" shading color of pixel</p></li>
+            <li><p>ambient occlusion samples depth buffer of pixels nearby (so it's not purely subpass input sadly, since we need adjacent pixels. But it's filled in previous renderpass, so we can safely do it) and darkens pixel for "corners"</p></li>
+            <li><p>glossy reflections shader uses same technique as radiance field updater, but with slightly different settings (and it is culled with cheap shader marking pixels for processing in stencil mask as an optimization. Because even if you immediately discard in expensive shader, it means that this thread will just idle while expensive computations happen - it is much better to not even start expensive shaders. Alternative is dynamically redistribute work with shared memory, but this is way too complicated)<br />
+            This is enhanced by a little bit of screen-space raymarching to preserve some of the non-grid-aligned details</p></li>
+            <li><p>volumetrics sample 3D perlin noise as density and traversal thickness of volumetric in corresponding pixel to calculate total obfuscation, and then blend using it as alpha. No shiny raymarching towards light sources. They are culled in a similar to glossy way, but their stencil mask is setten by the same shader that determines thickness (just rasterizing volumetric shape into far&amp;near depth images - this also means that it cant detect overlapping volumetrics and treats them as a single very thick one)</p></li>
+            <li><p>tonemap does all per-pixel color processing - remapping color range, some filters, and outputs directly to swapchain image (we dont render to swapchain immediately because we need slightly higher color range)</p></li>
             </ul>
             </section>
         </article>
-    </main>
-        </body>
+
+            </main>
+        <script>
+        const btn = document.getElementById('toggle-code-outline-btn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const no_outlines = document.body.classList.toggle('no-code-outline');
+                if (no_outlines) {
+                    btn.textContent = 'turn outlines on';
+                } else {
+                    btn.textContent = 'turn outlines off';
+                }
+            });
+        }
+    </script>
+</body>
 
 </html>
