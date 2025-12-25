@@ -98,20 +98,20 @@ For debug build, `Rust` can recompile in around a second, while `C++` (even with
 
 **Performance-wise, `Rust` is truly a rocket. But not all `Rust`.**
 
-`C`-like `Rust` is a beast. Simple references and struct hierarchy forces you into code that produces insane assembly. Enums for polymorphism are just regular functions. However, wrap everything in `Option`s, `Rc` `Cell`s and `Box`es, `dyn trait`s, hashtables to fight borrow checker, and it's not so fast anymore.
+`C`-like `Rust` is a beast. Simple references and struct hierarchy forces you into code that produces insane assembly. Enums for polymorphism are just regular functions. However, wrap everything in `Option`{.keep-style}s, `Rc`{.keep-style} `Cell`{.keep-style}s and `Box`{.keep-style}es, `dyn trait`{.keep-style}s, hashtables to fight borrow checker, and it's not so fast anymore.
 
 ## negatives
 
 Not sure if it clicked or not. I frequently wonder if I'm still missing a fundamental piece of `Rust` philosophy
-I thought i understood move semantics and tried to utilize it only to get mismatch between drop (which takes `&mut` and not `mut`) and the fact that i want to take out a thing from a struct. I had to either wrap it in `Option<_>` or use `MaybeUninit`
+I thought i understood move semantics and tried to utilize it only to get mismatch between drop (which takes `&mut`{.keep-style} and not `mut`{.keep-style}) and the fact that i want to take out a thing from a struct. I had to either wrap it in `Option<_>`{.keep-style} or use `MaybeUninit`{.keep-style}
 
 ---
 
-Gamedev needs safe code that does not fall under safe `Rust` quite often. And vice versa, actually - gamedev writes "unsafe" code that falls under safe `Rust` - there's a trend to trick the borrow checker using `Vec[index]` as "virtual memory" (effectively disabling a borrow checker via virtual memory)
+Gamedev needs safe code that does not fall under safe `Rust` quite often. And vice versa, actually - gamedev writes "unsafe" code that falls under safe `Rust` - there's a trend to trick the borrow checker using `Vec[index]`{.keep-style} as "virtual memory" (effectively disabling a borrow checker via virtual memory)
 
 ---
 
-You are not always given control over things - other people decided you should **not** have it, and now you have a problem. You cannot just disable slice bound checks for a scope - rewriting ops with `proc_macro` wont modify called functions, custom wrapper is ugly and has the same scope problem, replacing `#[panic_hook]` with `unreachable_unchecked!()` is insanity.
+You are not always given control over things - other people decided you should **not** have it, and now you have a problem. You cannot just disable slice bound checks for a scope - rewriting ops with `proc_macro`{.keep-style} wont modify called functions, custom wrapper is ugly and has the same scope problem, replacing `#[panic_hook]`{.keep-style} with `unreachable_unchecked!()`{.keep-style} is insanity.
 It is absolutely possible to have fine-grain control in `Rust` - its just ugly, verbose and unreadable. You want "-ffast-math" in function? Good luck! You cant change it for dependencies, and have to use intrinsics*. Is it possible? Sure, but you better off code it in `C` and link with LTO. Or just code in `C`.
 \* not literally intrinsics, but methods that call intrinsics. They are not overloaded.\
 Sometimes i feel like people have joined a cult of "no unsafe <strike>code</strike>"
@@ -212,7 +212,7 @@ i like how result usually looks like, but i wish i could just remove restriction
 
 * default containers are fast, checked, and free from a lot of problems.
 
-* enums (tagged unions) are also imo best drop-in inheritance replacement. If you want dynamic dispatch, it is faster than `C++` version - `<dyn Trait>` will be (*struct, *virtual functions table), and getting a function pointer from table is one level of indirection, unlike `C++`, where it is two (vtable ptr stored in class memory)
+* enums (tagged unions) are also imo best drop-in inheritance replacement. If you want dynamic dispatch, it is faster than `C++` version - `<dyn Trait>`{.keep-style} will be (*struct, *virtual functions table), and getting a function pointer from table is one level of indirection, unlike `C++`, where it is two (vtable ptr stored in class memory)
 
 * everything-from-source as build system idea (and static linking)
 

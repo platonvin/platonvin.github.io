@@ -12,6 +12,13 @@ h5 {
   text-align: center
 }
 
+.standalone-heading {
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 h1 {
   font-size: 4.6rem;
   margin-bottom: 1rem
@@ -470,7 +477,7 @@ button header {
   padding: 2rem
 }
 
-#toggle-code-outline-btn {
+.button-style {
   background-color: var(--body-background-color);
   border: var(--border-small);
   box-shadow: var(--box-shadow-small);
@@ -481,14 +488,23 @@ button header {
   justify-self: left;
   width: fit-content;
   margin-left: 0;
+  text-decoration: none;
+  color: var(--black);
 }
 
-#toggle-code-outline-btn:hover {
+.button-style:hover {
   box-shadow: none;
   color: var(--link-color-hover);
 }
 
-body.no-code-outline code {
+body.no-code-outline code:not(.keep-style) {
   border: 1px solid transparent;
   box-shadow: none;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
 }

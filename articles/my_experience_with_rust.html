@@ -13,8 +13,8 @@
 
 <body>
     <header>
-        <a href="../index.html" class="nav-link">← back to main</a>
-        <button id="toggle-code-outline-btn" title="Toggle code highlight">turn outlines off</button>
+        <a href="../index.html" class="nav-link button-style">← back to main</a>
+        <button id="toggle-code-outline-btn" class="button-style" title="Toggle code highlight">turn outlines off</button>
         <div class="header-content">
             <h1 class="big-headline">my experience with <code>Rust</code></h1>
         </div>
@@ -111,16 +111,16 @@
             </ul>
             <hr />
             <p><strong>Performance-wise, <code>Rust</code> is truly a rocket. But not all <code>Rust</code>.</strong></p>
-            <p><code>C</code>-like <code>Rust</code> is a beast. Simple references and struct hierarchy forces you into code that produces insane assembly. Enums for polymorphism are just regular functions. However, wrap everything in <code>Option</code>s, <code>Rc</code> <code>Cell</code>s and <code>Box</code>es, <code>dyn trait</code>s, hashtables to fight borrow checker, and it's not so fast anymore.</p>
+            <p><code>C</code>-like <code>Rust</code> is a beast. Simple references and struct hierarchy forces you into code that produces insane assembly. Enums for polymorphism are just regular functions. However, wrap everything in <code class="keep-style">Option</code>s, <code class="keep-style">Rc</code> <code class="keep-style">Cell</code>s and <code class="keep-style">Box</code>es, <code class="keep-style">dyn trait</code>s, hashtables to fight borrow checker, and it's not so fast anymore.</p>
             </section>
             <section id="negatives" class="level2">
             <h2>negatives</h2>
             <p>Not sure if it clicked or not. I frequently wonder if I'm still missing a fundamental piece of <code>Rust</code> philosophy<br />
-            I thought i understood move semantics and tried to utilize it only to get mismatch between drop (which takes <code>&amp;mut</code> and not <code>mut</code>) and the fact that i want to take out a thing from a struct. I had to either wrap it in <code>Option&lt;_&gt;</code> or use <code>MaybeUninit</code></p>
+            I thought i understood move semantics and tried to utilize it only to get mismatch between drop (which takes <code class="keep-style">&amp;mut</code> and not <code class="keep-style">mut</code>) and the fact that i want to take out a thing from a struct. I had to either wrap it in <code class="keep-style">Option&lt;_&gt;</code> or use <code class="keep-style">MaybeUninit</code></p>
             <hr />
-            <p>Gamedev needs safe code that does not fall under safe <code>Rust</code> quite often. And vice versa, actually - gamedev writes "unsafe" code that falls under safe <code>Rust</code> - there's a trend to trick the borrow checker using <code>Vec[index]</code> as "virtual memory" (effectively disabling a borrow checker via virtual memory)</p>
+            <p>Gamedev needs safe code that does not fall under safe <code>Rust</code> quite often. And vice versa, actually - gamedev writes "unsafe" code that falls under safe <code>Rust</code> - there's a trend to trick the borrow checker using <code class="keep-style">Vec[index]</code> as "virtual memory" (effectively disabling a borrow checker via virtual memory)</p>
             <hr />
-            <p>You are not always given control over things - other people decided you should <strong>not</strong> have it, and now you have a problem. You cannot just disable slice bound checks for a scope - rewriting ops with <code>proc_macro</code> wont modify called functions, custom wrapper is ugly and has the same scope problem, replacing <code>#[panic_hook]</code> with <code>unreachable_unchecked!()</code> is insanity.<br />
+            <p>You are not always given control over things - other people decided you should <strong>not</strong> have it, and now you have a problem. You cannot just disable slice bound checks for a scope - rewriting ops with <code class="keep-style">proc_macro</code> wont modify called functions, custom wrapper is ugly and has the same scope problem, replacing <code class="keep-style">#[panic_hook]</code> with <code class="keep-style">unreachable_unchecked!()</code> is insanity.<br />
             It is absolutely possible to have fine-grain control in <code>Rust</code> - its just ugly, verbose and unreadable. You want "-ffast-math" in function? Good luck! You cant change it for dependencies, and have to use intrinsics*. Is it possible? Sure, but you better off code it in <code>C</code> and link with LTO. Or just code in <code>C</code>.<br />
             * not literally intrinsics, but methods that call intrinsics. They are not overloaded.<br />
             <br />
@@ -196,7 +196,7 @@ struct Apple {
             <ul>
             <li><p>design by committee is really powerful. But only when language sparks joy and people DO want to be committee and design a language. You can expect <code>Rust</code> to be very polished. Unbelievably polished sometimes.</p></li>
             <li><p>default containers are fast, checked, and free from a lot of problems.</p></li>
-            <li><p>enums (tagged unions) are also imo best drop-in inheritance replacement. If you want dynamic dispatch, it is faster than <code>C++</code> version - <code>&lt;dyn Trait&gt;</code> will be (<em>struct, </em>virtual functions table), and getting a function pointer from table is one level of indirection, unlike <code>C++</code>, where it is two (vtable ptr stored in class memory)</p></li>
+            <li><p>enums (tagged unions) are also imo best drop-in inheritance replacement. If you want dynamic dispatch, it is faster than <code>C++</code> version - <code>&lt;dyn Trait&gt;{.keep-style}</code> will be (<em>struct, </em>virtual functions table), and getting a function pointer from table is one level of indirection, unlike <code>C++</code>, where it is two (vtable ptr stored in class memory)</p></li>
             <li><p>everything-from-source as build system idea (and static linking)</p></li>
             <li><p>MIRI (Interpreter for Rust with runtime UB checks) . And UB preconditions. Asserts are everywhere, and i mean non-trivial ones (like casting 8-aligned pointer to 32-aligned *struct)</p></li>
             </ul>
