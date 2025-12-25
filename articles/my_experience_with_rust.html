@@ -158,13 +158,18 @@ struct Apple {
             <div class="sourceCode" id="cb2"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="co">// perfectly fine, we DO support partial borrows!</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_1<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_1 <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">.</span>field_1<span class="op">;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_2<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_2 <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">.</span>field_2<span class="op">;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="co">// Not across function boundaries tho</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_1<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_1 <span class="op">=</span> <span class="kw">self</span><span class="op">.</span>mut_field_1()<span class="op">;</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Error: first mutable borrow occurs in a line above</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_2<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_2 <span class="op">=</span> <span class="kw">self</span><span class="op">.</span>mut_field_2()<span class="op">;</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>borrowed_field_1 <span class="op">=</span> Field_1 <span class="op">{};</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>borrowed_field_2 <span class="op">=</span> Field_2 <span class="op">{};</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="co">// Not across function boundaries tho</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_1<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_1 <span class="op">=</span> <span class="kw">self</span><span class="op">.</span>mut_field_1()<span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Error: first (mutable) borrow occurs in a line above</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> borrowed_field_2<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Field_2 <span class="op">=</span> <span class="kw">self</span><span class="op">.</span>mut_field_2()<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>borrowed_field_1 <span class="op">=</span> Field_1 <span class="op">{};</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>borrowed_field_2 <span class="op">=</span> Field_2 <span class="op">{};</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+            <p><em>waiting for <code>Polonius</code></em></p>
             <p>You can fight this to some degree by generating declarative macro in proc/declarative macro, but this is ugly and incomplete.</p>
             <p><em>would be cool to see memory-oriented language that has <strong>warning or recommendations</strong> with <code>Rust</code> borrow checker tech where above would be expressible</em></p>
             <p>Code structure for graphics programming tends to get easier for me when i can have megastructs, which are not compatible with <code>Rust</code> borrowing rules.<br />

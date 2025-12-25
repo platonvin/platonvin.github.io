@@ -1,6 +1,6 @@
 # Native support for linear algebra types: vectors, matrices, and quaternions
 
-- Feature Name: linear_algebra_types
+- Feature Name: linear_algebra_primitives
 - Start Date: 2025-12-25
 - RFC PR: [rust-lang/rfcs#0000](https://github.com/rust-lang/rfcs/pull/0000)
 - Rust Issue: [rust-lang/rust#0000](https://github.com/rust-lang/rust/issues/0000)
@@ -14,8 +14,9 @@ Add built-in vector, matrix and quaternion types with swizzles (.xyzw/.rgba), in
 [motivation]: #motivation
 
 Fragmented ecosystem (nalgebra, glam, vek, cgmath, dozen others and manual implementations (to not add dependencies)) cause duplication, conversion overhead (cognitive and performance), extra deps, inconsistent and inconvenient syntax. Vectors match SIMD. Builtins would unify, optimize, cut compile times for graphics (realtime, offline for 3d software, image processing, game engines)/physics (both 2d and 3d)/ML.
-This would make Rust a step close to being adopted by gamedev industry and a step ahead multiple other languages, including its usage as GPU shading language.
-Value of syntax sugar for mathematics is high, some features of e.g. C++ (templates/overloads) are often the only used features and used for math (e.g. GLM).
+This would make Rust a step closer to being adopted by gamedev industry, including its usage as GPU shading language.
+Value of syntax sugar for mathematics is high*, some features of e.g. C++ (templates/overloads) are often the only used features and used for math (e.g. GLM).
+* Mathematicians/physicists invent new symbols just to shorten expressions all the time, we use one-letter notations to type less, etc.
 
 ## Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
@@ -48,8 +49,8 @@ let casted: vec4<i32> = v as i32vec4; // same as per-element `as` cast
 
 ## Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
-
-vecN<T> (N=2-4; T=f32/f64/i8-i64/u8-u64; aliases); matMxN<T> (column-major default); quat<T> ({x,y,z,w}).
+N=2-4; T=f32/f64/i8-i64/u8-u64\
+vecN\<T> (aliases to TvecN); matMxN\<T> (major?, aliases to TmatMxN); quat\<T> (aliases to Tquat).
 
 - writable/readable swizzles; indexing; element-wise ops; matrix/quat mul and other overloads
 - casts: 'as' same-size; From/Into arrays.
@@ -58,38 +59,50 @@ vecN<T> (N=2-4; T=f32/f64/i8-i64/u8-u64; aliases); matMxN<T> (column-major defau
 ## Drawbacks
 [drawbacks]: #drawbacks
 
-Extra complexity, syntactical exceptions, "magic", compiler speed/size. 
+Extra complexity, syntactical exceptions, "magic", compiler speed/size, some work needs to be done to existing vector libraries.
 
 ## Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
 
-Built-ins enable syntax that libs can't. Fixed 2-4D covers 99% of usecases. In many projects linear algebra is primary reason for operator overloads to exist. Pretty much every game/graphics/physics library depends on one or more linear algebra library, and when combining those you have to "glue" them together.
-Adding this feature would make gamedev a lot more appealing in Rust, make graphics programming less painful, help projects like Rust-GPU (and integrate with things like std::offload). Syntax sugar for vectors would be primary reason to use shading languages (e.g. GLSL) instead of Rust (if all other issues were resolved).
+Built-ins enable syntax that libs can't. Fixed 2-4D covers 99% of usecases. In many projects linear linal is primary reason for operator overloads to exist. Pretty much every game/graphics/physics lib depends on one or more linal libs, and when combining those you have to "glue" them together.
+Adding this feature would make gamedev a lot more appealing in Rust, make graphics programming less painful, help projects like Rust-GPU (and integrate with things like std::offload). Syntax sugar for vectors would be primary reason to use shading languages (e.g. GLSL) instead of Rust (if compilation issues were resolved).
 
-Could this be done in a library or macro instead? Yes, this is mostly syntactical change. I do think, however, this is a syntactical sugar that is worth it for enumerated areas.
+Abruptness of this proposal is understandable. But consider something you are very familiar with - floats. Floats existed in before IEEE 754 standard, and pretty much every language has them. As well as integer mathematics. Even if operations on those do not end up as trivial assembly (e.g. integer division in Rust produces a branch with zero-division check). Yet everyone understands and expects "builtin sugary" syntax for both floats and integers.
+Imagine the ecosystem if there were no builtin floats. "Yes, we have instructions that map directly to float operations, but we also have vector instructions - so what? There is million ways one could implement floating point numbers - have or not have checks, precision, comparisons, pretend as if it associative or not, NaN policy, etc. Someone could want 128 integer fixed point floats, someone could want packed 24-bit floats in range from 0 to 1. Something as complex and variable as floats could and should be implemented as a library"
+
+Could this be done in a library or macro instead? Yes, this is mostly syntactical change. I do think, however, this syntactical sugar is worth way more than added complexity.
+Alternatively, something could be done to:
+- allow safe `as` casts / implicit casts
+- allow writeable swizzles to exist (e.g. struct that contains compile-time known zero-size mutable reference to memory sections of its owner)
+- allow some sort of overloads (not that big of a deal if you are fine with bloated macro expansions)
+
+Currently, if someone wants nice linal syntax, they can:
+- use some other language (complicated build, potentially glue code). That is what most people currently do with GLSL, HLSL, WGLS, etc.
+- create a preprocessing system for desugaring, that would run before compilation (complicated build, error-prone, slow, no rust-analyzer integration)
+- pay compile & runtime fee (for half the syntax) but keep everything in Rust
 
 ## Prior art
 [prior-art]: #prior-art
 
-| Language                 | Swizzles syntax sugar                | Constructors                                 | Elementwise operations | Matrix * Vector Mul | Quat * Vector Mul (rotation) sugar | Vector casts                         |
-| ------------------------ | ------------------------------------ | -------------------------------------------- | ---------------------- | ------------------- | ---------------------------------- | ------------------------------------ |
-| Odin                     | Yes, with writes                     | explicit elements                            | Yes                    | Yes (m * v)         | No                                 | explicit per-element                 |
-| GLSL                     | Yes, with writes                     | overloaded fill, implicit casts, from others | Yes                    | Yes (m * v)         | No                                 | explicit constructors, downcasts     |
-| WGSL                     | Yes, reads + single-component writes | overloaded fill, from others                 | Yes                    | Yes (m * v)         | No                                 | explicit constructors, down/up casts |
-| HLSL                     | Yes, with writes                     | implicit casts, from others                  | Yes                    | Yes (mul(m, v))     | No                                 | implicit/explicit, downcasts         |
-| Metal                    | Yes, with writes                     | overloaded fill, implicit casts, from others | Yes                    | Yes (m * v)         | No                                 | explicit                             |
-| C (GCC/Clang extensions) | No                                   | explicit elements                            | Yes                    | No (manual)         | No                                 | implicit/explicit same-size          |
-| Zig                      | No                                   | explicit elements                            | Yes                    | No (manual)         | No                                 | explicit                             |
+| Language                 | Swizzles syntax sugar                | Constructors                                 | Elementwise operations | Matrix * Vector Mul | Vector casts                         |
+| ------------------------ | ------------------------------------ | -------------------------------------------- | ---------------------- | ------------------- | ------------------------------------ |
+| Odin                     | Yes, with writes                     | explicit elements                            | Yes                    | Yes (m * v)         | explicit per-element                 |
+| GLSL                     | Yes, with writes                     | overloaded fill, implicit casts, from others | Yes                    | Yes (m * v)         | explicit constructors, downcasts     |
+| WGSL                     | Yes, reads + single-component writes | overloaded fill, from others                 | Yes                    | Yes (m * v)         | explicit constructors, down/up casts |
+| HLSL                     | Yes, with writes                     | implicit casts, from others                  | Yes                    | Yes (mul(m, v))     | implicit/explicit, downcasts         |
+| Metal                    | Yes, with writes                     | overloaded fill, implicit casts, from others | Yes                    | Yes (m * v)         | explicit                             |
+| C (GCC/Clang extensions) | No                                   | expli   cit elements                         | Yes                    | No (manual)         | implicit/explicit same-size          |
+| Zig                      | No                                   | explicit elements                            | Yes                    | No (manual)         | explicit                             |
 
 Code for verifying these features in enumerated languages at the bottom.
 
-Odin (which many people know as gamedev-oriented language) had success with vectors/matrices/quaternions that are closest in sugar level to proposed.
+Odin (which many people know as gamedev-oriented language). Shading languages had obvious success (no one really writes their shaders in C).
 It is hard to judge other languages in that regard because of unique differences and the fact we are comparing syntax.
 
 ## Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
-Dims limit; quats/complex; alignment; (row/column) major; casts; at which level is this implemented. (e.g. desugared directly into std::simd or to some std::linal?)
+Dims limit; quats/complex; alignment (possibly just std::simd?); (row/column) major; at which level is this implemented;    
 
 ## Future possibilities
 [future-possibilities]: #future-possibilities

@@ -162,12 +162,16 @@ basically this:
 { // perfectly fine, we DO support partial borrows!
     let borrowed_field_1: &mut Field_1 = &mut self.field_1;
     let borrowed_field_2: &mut Field_2 = &mut self.field_2;
+    *borrowed_field_1 = Field_1 {};
+    *borrowed_field_2 = Field_2 {};
 }
 
 { // Not across function boundaries tho
     let borrowed_field_1: &mut Field_1 = self.mut_field_1();
-    // Error: first mutable borrow occurs in a line above
+    // Error: first (mutable) borrow occurs in a line above
     let borrowed_field_2: &mut Field_2 = self.mut_field_2();
+    *borrowed_field_1 = Field_1 {};
+    *borrowed_field_2 = Field_2 {};
 }
 ```
 *waiting for `Polonius`*
