@@ -170,6 +170,7 @@ basically this:
     let borrowed_field_2: &mut Field_2 = self.mut_field_2();
 }
 ```
+*waiting for `Polonius`*
 
 You can fight this to some degree by generating declarative macro in proc/declarative macro, but this is ugly and incomplete.
 

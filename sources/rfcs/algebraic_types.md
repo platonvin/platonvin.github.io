@@ -1,4 +1,4 @@
-# Native Support for Linear Algebra Types: Vectors, Matrices, and Quaternions
+# Native support for linear algebra types: vectors, matrices, and quaternions
 
 - Feature Name: linear_algebra_types
 - Start Date: 2025-12-25
@@ -52,14 +52,13 @@ let casted: vec4<i32> = v as i32vec4; // same as per-element `as` cast
 vecN<T> (N=2-4; T=f32/f64/i8-i64/u8-u64; aliases); matMxN<T> (column-major default); quat<T> ({x,y,z,w}).
 
 - writable/readable swizzles; indexing; element-wise ops; matrix/quat mul and other overloads
-- backend: std::simd.
-- layouts: #[repr(simd)]; major attrs.
 - casts: 'as' same-size; From/Into arrays.
+- backend: std::simd.
 
 ## Drawbacks
 [drawbacks]: #drawbacks
 
-Extra complexity, syntactical exceptions, "magic", compiler speed/size 
+Extra complexity, syntactical exceptions, "magic", compiler speed/size. 
 
 ## Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
@@ -67,16 +66,41 @@ Extra complexity, syntactical exceptions, "magic", compiler speed/size
 Built-ins enable syntax that libs can't. Fixed 2-4D covers 99% of usecases. In many projects linear algebra is primary reason for operator overloads to exist. Pretty much every game/graphics/physics library depends on one or more linear algebra library, and when combining those you have to "glue" them together.
 Adding this feature would make gamedev a lot more appealing in Rust, make graphics programming less painful, help projects like Rust-GPU (and integrate with things like std::offload). Syntax sugar for vectors would be primary reason to use shading languages (e.g. GLSL) instead of Rust (if all other issues were resolved).
 
-Could this be done in a library or macro instead? Yes, this is mostly syntactical change 
+Could this be done in a library or macro instead? Yes, this is mostly syntactical change. I do think, however, this is a syntactical sugar that is worth it for enumerated areas.
 
 ## Prior art
 [prior-art]: #prior-art
 
-Updated verified examples:
+| Language                 | Swizzles syntax sugar                | Constructors                                 | Elementwise operations | Matrix * Vector Mul | Quat * Vector Mul (rotation) sugar | Vector casts                         |
+| ------------------------ | ------------------------------------ | -------------------------------------------- | ---------------------- | ------------------- | ---------------------------------- | ------------------------------------ |
+| Odin                     | Yes, with writes                     | explicit elements                            | Yes                    | Yes (m * v)         | No                                 | explicit per-element                 |
+| GLSL                     | Yes, with writes                     | overloaded fill, implicit casts, from others | Yes                    | Yes (m * v)         | No                                 | explicit constructors, downcasts     |
+| WGSL                     | Yes, reads + single-component writes | overloaded fill, from others                 | Yes                    | Yes (m * v)         | No                                 | explicit constructors, down/up casts |
+| HLSL                     | Yes, with writes                     | implicit casts, from others                  | Yes                    | Yes (mul(m, v))     | No                                 | implicit/explicit, downcasts         |
+| Metal                    | Yes, with writes                     | overloaded fill, implicit casts, from others | Yes                    | Yes (m * v)         | No                                 | explicit                             |
+| C (GCC/Clang extensions) | No                                   | explicit elements                            | Yes                    | No (manual)         | No                                 | implicit/explicit same-size          |
+| Zig                      | No                                   | explicit elements                            | Yes                    | No (manual)         | No                                 | explicit                             |
+
+Code for verifying these features in enumerated languages at the bottom.
+
+Odin (which many people know as gamedev-oriented language) had success with vectors/matrices/quaternions that are closest in sugar level to proposed.
+It is hard to judge other languages in that regard because of unique differences and the fact we are comparing syntax.
+
+## Unresolved questions
+[unresolved-questions]: #unresolved-questions
+
+Dims limit; quats/complex; alignment; (row/column) major; casts; at which level is this implemented. (e.g. desugared directly into std::simd or to some std::linal?)
+
+## Future possibilities
+[future-possibilities]: #future-possibilities
+
+Arbitrary-sized integers/floats in vectors and vector sizes.
+
+## Other language features
 
 C:
 ```c
-// gcc at.c -o at && ./at
+// clang at.c
 
 #include <stdio.h>
 
@@ -416,23 +440,3 @@ pub fn main() !void {
     // no swizzle on smaller vectors
 }
 ```
-
-| Language | Swizzles               | Constructors              | Per-element Ops | Matrix * Vector | Quat * Vector              | Casts                  |
-| -------- | ---------------------- | ------------------------- | --------------- | --------------- | -------------------------- | ---------------------- |
-| Odin     | Yes, writes            | explicit                  | Yes             | Yes (m * v)     | No (but quaternions exist) | explicit               |
-| GLSL     | Yes, writes            | fill/implicit/from others | Yes             | Yes (m * v)     | No                         | explicit/downcast      |
-| WGSL     | Yes, read/single write | fill/from others          | Yes             | Yes (m * v)     | No                         | explicit/down/up       |
-| HLSL     | Yes, writes            | implicit/from others      | Yes             | Yes (mul(m,v))  | No                         | implicit/explicit/down |
-| Metal    | Yes, writes            | fill/implicit/from others | Yes             | Yes (m * v)     | No                         | explicit               |
-| C        | No                     | n/a                       | Yes             | No              | No                         | implicit/explicit      |
-| Zig      | No                     | explicit                  | Yes             | No              | No                         | explicit               |
-
-## Unresolved questions
-[unresolved-questions]: #unresolved-questions
-
-Dims limit; quats/complex; alignment; major; casts; std::simd timeline.
-
-## Future possibilities
-[future-possibilities]: #future-possibilities
-
-Tensors; ops; SVE; crate deprecation.
