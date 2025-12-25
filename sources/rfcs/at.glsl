@@ -35,6 +35,8 @@ void main() {
     
     // cast (constructor = explicit cast)
     ivec4 casted = ivec4(v);
+    ivec3 down_casted = ivec3(v);
+    // ivec4 up_casted = ivec4(down_casted);
     
     // valid swizzle on vec3
     v3.rbg = vec3(1.0);

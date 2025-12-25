@@ -38,5 +38,5 @@ main :: proc() {
 	rotated := linalg.quaternion_mul_vector3(q, v3)
 
 	// cast - NO syntax sugar
-	casted: [4]i32 = linalg.array_cast(v, i32)
+	// casted: [4]i32 = linalg.array_cast(v, i32)
 }
