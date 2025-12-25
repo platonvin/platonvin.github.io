@@ -2,7 +2,7 @@
 title: "platonvin: Last GAPI"
 backlink: "../index.html"
 headline: "Last Graphics API"
-comments: true
+# comments: true
 ---
 
 tl;dr: 1 arch to make it even simpler. Bindless plays nicely with pointers.

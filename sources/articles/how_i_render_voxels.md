@@ -2,7 +2,7 @@
 title: "platonvin: Voxels"
 backlink: "../index.html"
 headline: "how Lum works"
-comments: true
+# comments: true
 ---
 
 ## Why is this an article?

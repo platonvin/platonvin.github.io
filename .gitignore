@@ -8,3 +8,5 @@ drafts
 /node_modules
 # LOL
 node_modules
+*.spv
+*.sirv

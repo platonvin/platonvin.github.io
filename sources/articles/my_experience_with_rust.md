@@ -4,8 +4,7 @@ lang:
 backlink: ../index.html
 headline: my experience with `Rust`
 intro_footer: <p><em>information is subjective. Treat it as a story about experience</em></p>
-comments: true
-after_body_script: <script type="module"> import init from '../pkg/demo_lib.js'; async function start_lum() { try { await init('../pkg/demo_lib_bg.wasm'); const canvas = document.getElementById('lum_canvas'); if (canvas) { canvas.blur(); }} catch (e) {console.error('Failed to init WASM:', e);}} start_lum(); </script>
+# comments: true
 ---
 
 ## why i tried it
@@ -45,7 +44,8 @@ And `Rust` has a lot of nice features!
 * `include_bytes!()` (I wish it was auto-aligned)
 * `#[proc_macro]` let you rewrite language if something is missing
 * simple wasm builds (though you do need some extra tooling (and `--target-cpu=mvp` now)).
-<details>
+```{=html}
+<details id="lum-details">
     <summary>
         Click to see my renderer running in web! (right here)
     </summary>
@@ -55,21 +55,36 @@ And `Rust` has a lot of nice features!
     <div class="project-preview">
         <script type="module">
             import init from '/../pkg/demo_lib.js';
-            async function start_lum() {
-                try {
-                    await init('/../pkg/demo_lib_bg.wasm');
-                    const canvas = document.getElementById('lum_canvas');
-                    if (canvas) {
-                        canvas.blur();
-                    }
-                } catch (e) {
-                    console.error('Failed to init WASM:', e);
+            const details = document.getElementById('lum-details');
+            let wasmInitialized = false;
+            details.addEventListener('toggle', (event) => {
+                if (details.open) {
+                    // only start if expanded
+                    start_lum_prioritized();
+                } else {
+                    console.log('Details closed');
                 }
+            });
+            async function start_lum_prioritized() {
+                if (wasmInitialized) return;
+                // less priority (wait for browser idle)
+                const scheduler = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+                scheduler(async () => {
+                    try {
+                        console.log('Initializing WASM in idle time...');
+                        await init('/../pkg/demo_lib_bg.wasm');
+                        const canvas = document.getElementById('lum_canvas');
+                        if (canvas) canvas.blur();
+                        wasmInitialized = true;
+                    } catch (e) {
+                        console.error('Failed to init WASM:', e);
+                    }
+                });
             }
-            start_lum();
         </script>
     </div>
 </details>
+```
 
 ## real info
 
