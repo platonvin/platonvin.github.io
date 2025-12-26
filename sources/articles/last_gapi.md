@@ -5,18 +5,17 @@ headline: "Last Graphics API"
 # comments: true
 ---
 
-tl;dr: 1 arch to make it even simpler. Bindless plays nicely with pointers.
+##
+
+**tl;dr**: 1 arch to make it even simpler. Bindless plays nicely with pointers.
 
 This is textual representation of what sparked in my brain after i read [Sebastian Aaltonen article](https://www.sebastianaaltonen.com/blog/no-graphics-api). If you think i am wrong - please, correct me (gotta learn somehow). I likely fucked something up.
-
-
----
 
 ## lets just lock ISA 
 (and some other details). GPUs are still "evolving", but their architecture has not fundamentally changed and is somewhat similar across vendors.
 Following is reflections on "what if..."
 
-Drivers currently act like JIT compilers for IR. If we had same instruction set everyone agrees on, this problem would vanish*. You would be able to **actually** compile and optimize your shaders. No pipeline caches.
+Drivers currently act like JIT compilers for IR. If we had same instruction set everyone agrees on, this problem would vanish\*. You would be able to **actually** compile and optimize your shaders. No pipeline caches.
 drawback: we will get microcode-like thing then. Currently, drivers compile shaders into actual instructions, and they get directly executed. However, one could argue microcode can actually be an optimization for more compact instructions and simpler internals.
 In any way, microcode does not run expensive optimization passes or run CPU code in runtime :)
 *: we would stop shipping 'Intermediate Representations' and start shipping binaries, just like C.

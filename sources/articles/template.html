@@ -14,9 +14,11 @@
 </head>
 
 <body>
-    <header>
+    <div class="fixed-controls">
         $if(backlink)$<a href="$backlink$" class="nav-link button-style">← back to main</a>$endif$
         <button id="toggle-code-outline-btn" class="button-style" title="Toggle code highlight">turn outlines off</button>
+    </div>
+    <header>
         <div class="header-content">
             $if(headline)$<h1 class="big-headline">$headline$</h1>$else$<h1 class="big-headline">$title$</h1>$endif$
         </div>

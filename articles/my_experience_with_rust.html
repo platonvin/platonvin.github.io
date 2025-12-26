@@ -12,9 +12,11 @@
 </head>
 
 <body>
-    <header>
+    <div class="fixed-controls">
         <a href="../index.html" class="nav-link button-style">← back to main</a>
         <button id="toggle-code-outline-btn" class="button-style" title="Toggle code highlight">turn outlines off</button>
+    </div>
+    <header>
         <div class="header-content">
             <h1 class="big-headline">my experience with <code>Rust</code></h1>
         </div>
@@ -196,7 +198,7 @@ struct Apple {
             <ul>
             <li><p>design by committee is really powerful. But only when language sparks joy and people DO want to be committee and design a language. You can expect <code>Rust</code> to be very polished. Unbelievably polished sometimes.</p></li>
             <li><p>default containers are fast, checked, and free from a lot of problems.</p></li>
-            <li><p>enums (tagged unions) are also imo best drop-in inheritance replacement. If you want dynamic dispatch, it is faster than <code>C++</code> version - <code>&lt;dyn Trait&gt;{.keep-style}</code> will be (<em>struct, </em>virtual functions table), and getting a function pointer from table is one level of indirection, unlike <code>C++</code>, where it is two (vtable ptr stored in class memory)</p></li>
+            <li><p>enums (tagged unions) are also imo best drop-in inheritance replacement. If you want dynamic dispatch, it is faster than <code>C++</code> version - <code class="keep-style">&lt;dyn Trait&gt;</code> will be (<em>struct, </em>virtual functions table), and getting a function pointer from table is one level of indirection, unlike <code>C++</code>, where it is two (vtable ptr stored in class memory)</p></li>
             <li><p>everything-from-source as build system idea (and static linking)</p></li>
             <li><p>MIRI (Interpreter for Rust with runtime UB checks) . And UB preconditions. Asserts are everywhere, and i mean non-trivial ones (like casting 8-aligned pointer to 32-aligned *struct)</p></li>
             </ul>
