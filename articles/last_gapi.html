@@ -12,9 +12,11 @@
 </head>
 
 <body>
+    <div class="fixed-controls">
+        <a href="../index.html" class="nav-link button-style">← back to main</a>
+        <button id="toggle-code-outline-btn" class="button-style" title="Toggle code highlight">turn outlines off</button>
+    </div>
     <header>
-        <a href="../index.html" class="nav-link">← back to main</a>
-        <button id="toggle-code-outline-btn" title="Toggle code highlight">turn outlines off</button>
         <div class="header-content">
             <h1 class="big-headline">Last Graphics API</h1>
         </div>
@@ -22,17 +24,19 @@
 
     <main>
                 <article>
-            <p>tl;dr: 1 arch to make it even simpler. Bindless plays nicely with pointers.</p>
+            <section id="section" class="level2">
+            <h2></h2>
+            <p><strong>tl;dr</strong>: 1 arch to make it even simpler. Bindless plays nicely with pointers.</p>
             <p>This is textual representation of what sparked in my brain after i read <a href="https://www.sebastianaaltonen.com/blog/no-graphics-api">Sebastian Aaltonen article</a>. If you think i am wrong - please, correct me (gotta learn somehow). I likely fucked something up.</p>
-            <hr />
+            </section>
             <section id="lets-just-lock-isa" class="level2">
             <h2>lets just lock ISA</h2>
             <p>(and some other details). GPUs are still "evolving", but their architecture has not fundamentally changed and is somewhat similar across vendors.<br />
             Following is reflections on "what if..."</p>
-            <p>Drivers currently act like JIT compilers for IR. If we had same instruction set everyone agrees on, this problem would vanish<em>. You would be able to <strong>actually</strong> compile and optimize your shaders. No pipeline caches.<br />
+            <p>Drivers currently act like JIT compilers for IR. If we had same instruction set everyone agrees on, this problem would vanish*. You would be able to <strong>actually</strong> compile and optimize your shaders. No pipeline caches.<br />
             drawback: we will get microcode-like thing then. Currently, drivers compile shaders into actual instructions, and they get directly executed. However, one could argue microcode can actually be an optimization for more compact instructions and simpler internals.<br />
             In any way, microcode does not run expensive optimization passes or run CPU code in runtime :)<br />
-            </em>: we would stop shipping 'Intermediate Representations' and start shipping binaries, just like C.</p>
+            *: we would stop shipping 'Intermediate Representations' and start shipping binaries, just like C.</p>
             <p>Locked ISA solves big nightmare in graphics: vendor-specific tooling. Currently, to profile shaders, you need Nvidia Nsight for Nvidia because the ISAs are secret (i dont have AMD gpu and Intel profiler seems not very useful compared to Nsight).<br />
             tools like RenderDoc cant show you register pressure, where pipeline stalls occur, saturation<br />
             We would have actual opensource debuggers, profilers</p>

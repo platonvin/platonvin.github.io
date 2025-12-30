@@ -12,6 +12,13 @@ h5 {
   text-align: center
 }
 
+.standalone-heading {
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 h1 {
   font-size: 4.6rem;
   margin-bottom: 1rem
@@ -345,24 +352,8 @@ header section {
   padding: 1rem
 }
 
-button,
 header section {
   border: var(--border-default)
-}
-
-button {
-  background-color: var(--caution-text-bg);
-  box-shadow: var(--box-shadow-default);
-  color: var(--caution-text-fg);
-  font-size: 2.1rem;
-  margin-left: 1rem;
-  padding: 0;
-  white-space: nowrap
-}
-
-button:hover {
-  box-shadow: none;
-  color: var(--link-color-hover)
 }
 
 button header {
@@ -460,35 +451,39 @@ button header {
   background-color: var(--selection-color)
 }
 
-.giscus-container {
-  background-color: var(--body-background-color);
-  border: var(--border-default);
-  box-shadow: var(--box-shadow-large);
-  grid-column: 4;
-  margin-bottom: 4rem;
-  margin-top: 2rem;
-  padding: 2rem
+.fixed-controls {
+  position: fixed;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 10;
 }
 
-#toggle-code-outline-btn {
+.button-style {
   background-color: var(--body-background-color);
   border: var(--border-small);
   box-shadow: var(--box-shadow-small);
   cursor: pointer;
   font-size: 1.6rem;
-  padding: 0.5rem 1rem;
-  margin-top: 1rem;
-  justify-self: left;
-  width: fit-content;
-  margin-left: 0;
+  padding: 0.5rem 0.5rem;
+  text-decoration: none;
+  color: var(--black);
 }
 
-#toggle-code-outline-btn:hover {
+.button-style:hover {
   box-shadow: none;
   color: var(--link-color-hover);
 }
 
-body.no-code-outline code {
+body.no-code-outline code:not(.keep-style) {
   border: 1px solid transparent;
   box-shadow: none;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
 }
