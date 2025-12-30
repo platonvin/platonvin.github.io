@@ -1,54 +1,111 @@
-Add options to turn some runtime UB checks off
+# Runtime safety checks configuration
 
-Currently, there are some choices made for the programmer in relation to safety. Specifically,
-- very precise math\*
-- zero division checks
-- bounds checks (for slices)
-- defined overflow
-\* not like super precise, just different. 
+This would likely be 2 different RFCs but i believe they are coupled in who would be interested in them, so for purpose of collection commentary they are bundled into one. 
 
-You absolutely can write Rust code that does not have these checks:
-- fdiv_fast, fmul_fast, ...
-- unchecked_div
-- get_unchecked
-- unchecked_add
+## Summary
+[summary]: #summary
 
-However, consider following syntactically
+Add rustc and Cargo options to disable specific runtime validness/UB checks: precise floating-point operations, integer overflow checks/behavior, zero-division checks, and slice bounds checks.
+
+## Motivation
+[motivation]: #motivation
+
+Rust inserts runtime checks for safety: defined integer overflow, zero-division, bounds checking, and precise floating-point math. These can be avoided manually via unchecked operations (e.g., `unchecked_add`, `get_unchecked`, `fmul_fast`), but this degrades readability and makes code more error-prone (e.g. a lot easier to not see copy-paste mistake).
+
+Example:
 ```rust
-let c = a * a + b * 2.0;
+let c = a * a + b * 2.0;  // checked
 ```
-versus
+vs
 ```rust
-let c = a.fmul_fast(a).fadd_fast(b.fmul_fast(2.0f32));
+let c = a.fmul_fast(a).fadd_fast(b.fmul_fast(2.0f32));  // unchecked
 ```
 
-Second example is less readable and more error prone. Same goes for integers
+Use cases:
+- Performance-critical code.
+- Benchmarking checks price to identify when restructure to alternative safe code with less checks would benefit.
+ 
+Combined with proposed linear algebra types, reduces need for manual SIMD intrinsics.
 
-Proposal: add rustc and Cargo options to turn those checks off. Ideally, this should be doable on binary, library and scope level (so you would be able to build all of your code with this flag, or code in some function only (e.g. hot loop), or a library (e.g. image processing library))
+Many developers are not even ware these checks exist in release builds. Providing explicit control gives choice without sacrificing default safety (they should be off even in release mode by default).
 
-Together with linear algebra primitives, this could make manual SIMD intrinsics redundant in some places.
+## Guide-level explanation
+[guide-level-explanation]: #guide-level-explanation
 
-Ability to disable bounds checks would make following workflow possible:
-1) write perfectly safe Rust library
-2) benchmark it
-3) turn all checks off 
-4) benchmark it again
-5) if performance differs too much, it means those checks were costly. Identify hot paths and restructure code to have less checks (or, if you can prove validness, use unchecked versions)
+New flags/attributes:
 
-It is understandable why those checks exist - they make software in Rust more robust. However, it is important to give developers choice. 
+```toml
+# Cargo.toml
+[profile.distribution]
+disable-runtime-checks = ["overflow", "bounds", "divzero", "fp-precise"]
+overflow-checks = true/false/unchecked
+slice-bounds-checks = true/false
+zero-division-checks = true/false
+precise-fp-math = true/false
+```
 
-alternatives: custom wrappers that overload operations to their unchecked versions (if e.g. some feature is set)
-problems: 
-- no custom `as` casts
-- no control over libraries
-- bloat and complexity of wrappers (in comparison to a flag/attribute)
+Or rustc:
+```bash
+rustc --cfg disable_runtime_checks="overflow,bounds"
+```
 
-can this be implemented as a library? Kind of.
-You can have a proc macro go through the scope, find all e.g. additions, replace them with function calls specialized for e.g. floats and integers as unchecked and for everything else as normal. However, running all of your code through proc macro does not sound great.
+Per-function:
+```rust
+#[disable_runtime_checks(overflow, bounds)]
+fn hot_loop(...) { ... }
+```
 
-some people dont even know that Rust has zero division and bounds checks in release 
+Behavior matches existing unchecked operations but applies automatically to normal arithmetic/indexing.
 
-prior art:
-Clang C/C++ compilers, GCC C/C++/Fortran compilers
-Zig
-D
+## Reference-level explanation
+[reference-level-explanation]: #reference-level-explanation
+
+Options:
+- overflow: use wrapping/unchecked instead of checked.
+- bounds: omit slice/index bounds checks.
+- divzero: omit integer division-by-zero checks.
+- fp-precise: use fast approximate floating-point ops.
+
+This:
+- Global via rustc flag/Cargo profile.
+- Crate via cfg.
+- Scope via attribute.
+
+Implementation: codegen emits unchecked equivalents where checks normally inserted.
+
+No change to debug builds (checks remain).
+
+## Drawbacks
+[drawbacks]: #drawbacks
+
+Introduces UB, which is still UB even if explicitly opted-in.
+More options for developers to get lost in.
+
+## Rationale and alternatives
+[rationale-and-alternatives]: #rationale-and-alternatives
+
+Flags preserve syntax while allowing opt-out, unlike manual unchecked calls (verbose) or wrappers (limited, no casts, no support from other code, bloat).
+
+Proc-macro rewriting is possible to some degree but still limited.
+No action keeps checks mandatory, limiting performance tuning.
+
+## Prior art
+[prior-art]: #prior-art
+
+Clang/GCC: -fno-trapv, -fno-delete-null-pointer-checks, etc.  
+Zig: explicit unchecked operations or release-fast mode.  
+D: similar unchecked options.
+
+## Unresolved questions
+[unresolved-questions]: #unresolved-questions
+
+Exact flag names and syntax.  
+Per-scope granularity (function/module).  
+Interaction with miri/UB detection.  
+Default sets (e.g., "all").
+
+## Future possibilities
+[future-possibilities]: #future-possibilities
+
+Profile-guided selective disabling.  
+Integration with linear algebra types for auto-vectorization.
