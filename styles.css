@@ -219,6 +219,7 @@ p a {
 }
 
 code {
+  overflow-x: auto;
   background-color: var(--code-background-color);
   border: var(--border-small);
   box-shadow: var(--box-shadow-xsmall);

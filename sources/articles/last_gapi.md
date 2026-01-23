@@ -32,10 +32,10 @@ I very much liked the idea of making things pointers. I do not believe automatic
 If we could somehow get SoC architecture that everyone agrees on that would be even better. Basically standardize integrated GPUs? That would smooth out **so many** skill issues - just look at Apple
 
 Lets expand on pointers a little. Since we are locking everything and trying to make things simpler, we can just say that "descriptors are just pointers" - fully bindless model; buffers & textures are same - just memory, and differ in how you access them. You would have instructions for just memory loads, computed manually for "linear layout" textures, but also some (agreed on and standardized) "morton indexing-like", as well as compression. These could be arguments to an instruction:
-`load_image: x,y,z, LAYOUT_MORTON_BIT | COMPRESSION_BC7_BIT`
-Since everyone would know layout, loading images would be a lot simpler (no extra copy with custom pixels reordering)
-
-problem: afaik Nvidia / AMD memory controllers are designed for very different layouts. However, running at 80% efficiency is still fine for sake of stability, faster asset streaming and developer sanity.
+`load_image: reg, x,y,z, FORMAT_RGBA_U8_UNNORM, LAYOUT_MORTON_V2_BIT | COMPRESSION_BC7_BIT`
+Since everyone would know layout, loading images would be a lot simpler (no extra copy with custom pixels reordering). 
+problem: afaik Nvidia / AMD memory controllers are designed for very different layouts. However, running at 80% efficiency is still fine for sake of stability, faster asset streaming and developer sanity.\
+We could also expose multiple (e.g. all currently used) layouts, and then provide information about how well they perform.
 
 So, buffer is just memory you allocate and manage (free, divide in sub-buffers with your custom allocator) yourself. But what is a descriptor?
 Descriptor is just pointer! What matters is how you access memory.
@@ -63,7 +63,8 @@ BIND {
     ubo: *MyUBO,
     // could be *void and just casted to *MyBufferElem
     my_buffer: *MyBufferElem,
-    // typed in your shader language, and only thing type does is results to proper bits for setting asm instruction from loading from memory.
+    // typed in your shader language, and only thing type does is
+    // setting up asm instruction from loading from memory.
     // this is how you would do what is currently "bindless"
     my_texture_arr: **Texture<rgba16float>,
 }

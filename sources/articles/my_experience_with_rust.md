@@ -9,25 +9,23 @@ intro_footer: <p><em>information is subjective. Treat it as a story about experi
 
 ## why i tried it
 
-A friend of mine was actively pitching `Rust` as new shiny thing i should try. I am always in search for a better language for gamedev, and after a week of attempts on integrating `C++20` modules (faster compile and no headers), which totally failed* - bugs, ICEs, docs so bad that reading source is more useful, - i realized how much time i spend on `CMake` (and earlier `Make` - i love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe `Rust` - which is praised for tooling - could solve that.
+After a week of integrating `C++20` modules i got burned out and decided to try something new and shiny - friend of mine was actively pitching `Rust`. 
 
-\* *for the purpose of correctness, i revisited it and actually moved to modules - this time successfully*
+<!--  *for the purpose of correctness, i revisited it and actually moved to modules - this time successfully* --!>
 
 > NOTE: i do gamedev/GPUs. Web `Rust` is different. Kernel `Rust` is different.
 
-<!-- NOTE: not anymore. You can still do it if you want. But i don't super-badly need it now -->
 <!-- <small>If you are a `Rust` dev, i would really appreciate code review of [it (link)](https://github.com/platonvin/lum-rs). Suggestions about compile times are especially welcome.</small> -->
-
-## first impressions/ positives
+<!-- NOTE: not anymore. You can still do it if you want. But i don't super-badly need it now -->
 
 `Cargo` is a build system that i don't think much about (I like that). Tooling is amazing: `rust-analyzer`, `clippy`, `fmt` (`Rust` is the only language where a formatter almost does not annoy me), plus community tools like `cargo-asm` and lots of others.
 
+However, thing is - i dont need a complicated build system for `C`! I also dont need laggy language server, clippy, formatter and "asm" viewer. It is all either redundant or build into the compiler.
+
 ---
 
-And `Rust` has a lot of nice features!
-
 * enums
-* stack traces (i basically don't use a debugger)
+* stack traces (i basically don't use a debugger. I was almost never using debugger in C tho)
 * built-in checks (out-of-bounds, alignment, overflows / zero-div). I wish they were more optional though
 * No constructors (seriously, there are more constructors in `C++` than there are math subjects). 
 <details>
@@ -115,7 +113,7 @@ You are not always given control over things - other people decided you should *
 It is absolutely possible to have fine-grain control in `Rust` - its just ugly, verbose and unreadable. You want "-ffast-math" in function? Good luck! You cant change it for dependencies, and have to use intrinsics*. Is it possible? Sure, but you better off code it in `C` and link with LTO. Or just code in `C`.
 \* not literally intrinsics, but methods that call intrinsics. They are not overloaded.\
 Sometimes i feel like people have joined a cult of "no unsafe <strike>code</strike>"
-no unsafe != what you dream about code doing. Unsafe != incorrect. Unsafe is just a marker that demands explicit acknowledgement.
+no unsafe != what you dream about   code doing. Unsafe != incorrect. Unsafe is just a marker that demands explicit acknowledgement.
 good luck turning off integer zero division checks. Or forcing `-ffast-math`. Or turning asserts into debug_assert
 someone literally decided "oh thats too unsafe, `Rust` programmers are idiots and we should not even have this as opt-in option". It is probably fixable with a custom MIR pass.
 
