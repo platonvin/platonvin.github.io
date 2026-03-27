@@ -64,6 +64,22 @@ cv_ru.pdf: sources/cv_ru.html sources/cv_ru.css
 	  -V mainfont="Segoe UI" \
 	  sources/cv_ru.html -o cv_ru.pdf
 
+# Windows-compatible watch (PowerShell)
+watch:
+	@powershell -Command " \
+		echo 'Watching for changes in sources/...'; \
+		$$last = Get-ChildItem -Recurse sources, styles.css | Measure-Object -Property LastWriteTime -Maximum | Select-Object -ExpandProperty Maximum; \
+		while($$true) { \
+			$$current = Get-ChildItem -Recurse sources, styles.css | Measure-Object -Property LastWriteTime -Maximum | Select-Object -ExpandProperty Maximum; \
+			if ($$current -gt $$last) { \
+				echo 'Change detected. Rebuilding...'; \
+				make build_html; \
+				$$last = $$current; \
+			} \
+			Start-Sleep -Milliseconds 200; \
+		}"
+
+
 purge_css: purgecss
 
 purgecss:

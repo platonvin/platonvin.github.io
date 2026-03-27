@@ -1,12 +1,11 @@
 ---
 title: "platonvin: Voxels"
 backlink: "../index.html"
-headline: "how Lum works"
+headline: "how i render voxels"
 # comments: true
 ---
 
-## Why is this an article?
-Really, just in hopes it makes GPUs "click" for someone. You are free to ask (literally any amount of any) questions (anywhere)
+### feel free to ask (literally any amount of any) questions (anywhere)
 
 ## What?
 Lum is a voxel renderer i develop to power some of my future games. It is not an extendable general purpose engine, rather fast and simple library.

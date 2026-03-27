@@ -11,3 +11,4 @@ node_modules
 *.spv
 *.sirv
 *.exe
+*.xml

@@ -29,22 +29,19 @@
                 <article>
             <section id="why-i-tried-it" class="level2">
             <h2>why i tried it</h2>
-            <p>A friend of mine was actively pitching <code>Rust</code> as new shiny thing i should try. I am always in search for a better language for gamedev, and after a week of attempts on integrating <code>C++20</code> modules (faster compile and no headers), which totally failed* - bugs, ICEs, docs so bad that reading source is more useful, - i realized how much time i spend on <code>CMake</code> (and earlier <code>Make</code> - i love slashes btw), dependency management, resolving compiler differences and other non-programming stuff, and thought that maybe <code>Rust</code> - which is praised for tooling - could solve that.</p>
-            <p>* <em>for the purpose of correctness, i revisited it and actually moved to modules - this time successfully</em></p>
+            <p>After a week of integrating <code>C++20</code> modules i got burned out and decided to try something new and shiny - friend of mine was actively pitching <code>Rust</code>.</p>
+            <p>&lt;!-- <em>for the purpose of correctness, i revisited it and actually moved to modules - this time successfully</em> --!&gt;</p>
             <blockquote>
             <p>NOTE: i do gamedev/GPUs. Web <code>Rust</code> is different. Kernel <code>Rust</code> is different.</p>
             </blockquote>
-            <!-- NOTE: not anymore. You can still do it if you want. But i don't super-badly need it now -->
             <!-- <small>If you are a `Rust` dev, i would really appreciate code review of [it (link)](https://github.com/platonvin/lum-rs). Suggestions about compile times are especially welcome.</small> -->
-            </section>
-            <section id="first-impressions-positives" class="level2">
-            <h2>first impressions/ positives</h2>
+            <!-- NOTE: not anymore. You can still do it if you want. But i don't super-badly need it now -->
             <p><code>Cargo</code> is a build system that i don't think much about (I like that). Tooling is amazing: <code>rust-analyzer</code>, <code>clippy</code>, <code>fmt</code> (<code>Rust</code> is the only language where a formatter almost does not annoy me), plus community tools like <code>cargo-asm</code> and lots of others.</p>
+            <p>However, thing is - i dont need a complicated build system for <code>C</code>! I also dont need laggy language server, clippy, formatter and "asm" viewer. It is all either redundant or build into the compiler.</p>
             <hr />
-            <p>And <code>Rust</code> has a lot of nice features!</p>
             <ul>
             <li>enums</li>
-            <li>stack traces (i basically don't use a debugger)</li>
+            <li>stack traces (i basically don't use a debugger. I was almost never using debugger in C tho)</li>
             <li>built-in checks (out-of-bounds, alignment, overflows / zero-div). I wish they were more optional though</li>
             <li>No constructors (seriously, there are more constructors in <code>C++</code> than there are math subjects).<br />
             <details><br />

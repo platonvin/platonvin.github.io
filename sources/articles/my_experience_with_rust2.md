@@ -7,23 +7,26 @@ intro_footer: <p><em>information is subjective. Treat it as a story about experi
 # comments: true
 ---
 
-Rust attracted attention in gamedev because it promised low-level control with safety, performance, productivity and excellent tooling. Cargo largely stays out of the way, rust-analyzer/clippy/rustfmt work reliably (rustfmt is one of the few formatters that rarely fights me, and RA is helpful), and utilities like cargo-asm help understand the language like black box. Features like tagged unions, built-in tests/benchmarks/docs, stack slices, default traits, associated types, `include_bytes!`, and macros are all there to help you. Dynamic dispatch via `dyn Trait` is less indirect than C++'s equivalent, default containers are fast & checked. MIRI catches UB that would slip elsewhere, and the design-by-committee process has produced an unusually refined language in many surface details.
+Rust attracted attention in gamedev because it promises low-level control with safety, performance, productivity and excellent tooling. Cargo largely stays out of the way, rust-analyzer/clippy/rustfmt work reliably (rustfmt is one of the few formatters that rarely fights me, and RA is helpful), and utilities like cargo-asm help understand the language like black box. Features like tagged unions, built-in tests/benchmarks/docs, stack slices, [default] traits, associated types, `include_bytes!`, and macros are all there to help you. Dynamic dispatch via `dyn Trait` is less indirect than C++'s equivalent, default containers are fast & checked. MIRI catches UB that would slip elsewhere, and the design-by-committee process has produced an unusually refined language in many surface details.
 
 Yet the deeper you gou [*especially* in gamedev] the more problems become visible.
-I guess that for any given feature set, it is impossible to predict how usable the language would be, and we can only try out different features and select the ones that seemed to be increasing productivity. 
+I guess for any feature set, it is impossible to predict its usability, we can only try features out and select ones that worked. 
 
-Performance is strong when code stays C-like: simple references, struct hierarchies, and enums produce excellent assembly. But the borrow checker pushes towards heavy wrappings with `Option`s, `Rc`/`Cell`s, `Box`es, `dyn` traits, hashtables -- all to satisfy its rules, and the result is noticeably slower.\
-Many end up using `Vec` & indexing as "virtual memory" to bypass aliasing analysis entirely, which is defeating the point of having borrow checker in the first place (so you get zero benefits and all downsides). In many cases, ECS is cope for not dealing with borrow checker rules (and moving validation to runtime).
-Hidden control flow, disability to alter codegen, branch predictor bloat and barriers from "safety" checks [why are we calling runtime validation "safety"?], complexity of shared allocations and custom allocators - all contribute to Rust being not even close to C.
+Performance is strong when code stays C-like: simple references, struct hierarchies, and enums produce excellent assembly. But the borrow checker pushes towards heavy wrappings with `Option`s, `Rc`/`Cell`s, `Box`es, `dyn` traits, hashtables - and the result is noticeably slower.\
+Many end up using `Vec` & indexing as "virtual memory" to bypass aliasing analysis entirely, which is defeating the point of having borrow checker in the first place (so you get zero benefits and most downsides). In many cases, ECS is just cope for not dealing with borrow checker rules (and moving validation to runtime).
+Hidden control flow, disability to alter codegen, bloated barriers from "safety" checks [why are we calling runtime validation "safety"?] which also hurt branch predictor, complexity of shared allocations and custom allocators (no one does that) - all contribute to Rust being not even close to C.
 
-That is not the main issue, however - core friction in gamedev is the borrow checker's hostility to megastructs. A `Player` with fields like `hand` and `stats` [imagine some generic roguelike deckbuilder] should allow iterating cards while modifying stats, but cross-function partial borrows fail. Workarounds exist - temporary removals (put things into Option - lower perfomance, less readable, more typing), separate parameters (pass separately in every function down in call stack) - all force constant restructuring and/or functions with 10+ arguments. Graphics, physics and gameplay code naturally gravitate toward large coherent objects; Rust makes that painful. We will see if Polonius fixes that.
+That is not the main issue, however - core friction in gamedev is the borrow checker's hostility to megastructs. A `Player` with fields like `hand` and `stats` [imagine some generic roguelike deckbuilder] should allow iterating cards while modifying stats, but cross-function partial borrows fail. Workarounds exist - temporary removals (put things into Option - lower performance, less readable, more typing), separate parameters (pass separately in every function down in call stack) - all force constant restructuring and/or functions with 10+ arguments. Graphics, physics and gameplay code naturally gravitate toward large coherent objects; Rust makes that painful. We'll see if Polonius fixes that.
 
-Control is often withheld on principle. Disabling slice bounds checks for a scope requires ugly wrappers or insanity like replacing the panic hook with `unreachable_unchecked!` (which is not even possible rn). Per-function `-ffast-math` isn't possible without manual intrinsics (and you can't override it in dependencies, and macro system is not strong enough to properly cover that). Zero-division checks, overflow checks, turning asserts into `debug_assert` - all locked behind decisions that seem to assume programmers are reckless and dumb. Fine-grained control is technically possible, but verbose, unreadable and error-prone. The language frequently decides you shouldn't have an opt-in feature because someone might misuse it. Rust is for idiots to write hello world, not engineers building complicated systems.
+Control is often withheld on principle. Disabling slice bounds checks for a scope requires ugly wrappers or insanity like replacing the panic hook with `unreachable` (im not sure if thats a thing rn). Per-function `-ffast-math` isn't possible without manual intrinsics (you can't override it in dependencies, and macro system is not strong enough to properly cover even your code). Zero-division checks, overflow checks, turning asserts into `debug_assert` - all locked behind decisions that seem to assume programmers are reckless and dumb. Fine-grained control is technically possible, but verbose, unreadable, error-prone, and takes unreasonable amount of work. Wanna see if ffast math would improve perf for a library? Yeah, for it and rewrite it manually. The language frequently decides you shouldn't have an opt-in feature because someone might misuse it. Rust is for idiots to write "hello world", not engineers building complicated systems. And oh boy hello world looks nice and compiles fast.
+That is my another issue with Rust. Both people who make the language and those who are public about it are always trying to make decisions for me and impose a solution. Are we programming in isolated emulator or in systems PL? 
 
-Math support is surprisingly weak for a new systems language. No built-in SIMD vector types despite SSE being universal (your browser requires it) and entire industry agreeing on almost every implementation detail (to the point of having specialized instructions), so the ecosystem is flooded with competing and syntactically ugly libraries - `nalgebra`, `glam`, `vek`, `cgmath`, dozens more.
-Constant casting between `u32`/`usize`/`u64`/`isize` for serialization/performance/APIs adds noise.
+You cannot modify allocator for a library/scope. Yeah, fork that lib and make it generic over an Allocator.
 
-The other ecosystems reflect the same fragmentation. Finding a suiting library takes forever. OpenGL setup with `winit`/`glow` is more cumbersome than GLFW [took me multiple hours], Vulkan wrappers keep renaming things for no reason, popular crates like gltf loaders are over-engineered, and documentation often states facts without explaining connections (std::random is a classic: individual pieces clear, overall flow opaque. What do i do with struct X?). Libraries are written as if the reader already understands the problem they're solving - which is precisely why one reaches for a library [if i fully understand the problem, i can type it myself!]. Crates refactor frequently, break APIs unnecessarily (true 1.0.0 stability is rare, everyone just stays at 0.X.Y forever), pull forests of dependencies (staying below triple digits is practically impossible for most projects) [and overwriting dependency of dependency is not there].
+Math support is surprisingly weak for a modern systems language. No built-in SIMD vector types despite SSE being universal (your browser requires it) and entire industry agreeing on almost every implementation detail (to the point of having specialized instructions), so the ecosystem is flooded with competing and syntactically ugly libraries - `nalgebra`, `glam`, `vek`, `cgmath`, dozens more - and all doing somewhat the same.
+Constant casting between `u32`/`usize`/`u64`/`isize` because APIs cant agree on that adds noise. 
+
+Ecosystems in general has this fragmentation problem. Finding a suiting library takes forever. OpenGL setup with `winit`/`glow` is hard for no reason [took me multiple hours; i know all the calls that need to happen under the hood but cant figure out how to use fucking wrappers], Vulkan wrappers keep renaming things for no reason, popular crates like gltf loaders are over-engineered, and documentation often states facts without explaining connections and reasons (std::random: each individual piece is clear, overall flow is opaque. What do i do with struct X?). Libraries are written as if the reader already understands the problem they're solving - which is precisely why one reaches for a library [if i fully understand the problem, i can type it myself!]. Crates refactor frequently, break APIs unnecessarily (true 1.0.0 stability is rare, everyone just stays at 0.X.Y forever), pull forests of dependencies (under triple digits is practically impossible for most projects) [and overwriting dependency of dependency is not a thing].
 Luckily disability of people to write good libraries will make you wanna do everything yourself anyways.
 I once ported a simple C magicavoxel (voxel file format) parser because I couldn't decipher its Rust counterpart despite exhaustive reading of source, docs, and examples; yet its C version was crystal clear.
 
@@ -62,6 +65,8 @@ Pin Box Dyn Future with Output = Result < Generic < ... is not even crazy by man
 
 Async creates parallel code universes with pinning and cancellation concerns.
 
+Why can you not overwrite dependency version? Someone decided that is not safe... Made the decision for you, now go fork like a hundred crates to fix it.
+
 2 main reasons to use Rust for me: winit + wgpu.
 
 [imho] Rust is better than C++ [i.e., faster to make *target* game in if following idiomatic patterns], but against C the trade is less clear: it  adds slow compiles and fat binaries for half-baked functional features and a region model that steers toward unmaintainable architectures.
@@ -74,11 +79,15 @@ Despite many problems, my Rust code more often works on the first try, the struc
 
 Compiling Rust for cross-platform is not as easy as C. For example, none of the officially provided ways for cross compiling to win 7 or wasm work for me [and without understanding of linkers & build systems you likely wont figure it out on yourself].
 
-I would not necessarily call Rust systems programming language in same way C is. Rust is more of a "what C++ should have been but with bad reflection and no respect for the programmer"
-Concepts? Traits.
-Templates? Constraint-based generics.
-Inheritance? fat dyn Trait pointers.
-Modules? Modules that work.
-...
+2 important reasons to use Rust for me also are: winit + wgpu.
 
+I would not call Rust a system programming language the same way C is. Rust is more of a "What C++ should have been but with bad reflection and no respect for the programmer"
+
+* Concepts? Traits.
+* Templates? Constraint-based generics.
+* Inheritance? Fat `dyn Trait` pointers.
+* Modules? Modules that work.
+
+
+:)
 :)

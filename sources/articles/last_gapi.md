@@ -7,8 +7,6 @@ headline: "Last Graphics API"
 
 ##
 
-**tl;dr**: 1 arch to make it even simpler. Bindless plays nicely with pointers.
-
 This is textual representation of what sparked in my brain after i read [Sebastian Aaltonen article](https://www.sebastianaaltonen.com/blog/no-graphics-api). If you think i am wrong - please, correct me (gotta learn somehow). I likely fucked something up.
 
 ## lets just lock ISA 
