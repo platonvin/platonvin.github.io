@@ -1,16 +1,4 @@
-# you need so much settings to just pandoc to not fuck up your data, love this
-
-# ARTICLE_PANDOC_ARGS = -f markdown-smart-markdown_in_html_blocks+raw_html+raw_attribute -t html --wrap=none --standalone --template=sources/articles/template.html --css=../styles.css --section-divs --highlight-style=kate --shift-heading-level-by 0
-
-# ARG_LINE_BREAKS = --wrap=preserve
-ARG_LINE_BREAKS = --wrap=none
-# ARG_LINE_BREAKS = 
-
-REST_OF_CHANGING_STUFF = styles.css Makefile
-
-ARTICLE_PANDOC_ARGS = -f markdown-smart-markdown_in_html_blocks+raw_html+raw_attribute+backtick_code_blocks+hard_line_breaks $(ARG_LINE_BREAKS) -t html --standalone --template=sources/articles/template.html --css=../styles.css --highlight-style=kate --section-divs --shift-heading-level-by 0 
-ARTICLE_MD_FILES = $(wildcard sources/articles/*.md)
-ARTICLE_HTML_FILES = $(patsubst sources/articles/%.md,articles/%.html,$(ARTICLE_MD_FILES))
+.PHONY: default setup build_lum build_html build_articles watch serve run purgecss purge_css
 
 default: build_html run
 
@@ -26,59 +14,15 @@ build_lum: setup
 run:
 	microserver.exe . -i index.html -p 8080
 
-build_html: build_articles projects/lum.html # build_projects
+build_html: build_articles
 
-build_articles: articles $(ARTICLE_HTML_FILES)
+build_articles:
+	pnpm exec eleventy --quiet
 
-articles/%.html: sources/articles/%.md  sources/articles/template.html $(REST_OF_CHANGING_STUFF)
-	pandoc $< $(ARTICLE_PANDOC_ARGS) -o $@
+watch: serve
 
-projects/lum.html: lum-rs/README.md 
-	pandoc lum-rs/README.md -f markdown -t html --wrap=none --template=sources/projects/lum_template.html --section-divs  -o projects/lum.html
-
-# build_projects: projects $(PROJECT_HTML_FILES)
-
-# projects/%.html: sources/projects/%.md
-# 	pandoc $< $(PROJECTS_PANDOC_ARGS) --output=$@
-
-build_cv: cv.pdf cv_ru.pdf
-
-cv.pdf: sources/cv.html sources/cv.css
-	pandoc \
-	  --variable geometry="margin=0.2in" \
-	  --pdf-engine=xelatex \
-	  --variable fontsize=11pt \
-	  --css=sources/cv.css \
-	  -V colorlinks=true \
-	  -V linkcolor=blue \
-	  sources/cv.html -o cv.pdf
-
-cv_ru.pdf: sources/cv_ru.html sources/cv_ru.css
-	pandoc \
-	  --variable geometry="margin=0.2in" \
-	  --pdf-engine=xelatex \
-	  --variable fontsize=11pt \
-	  --css=sources/cv_ru.css \
-	  -V colorlinks=true \
-	  -V linkcolor=blue \
-	  -V mainfont="Segoe UI" \
-	  sources/cv_ru.html -o cv_ru.pdf
-
-# Windows-compatible watch (PowerShell)
-watch:
-	@powershell -Command " \
-		echo 'Watching for changes in sources/...'; \
-		$$last = Get-ChildItem -Recurse sources, styles.css | Measure-Object -Property LastWriteTime -Maximum | Select-Object -ExpandProperty Maximum; \
-		while($$true) { \
-			$$current = Get-ChildItem -Recurse sources, styles.css | Measure-Object -Property LastWriteTime -Maximum | Select-Object -ExpandProperty Maximum; \
-			if ($$current -gt $$last) { \
-				echo 'Change detected. Rebuilding...'; \
-				make build_html; \
-				$$last = $$current; \
-			} \
-			Start-Sleep -Milliseconds 200; \
-		}"
-
+serve:
+	pnpm exec eleventy --serve
 
 purge_css: purgecss
 

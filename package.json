@@ -1,4 +1,9 @@
 {
+	"scripts": {
+		"build": "eleventy --quiet",
+		"build:watch": "eleventy --serve",
+		"build:debug": "eleventy"
+	},
 	"devDependencies": {
 		"cssnano": "^7.1.2",
 		"postcss": "^8.5.6",

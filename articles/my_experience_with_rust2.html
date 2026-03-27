@@ -1,105 +1,108 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Experience with Rust</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<html lang="en" xml:lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Experience with Rust</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="../styles.css">
         
-</head>
-
-<body>
-    <div class="fixed-controls">
-        <a href="../index.html" class="nav-link button-style">← back to main</a>
-        <button id="toggle-code-outline-btn" class="button-style" title="Toggle code highlight">turn outlines off</button>
-    </div>
-    <header>
-        <div class="header-content">
-            <h1 class="big-headline">my experience with <code>Rust</code></h1>
+    </head>
+    <body>
+        <div class="fixed-controls">
+            
+                <a href="../index.html" class="nav-link button-style">← back to main</a>
+            
+            
         </div>
-    </header>
-
-    <main>
+        <header>
+            <div class="header-content">
+                <h1 class="big-headline">my experience with `Rust`</h1>
+            </div>
+        </header>
+        <main>
+            
                 <footer>
-            <p><em>information is subjective. Treat it as a story about experience</em></p>
-        </footer>
-                <article>
-            <p>Rust attracted attention in gamedev because it promises low-level control with safety, performance, productivity and excellent tooling. Cargo largely stays out of the way, rust-analyzer/clippy/rustfmt work reliably (rustfmt is one of the few formatters that rarely fights me, and RA is helpful), and utilities like cargo-asm help understand the language like black box. Features like tagged unions, built-in tests/benchmarks/docs, stack slices, [default] traits, associated types, <code>include_bytes!</code>, and macros are all there to help you. Dynamic dispatch via <code>dyn Trait</code> is less indirect than C++'s equivalent, default containers are fast &amp; checked. MIRI catches UB that would slip elsewhere, and the design-by-committee process has produced an unusually refined language in many surface details.</p>
-            <p>Yet the deeper you gou [<em>especially</em> in gamedev] the more problems become visible.<br />
-            I guess for any feature set, it is impossible to predict its usability, we can only try features out and select ones that worked.</p>
-            <p>Performance is strong when code stays C-like: simple references, struct hierarchies, and enums produce excellent assembly. But the borrow checker pushes towards heavy wrappings with <code>Option</code>s, <code>Rc</code>/<code>Cell</code>s, <code>Box</code>es, <code>dyn</code> traits, hashtables - and the result is noticeably slower.<br />
-            <br />
-            Many end up using <code>Vec</code> &amp; indexing as "virtual memory" to bypass aliasing analysis entirely, which is defeating the point of having borrow checker in the first place (so you get zero benefits and most downsides). In many cases, ECS is just cope for not dealing with borrow checker rules (and moving validation to runtime).<br />
-            Hidden control flow, disability to alter codegen, bloated barriers from "safety" checks [why are we calling runtime validation "safety"?] which also hurt branch predictor, complexity of shared allocations and custom allocators (no one does that) - all contribute to Rust being not even close to C.</p>
-            <p>That is not the main issue, however - core friction in gamedev is the borrow checker's hostility to megastructs. A <code>Player</code> with fields like <code>hand</code> and <code>stats</code> [imagine some generic roguelike deckbuilder] should allow iterating cards while modifying stats, but cross-function partial borrows fail. Workarounds exist - temporary removals (put things into Option - lower performance, less readable, more typing), separate parameters (pass separately in every function down in call stack) - all force constant restructuring and/or functions with 10+ arguments. Graphics, physics and gameplay code naturally gravitate toward large coherent objects; Rust makes that painful. We'll see if Polonius fixes that.</p>
-            <p>Control is often withheld on principle. Disabling slice bounds checks for a scope requires ugly wrappers or insanity like replacing the panic hook with <code>unreachable</code> (im not sure if thats a thing rn). Per-function <code>-ffast-math</code> isn't possible without manual intrinsics (you can't override it in dependencies, and macro system is not strong enough to properly cover even your code). Zero-division checks, overflow checks, turning asserts into <code>debug_assert</code> - all locked behind decisions that seem to assume programmers are reckless and dumb. Fine-grained control is technically possible, but verbose, unreadable, error-prone, and takes unreasonable amount of work. Wanna see if ffast math would improve perf for a library? Yeah, for it and rewrite it manually. The language frequently decides you shouldn't have an opt-in feature because someone might misuse it. Rust is for idiots to write "hello world", not engineers building complicated systems. And oh boy hello world looks nice and compiles fast.<br />
-            That is my another issue with Rust. Both people who make the language and those who are public about it are always trying to make decisions for me and impose a solution. Are we programming in isolated emulator or in systems PL?</p>
-            <p>You cannot modify allocator for a library/scope. Yeah, fork that lib and make it generic over an Allocator.</p>
-            <p>Math support is surprisingly weak for a modern systems language. No built-in SIMD vector types despite SSE being universal (your browser requires it) and entire industry agreeing on almost every implementation detail (to the point of having specialized instructions), so the ecosystem is flooded with competing and syntactically ugly libraries - <code>nalgebra</code>, <code>glam</code>, <code>vek</code>, <code>cgmath</code>, dozens more - and all doing somewhat the same.<br />
-            Constant casting between <code>u32</code>/<code>usize</code>/<code>u64</code>/<code>isize</code> because APIs cant agree on that adds noise.</p>
-            <p>Ecosystems in general has this fragmentation problem. Finding a suiting library takes forever. OpenGL setup with <code>winit</code>/<code>glow</code> is hard for no reason [took me multiple hours; i know all the calls that need to happen under the hood but cant figure out how to use fucking wrappers], Vulkan wrappers keep renaming things for no reason, popular crates like gltf loaders are over-engineered, and documentation often states facts without explaining connections and reasons (std::random: each individual piece is clear, overall flow is opaque. What do i do with struct X?). Libraries are written as if the reader already understands the problem they're solving - which is precisely why one reaches for a library [if i fully understand the problem, i can type it myself!]. Crates refactor frequently, break APIs unnecessarily (true 1.0.0 stability is rare, everyone just stays at 0.X.Y forever), pull forests of dependencies (under triple digits is practically impossible for most projects) [and overwriting dependency of dependency is not a thing].<br />
-            Luckily disability of people to write good libraries will make you wanna do everything yourself anyways.<br />
-            I once ported a simple C magicavoxel (voxel file format) parser because I couldn't decipher its Rust counterpart despite exhaustive reading of source, docs, and examples; yet its C version was crystal clear.</p>
-            <p>Actually, that is what bothers me the most in crates ecosystem: Rust abstraction mechanisms (as well as whatever latest C++ is pushing) are absolute bonkers for readers to use and understand.<br />
-            I open a C library. What do i do? Read some struct declarations in <strong>very distinct, separate, and clearly intended for that</strong> header file. Read some function prototypes - "oh, yes, this one gets a Settings* and Allocator* and returns new Object". I know i can just construct the Settings struct myself. Maybe there is <code>Settings make_default_settings()</code>.<br />
-            How is memory for Object elements stored? That is simply - as a contiguous memory block, allocated with my allocator (or default one, but you can override it with define). How i iterate through them? Just index. How i copy one? Just copy.</p>
-            <p>Now, how would the Rust counterpart look like? First of, every struct would have a comment like:</p>
-            <pre><code>/// A struct representing an object
+                    <p><em>information is subjective. Treat it as a story about experience</em></p>
+                </footer>
+            
+            <article>
+                <p>Rust attracted attention in gamedev because it promises low-level control with safety, performance, productivity and excellent tooling. Cargo largely stays out of the way, rust-analyzer/clippy/rustfmt work reliably (rustfmt is one of the few formatters that rarely fights me, and RA is helpful), and utilities like cargo-asm help understand the language like black box. Features like tagged unions, built-in tests/benchmarks/docs, stack slices, [default] traits, associated types, <code><span class="md-syntax">`</span>include_bytes!<span class="md-syntax">`</span></code>, and macros are all there to help you. Dynamic dispatch via <code><span class="md-syntax">`</span>dyn Trait<span class="md-syntax">`</span></code> is less indirect than C++'s equivalent, default containers are fast &amp; checked. MIRI catches UB that would slip elsewhere, and the design-by-committee process has produced an unusually refined language in many surface details.</p>
+<p>Yet the deeper you gou [<em><span class="md-syntax">*</span>especially<span class="md-syntax">*</span></em> in gamedev] the more problems become visible.<br>
+I guess for any feature set, it is impossible to predict its usability, we can only try features out and select ones that worked.</p>
+<p>Performance is strong when code stays C-like: simple references, struct hierarchies, and enums produce excellent assembly. But the borrow checker pushes towards heavy wrappings with <code><span class="md-syntax">`</span>Option<span class="md-syntax">`</span></code>s, <code><span class="md-syntax">`</span>Rc<span class="md-syntax">`</span></code>/<code><span class="md-syntax">`</span>Cell<span class="md-syntax">`</span></code>s, <code><span class="md-syntax">`</span>Box<span class="md-syntax">`</span></code>es, <code><span class="md-syntax">`</span>dyn<span class="md-syntax">`</span></code> traits, hashtables - and the result is noticeably slower.<br>
+Many end up using <code><span class="md-syntax">`</span>Vec<span class="md-syntax">`</span></code> &amp; indexing as “virtual memory” to bypass aliasing analysis entirely, which is defeating the point of having borrow checker in the first place (so you get zero benefits and most downsides). In many cases, ECS is just cope for not dealing with borrow checker rules (and moving validation to runtime).<br>
+Hidden control flow, disability to alter codegen, bloated barriers from “safety” checks [why are we calling runtime validation “safety”?] which also hurt branch predictor, complexity of shared allocations and custom allocators (no one does that) - all contribute to Rust being not even close to C.</p>
+<p>That is not the main issue, however - core friction in gamedev is the borrow checker’s hostility to megastructs. A <code><span class="md-syntax">`</span>Player<span class="md-syntax">`</span></code> with fields like <code><span class="md-syntax">`</span>hand<span class="md-syntax">`</span></code> and <code><span class="md-syntax">`</span>stats<span class="md-syntax">`</span></code> [imagine some generic roguelike deckbuilder] should allow iterating cards while modifying stats, but cross-function partial borrows fail. Workarounds exist - temporary removals (put things into Option - lower performance, less readable, more typing), separate parameters (pass separately in every function down in call stack) - all force constant restructuring and/or functions with 10+ arguments. Graphics, physics and gameplay code naturally gravitate toward large coherent objects; Rust makes that painful. We’ll see if Polonius fixes that.</p>
+<p>Control is often withheld on principle. Disabling slice bounds checks for a scope requires ugly wrappers or insanity like replacing the panic hook with <code><span class="md-syntax">`</span>unreachable<span class="md-syntax">`</span></code> (im not sure if thats a thing rn). Per-function <code><span class="md-syntax">`</span>-ffast-math<span class="md-syntax">`</span></code> isn’t possible without manual intrinsics (you can’t override it in dependencies, and macro system is not strong enough to properly cover even your code). Zero-division checks, overflow checks, turning asserts into <code><span class="md-syntax">`</span>debug_assert<span class="md-syntax">`</span></code> - all locked behind decisions that seem to assume programmers are reckless and dumb. Fine-grained control is technically possible, but verbose, unreadable, error-prone, and takes unreasonable amount of work. Wanna see if ffast math would improve perf for a library? Yeah, for it and rewrite it manually. The language frequently decides you shouldn’t have an opt-in feature because someone might misuse it. Rust is for idiots to write “hello world”, not engineers building complicated systems. And oh boy hello world looks nice and compiles fast.<br>
+That is my another issue with Rust. Both people who make the language and those who are public about it are always trying to make decisions for me and impose a solution. Are we programming in isolated emulator or in systems PL?</p>
+<p>You cannot modify allocator for a library/scope. Yeah, fork that lib and make it generic over an Allocator.</p>
+<p>Math support is surprisingly weak for a modern systems language. No built-in SIMD vector types despite SSE being universal (your browser requires it) and entire industry agreeing on almost every implementation detail (to the point of having specialized instructions), so the ecosystem is flooded with competing and syntactically ugly libraries - <code><span class="md-syntax">`</span>nalgebra<span class="md-syntax">`</span></code>, <code><span class="md-syntax">`</span>glam<span class="md-syntax">`</span></code>, <code><span class="md-syntax">`</span>vek<span class="md-syntax">`</span></code>, <code><span class="md-syntax">`</span>cgmath<span class="md-syntax">`</span></code>, dozens more - and all doing somewhat the same.<br>
+Constant casting between <code><span class="md-syntax">`</span>u32<span class="md-syntax">`</span></code>/<code><span class="md-syntax">`</span>usize<span class="md-syntax">`</span></code>/<code><span class="md-syntax">`</span>u64<span class="md-syntax">`</span></code>/<code><span class="md-syntax">`</span>isize<span class="md-syntax">`</span></code> because APIs cant agree on that adds noise.</p>
+<p>Ecosystems in general has this fragmentation problem. Finding a suiting library takes forever. OpenGL setup with <code><span class="md-syntax">`</span>winit<span class="md-syntax">`</span></code>/<code><span class="md-syntax">`</span>glow<span class="md-syntax">`</span></code> is hard for no reason [took me multiple hours; i know all the calls that need to happen under the hood but cant figure out how to use fucking wrappers], Vulkan wrappers keep renaming things for no reason, popular crates like gltf loaders are over-engineered, and documentation often states facts without explaining connections and reasons (std::random: each individual piece is clear, overall flow is opaque. What do i do with struct X?). Libraries are written as if the reader already understands the problem they’re solving - which is precisely why one reaches for a library [if i fully understand the problem, i can type it myself!]. Crates refactor frequently, break APIs unnecessarily (true 1.0.0 stability is rare, everyone just stays at 0.X.Y forever), pull forests of dependencies (under triple digits is practically impossible for most projects) [and overwriting dependency of dependency is not a thing].<br>
+Luckily disability of people to write good libraries will make you wanna do everything yourself anyways.<br>
+I once ported a simple C magicavoxel (voxel file format) parser because I couldn’t decipher its Rust counterpart despite exhaustive reading of source, docs, and examples; yet its C version was crystal clear.</p>
+<p>Actually, that is what bothers me the most in crates ecosystem: Rust abstraction mechanisms (as well as whatever latest C++ is pushing) are absolute bonkers for readers to use and understand.<br>
+I open a C library. What do i do? Read some struct declarations in <strong><span class="md-syntax">**</span>very distinct, separate, and clearly intended for that<span class="md-syntax">**</span></strong> header file. Read some function prototypes - “oh, yes, this one gets a Settings* and Allocator* and returns new Object”. I know i can just construct the Settings struct myself. Maybe there is <code><span class="md-syntax">`</span>Settings make_default_settings()<span class="md-syntax">`</span></code>.<br>
+How is memory for Object elements stored? That is simply - as a contiguous memory block, allocated with my allocator (or default one, but you can override it with define). How i iterate through them? Just index. How i copy one? Just copy.</p>
+<p>Now, how would the Rust counterpart look like? First of, every struct would have a comment like:</p>
+<pre><code>/// A struct representing an object
 struct Object {
     /// Elements of this object
     elements: Vec&lt;elements&gt; 
-}</code></pre>
-            <p>Second, the declarations will be scattered across 20 files each ~100loc . You have to jump around a bit.<br />
-            Now, how do i make an object? Docs dont really say anything, they just enumerate functions (methods and trait impls, with 90% being auto traits). So there is new function, but it needs some &amp; ResolvedSettings. And you need to create some ConcreteSettings yourself, implement Settings trait and pass it after casting Settings into ResolvedSettings via Into trait. However, compiler is not really going to help here, you must figure out proper imports for that to magically start working (since Trait impls need to be imported, and they magically add methods to structs).<br />
-            The library is also going to be async (but its fine, just add some dependencies like pollster and do block_on(future)) with types like <code>Pin&lt;Box&lt;dyn Future&lt;Output = ...</code>. It will come with few traits you need to implement (and per orphan rule, make wrapper types). Also the only way to read its memory is via iterators. Oh, it also does not implement Clone because of author decided to save some memory and play around with references; that is also why you wont be able to move code into helper function (!!!) without erasing lifetimes (i.e. casting everything to 'static).</p>
-            <p>Two out of three headline claims on the Rust website - <em>fast</em>, reliable, <em>productive</em> - feel overstated.<br />
-            It isn't as fast as C [struct layout optimization is not there, compilers can largely figure out aliasing for C even if restrict is not present, and hidden Rust control flow breaks important reordering optimizations. Luckily, you can ignore large programs and only do micro benchmarks where Rust is not noticeably slower and claim almost the same speed].<br />
-            Productivity suffers in large non-uniform codebases [multiple big studios tried Rust for games and walked away. Seriously, go to any Rust/gamedev subreddit and try to find "Rust is faster to make a game in" opinion].<br />
-            "Reliability" rests on a lifetime model that can't express many real patterns without escape hatches or reinvention of pointers/allocators.</p>
-            <p>In relation to real safety, Rust is moving in opposite direction - dependency hell certainly does not help with it, as well as static linking.<br />
-            Bundled dependencies hide vulnerabilities, delay patches, make package management hard.</p>
-            <p>Rust is not based on some fundamental simple and beautiful theory, and neither it is build for programmers to create real world complex systems on real world silicon - it is more of a collection of hacks that try to look like both. There is many examples to it, like famous 2015 bug casting local lifetimes to <code>'static</code> (that instance patched), or its "safety~performance" policy.<br />
-            Enum variants are not types, there is exception to every feature rule, and assembly is far from optimal.</p>
-            <p>Good memory management cant be expressed in lifetimes - arenas, linked lists, circular structures need custom handling. Alloca is not there, even scoped allocators are not there.</p>
-            <p>Rust <strong>does</strong> provide good static analysis. But so do C compilers.</p>
-            <p>Pin Box Dyn Future with Output = Result &lt; Generic &lt; ... is not even crazy by many rustaceans.</p>
-            <p>Async creates parallel code universes with pinning and cancellation concerns.</p>
-            <p>Why can you not overwrite dependency version? Someone decided that is not safe... Made the decision for you, now go fork like a hundred crates to fix it.</p>
-            <p>2 main reasons to use Rust for me: winit + wgpu.</p>
-            <p>[imho] Rust is better than C++ [i.e., faster to make <em>target</em> game in if following idiomatic patterns], but against C the trade is less clear: it adds slow compiles and fat binaries for half-baked functional features and a region model that steers toward unmaintainable architectures.</p>
-            <p>We need real reflection for inspectors, serialization, and UI. Instead, we have a build-time text generation system that is very complex to write, slow to run, has weird quirks and is limited in power yet hard to cache.</p>
-            <p>Hot reloading is... Is not. I am not brave enough to try it. Am i gonna break soundness that is only catchable by MIRI?</p>
-            <p>Despite many problems, my Rust code more often works on the first try, the structure <strong>feels</strong> [but has not <strong>proven</strong> to be] mechanically [more] sound - small pieces transforming data in tandem. I like to imagine it is an Opus Magnum [game] solution. But it is far from the language that trusts both theory and the programmer; and many of promised features solve problems that were never present at expense of noticeable inconvenience. I hope by the time i finish my Rust project, there will be something more fitting available.</p>
-            <p>Compiling Rust for cross-platform is not as easy as C. For example, none of the officially provided ways for cross compiling to win 7 or wasm work for me [and without understanding of linkers &amp; build systems you likely wont figure it out on yourself].</p>
-            <p>2 important reasons to use Rust for me also are: winit + wgpu.</p>
-            <p>I would not call Rust a system programming language the same way C is. Rust is more of a "What C++ should have been but with bad reflection and no respect for the programmer"</p>
-            <ul>
-            <li>Concepts? Traits.</li>
-            <li>Templates? Constraint-based generics.</li>
-            <li>Inheritance? Fat <code>dyn Trait</code> pointers.</li>
-            <li>Modules? Modules that work.</li>
-            </ul>
-            <p>:)<br />
-            :)</p>
-        </article>
+}
+</code></pre>
+<p>Second, the declarations will be scattered across 20 files each ~100loc . You have to jump around a bit.<br>
+Now, how do i make an object? Docs dont really say anything, they just enumerate functions (methods and trait impls, with 90% being auto traits). So there is new function, but it needs some &amp; ResolvedSettings. And you need to create some ConcreteSettings yourself, implement Settings trait and pass it after casting Settings into ResolvedSettings via Into trait. However, compiler is not really going to help here, you must figure out proper imports for that to magically start working (since Trait impls need to be imported, and they magically add methods to structs).<br>
+The library is also going to be async (but its fine, just add some dependencies like pollster and do block_on(future)) with types like <code><span class="md-syntax">`</span> Pin<Box<dyn Future<Output = ...<span class="md-syntax">`</span></code>. It will come with few traits you need to implement (and per orphan rule, make wrapper types). Also the only way to read its memory is via iterators. Oh, it also does not implement Clone because of author decided to save some memory and play around with references; that is also why you wont be able to move code into helper function (!!!) without erasing lifetimes (i.e. casting everything to 'static).</p>
+<p>Two out of three headline claims on the Rust website - <em><span class="md-syntax">*</span>fast<span class="md-syntax">*</span></em>, reliable, <em><span class="md-syntax">*</span>productive<span class="md-syntax">*</span></em> - feel overstated.<br>
+It isn’t as fast as C [struct layout optimization is not there, compilers can largely figure out aliasing for C even if restrict is not present, and hidden Rust control flow breaks important reordering optimizations. Luckily, you can ignore large programs and only do micro benchmarks where Rust is not noticeably slower and claim almost the same speed].<br>
+Productivity suffers in large non-uniform codebases [multiple big studios tried Rust for games and walked away. Seriously, go to any Rust/gamedev subreddit and try to find “Rust is faster to make a game in” opinion].<br>
+“Reliability” rests on a lifetime model that can’t express many real patterns without escape hatches or reinvention of pointers/allocators.</p>
+<p>In relation to real safety, Rust is moving in opposite direction - dependency hell certainly does not help with it, as well as static linking.<br>
+Bundled dependencies hide vulnerabilities, delay patches, make package management hard.</p>
+<p>Rust is not based on some fundamental simple and beautiful theory, and neither it is build for programmers to create real world complex systems on real world silicon - it is more of a collection of hacks that try to look like both. There is many examples to it, like famous 2015 bug casting local lifetimes to <code><span class="md-syntax">`</span>'static<span class="md-syntax">`</span></code> (that instance patched), or its “safety~performance” policy.<br>
+Enum variants are not types, there is exception to every feature rule, and assembly is far from optimal.</p>
+<p>Good memory management cant be expressed in lifetimes - arenas, linked lists, circular structures need custom handling. Alloca is not there, even scoped allocators are not there.</p>
+<p>Rust <strong><span class="md-syntax">**</span>does<span class="md-syntax">**</span></strong> provide good static analysis. But so do C compilers.</p>
+<p>Pin Box Dyn Future with Output = Result &lt; Generic &lt; … is not even crazy by many rustaceans.</p>
+<p>Async creates parallel code universes with pinning and cancellation concerns.</p>
+<p>Why can you not overwrite dependency version? Someone decided that is not safe… Made the decision for you, now go fork like a hundred crates to fix it.</p>
+<p>2 main reasons to use Rust for me: winit + wgpu.</p>
+<p>[imho] Rust is better than C++ [i.e., faster to make <em><span class="md-syntax">*</span>target<span class="md-syntax">*</span></em> game in if following idiomatic patterns], but against C the trade is less clear: it  adds slow compiles and fat binaries for half-baked functional features and a region model that steers toward unmaintainable architectures.</p>
+<p>We need real reflection for inspectors, serialization, and UI. Instead, we have a build-time text generation system that is very complex to write, slow to run, has weird quirks and is limited in power yet hard to cache.</p>
+<p>Hot reloading is… Is not. I am not brave enough to try it. Am i gonna break soundness that is only catchable by MIRI?</p>
+<p>Despite many problems, my Rust code more often works on the first try, the structure <strong><span class="md-syntax">**</span>feels<span class="md-syntax">**</span></strong> [but has not <strong><span class="md-syntax">**</span>proven<span class="md-syntax">**</span></strong> to be] mechanically [more] sound - small pieces transforming data in tandem. I like to imagine it is an Opus Magnum [game] solution. But it is far from the language that trusts both theory and the programmer; and many of promised features solve problems that were never present at expense of noticeable inconvenience. I hope by the time i finish my Rust project, there will be something more fitting available.</p>
+<p>Compiling Rust for cross-platform is not as easy as C. For example, none of the officially provided ways for cross compiling to win 7 or wasm work for me [and without understanding of linkers &amp; build systems you likely wont figure it out on yourself].</p>
+<p>2 important reasons to use Rust for me also are: winit + wgpu.</p>
+<p>I would not call Rust a system programming language the same way C is. Rust is more of a “What C++ should have been but with bad reflection and no respect for the programmer”</p>
+<ul>
+<li>Concepts? Traits.</li>
+<li>Templates? Constraint-based generics.</li>
+<li>Inheritance? Fat <code><span class="md-syntax">`</span>dyn Trait<span class="md-syntax">`</span></code> pointers.</li>
+<li>Modules? Modules that work.</li>
+</ul>
+<p>:)<br>
+:)</p>
 
-            </main>
+            </article>
+            
+        </main>
+        
         <script>
-        const btn = document.getElementById('toggle-code-outline-btn');
-        if (btn) {
-            btn.addEventListener('click', () => {
-                const no_outlines = document.body.classList.toggle('no-code-outline');
-                if (no_outlines) {
-                    btn.textContent = 'turn outlines on';
-                } else {
-                    btn.textContent = 'turn outlines off';
-                }
-            });
-        }
-    </script>
-</body>
-
+            const btn = document.getElementById("toggle-code-outline-btn");
+            if (btn) {
+                btn.addEventListener("click", () => {
+                    const noOutlines = document
+                        .body
+                        .classList
+                        .toggle("no-code-outline");
+                    btn.textContent = noOutlines
+                        ? "turn outlines on"
+                        : "turn outlines off";
+                });
+            }
+        </script>
+    </body>
 </html>

@@ -1,6 +1,6 @@
 deps:
 * make
-* python + pandoc
+* node.js + pnpm
 * nightly rust with std src
 * pnpm i -g purgecss
 

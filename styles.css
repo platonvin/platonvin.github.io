@@ -1,3 +1,5 @@
+/* hi there, person who likes reading css. Weird thing to do, huh? */
+
 h1,
 h2,
 h3,
@@ -99,6 +101,48 @@ header>p {
   margin: 0 0 2em
 }
 
+.md-syntax {
+  font-family: var(--code-font);
+  color: var(--gray-lighter);
+  font-weight: 400;
+  font-size: 0.8em;
+  user-select: none;
+  margin-right: 2px;
+}
+
+h1 .md-syntax,
+h2 .md-syntax,
+h3 .md-syntax,
+h4 .md-syntax,
+h5 .md-syntax {
+  opacity: 0.9;
+}
+
+strong {
+  color: var(--black);
+  letter-spacing: -0.02em;
+}
+
+em {
+  color: var(--gray);
+  font-style: italic;
+}
+
+blockquote {
+  border-left: var(--border-default);
+  margin: 1.5rem 0;
+  padding-left: 1.5rem;
+  font-family: var(--text-font);
+  color: var(--gray);
+}
+
+code .md-syntax {
+  color: var(--gray-lighter);
+}
+
+/* in-article stuff styling */
+/* coolstory: i once made it beautiful and ran purgecss without saving */
+
 article {
   border: var(--border-default);
   box-shadow: var(--box-shadow-large);
@@ -110,12 +154,31 @@ article {
 }
 
 article * {
-  grid-column: 1/-1
+  grid-column: 1/-1;
+  text-align: left;
+}
+
+/* we want zero in index.html */
+article:not(.home) * {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+article:not(.home) h2,
+h3,
+h4,
+small {
+  margin-left: 1%;
+}
+
+article:not(.home) :is(h1, h2, h3, h4, h5) {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
 }
 
 article :is(p:first-of-type, p:last-of-type) {
   margin-bottom: 0;
-  margin-top: 0
+  margin-top: 0;
 }
 
 article+h2 {
@@ -224,7 +287,7 @@ code {
   border: var(--border-small);
   box-shadow: var(--box-shadow-xsmall);
   color: var(--code-foreground-color);
-  display: inline-block;
+  /* display: inline-block; */
   font-family: var(--code-font);
   font-size: .9em;
   line-height: 1.2;
