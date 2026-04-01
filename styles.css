@@ -2,8 +2,8 @@
   box-sizing: border-box;
   color-scheme: only light;
   --gap: 1ch;
-  --title-font: sans-serif, "Sans the royal guard";
-  --text-font: sans-serif, "Sans the shopkeeper";
+  --title-font: "Sans the skeleton", sans-serif;
+  --text-font: "Sans the skeleton", sans-serif;
   --code-font: monospace;
   --border-color: #151414;
   --border-default: 3px solid var(--border-color);
@@ -113,7 +113,7 @@ section p {
   margin: 0;
 }
 
-/* better projects list layout*/
+/* cooler projects list layout*/
 .header-content {
   align-items: center;
   display: flex;
