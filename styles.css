@@ -20,7 +20,7 @@
 html {
   /*idk i should probably adjust it differently but whatever*/
   font-size: 62.5%;
-  min-width: 375px
+  min-width: 375px;
 }
 
 body {
@@ -34,9 +34,8 @@ body {
   background-color: var(--body-background-color);
 }
 
-
 ::selection {
-  background-color: var(--selection-color)
+  background-color: var(--selection-color);
 }
 
 /*lf h1-5*/
@@ -49,48 +48,48 @@ h5 {
   font-weight: 700;
   line-height: 1.1;
   margin: 0 0 1rem;
-  text-align: center
+  text-align: center;
 }
 
 strong {
-  color: var(--black)
+  color: var(--black);
 }
 
 em {
   color: var(--gray);
-  font-style: italic
+  font-style: italic;
 }
 
 a {
   color: var(--black);
-  text-decoration: none
+  text-decoration: none;
 }
 
 a:hover,
 a:focus,
 a:active {
-  color: var(--link-color-hover)
+  color: var(--link-color-hover);
 }
 
 /* Layout */
 main {
   display: grid;
-  grid-template-columns: 1fr 1fr var(--gap) minmax(1em, 70em) var(--gap) 1fr 1fr
+  grid-template-columns: 1fr 1fr var(--gap) minmax(1em, 70em) var(--gap) 1fr 1fr;
 }
 
 main>* {
-  grid-column: 4
+  grid-column: 4;
 }
 
 header {
   padding: 1em 0;
   display: grid;
-  grid-template-columns: 1fr
+  grid-template-columns: 1fr;
 }
 
 header :is(h1, h2, h3, h4, h5, section) {
   justify-self: center;
-  width: fit-content
+  width: fit-content;
 }
 
 article,
@@ -99,7 +98,7 @@ section {
   border: var(--border-default);
   box-shadow: var(--box-shadow-large);
   padding: 1rem;
-  margin-bottom: 1em
+  margin-bottom: 1em;
 }
 
 /* thin description text on homepage*/
@@ -115,19 +114,18 @@ section p {
   margin-top: 0.75rem;
 }
 
-
 section {
   border: var(--border-default);
   background: var(--body-background-color);
   padding: 1rem;
-  margin-bottom: 2rem
+  margin-bottom: 2rem;
 }
 
 blockquote {
   border-left: var(--border-default);
   margin: 1.5rem 0;
   padding-left: 1.5rem;
-  color: var(--gray)
+  color: var(--gray);
 }
 
 /* Code */
@@ -138,31 +136,31 @@ code {
   font-family: var(--code-font);
   /* font-size: .9em; */
   padding: .1rem .3rem;
-  margin: 0 .2rem
+  margin: 0 .2rem;
 }
 
 pre {
-  margin: 1rem 0
+  margin: 1rem 0;
 }
 
 pre code {
   display: block;
   padding: 1rem;
   background: #c6c5c5;
-  overflow-x: auto
+  overflow-x: auto;
 }
 
 /* Lists */
 ul.posts {
   list-style: none;
   margin: 0;
-  padding: 0
+  padding: 0;
 }
 
 ul.posts li {
   display: flex;
   justify-content: space-between;
-  font-weight: 700
+  font-weight: 700;
 }
 
 ul.icons {
@@ -171,23 +169,25 @@ ul.icons {
   justify-content: center;
   list-style: none;
   padding: 0;
-  margin: 1rem 0;
+  margin: 1.2rem 0 0.8rem;
 }
 
 ul.icons a {
   border: var(--border-default);
-  box-shadow: 4px 4px var(--border-color);
+  box-shadow: 3px 3px var(--border-color);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 4rem;
   height: 4rem;
   font-size: 3.1rem;
-  text-decoration: none
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  background-color: var(--body-background-color);
 }
 
 ul.icons a:hover {
-  box-shadow: none
+  box-shadow: 1px 1px var(--border-color);
+  transform: translate(2px, 2px);
 }
 
 /* align headlines as in md */
