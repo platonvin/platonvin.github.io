@@ -1,7 +1,3 @@
-/* 
-
-*/
-
 .lum-canvas,
 .lum-canvas-container {
     border: none;
@@ -17,7 +13,6 @@
     pointer-events: none
 }
 
-/* Optional extras you can also move here if you want */
 .fixed-controls {
     position: fixed;
     margin: 0;

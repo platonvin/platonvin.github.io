@@ -19,14 +19,14 @@
 
 html {
   /*idk i should probably adjust it differently but whatever*/
-  font-size: 62.5%;
+  font-size: 80%;
   min-width: 375px;
 }
 
 body {
-  background-image: radial-gradient(#000 1px, transparent 0);
-  background-position: -15px -15px;
-  background-size: 30px 31px;
+  background-image: radial-gradient(#21212185 1px, transparent 0);
+  background-position: -14px -25px;
+  background-size: 38px 38px;
   font-family: var(--text-font);
   font-size: 1.6em;
   line-height: 1.45;
@@ -38,13 +38,43 @@ body {
   background-color: var(--selection-color);
 }
 
-/*lf h1-5*/
 h1, h2, h3, h4, h5 {
   font-family: var(--title-font);
   font-weight: 700;
   line-height: 1.1;
   margin: 0 0 1rem;
-  text-align: center;
+  color: var(--black);
+  position: relative;
+}
+
+/* center them */
+:is(h1, h2, h3, h4, h5):not(article :is(h1, h2, h3, h4, h5)) {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* remove dots below text */
+:is(h1, h2, h3, h4, h5):not(article :is(h1, h2, h3, h4, h5))::after {
+  content: '';
+  position: absolute;
+  inset: -0.06em -0.22em;
+  background: var(--body-background-color);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* nicer in-section article name positioning*/
+.header-content * {
+  display: block;
+  text-align: left;
+  margin: 0;
+}
+
+.header-content {
+  align-items: baseline;
+  display: flex;
+  gap: 1em;
+  margin-top: 0.75rem;
 }
 
 strong {
@@ -94,17 +124,14 @@ article, section {
   margin-bottom: 1em;
 }
 
+/* align headlines as in md */
+article :is(h1, h2, h3, h4, h5) {
+  text-align: left;
+}
+
 /* thin description text on homepage*/
 section p {
   margin: 0;
-}
-
-/* cooler projects list layout*/
-.header-content {
-  align-items: center;
-  display: flex;
-  gap: 1em;
-  margin-top: 0.75rem;
 }
 
 section {
@@ -121,7 +148,6 @@ blockquote {
   color: var(--gray);
 }
 
-/* Code */
 code {
   background-color: var(--white);
   border: var(--border-small);
@@ -143,22 +169,22 @@ pre code {
   overflow-x: auto;
 }
 
-/* Lists */
+ul {
+  padding: 0 0 0 20px;
+}
+
 ul.posts {
-  list-style: none;
   margin: 0;
   padding: 0;
 }
 
 ul.posts li {
   display: flex;
-  justify-content: space-between;
   font-weight: 700;
 }
 
 ul.icons {
   display: flex;
-  gap: 1rem;
   justify-content: center;
   list-style: none;
   padding: 0;
@@ -169,11 +195,8 @@ ul.icons a {
   border: var(--border-default);
   box-shadow: 3px 3px var(--border-color);
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 4rem;
   height: 4rem;
-  font-size: 3.1rem;
   transition: transform 0.1s ease, box-shadow 0.15s ease;
   background-color: var(--body-background-color);
 }
@@ -181,9 +204,4 @@ ul.icons a {
 ul.icons a:hover {
   box-shadow: 1px 1px var(--border-color);
   transform: translate(2px, 2px);
-}
-
-/* align headlines as in md */
-article :is(h1, h2, h3, h4, h5) {
-  text-align: left;
 }
