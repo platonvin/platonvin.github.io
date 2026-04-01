@@ -1,360 +1,30 @@
-/* hi there, person who likes reading css. Weird thing to do, huh? */
-
-h1,
-h2,
-h3,
-h4,
-h5 {
-  background-color: var(--body-background-color);
-  font-family: var(--title-font);
-  font-weight: 700;
-  line-height: normal;
-  margin-bottom: .75rem;
-  margin-top: 0;
-  text-align: center
+:root {
+  box-sizing: border-box;
+  color-scheme: only light;
+  --gap: 1ch;
+  --title-font: sans-serif, "Sans the royal guard";
+  --text-font: sans-serif, "Sans the shopkeeper";
+  --code-font: monospace;
+  --border-color: #151414;
+  --border-default: 3px solid var(--border-color);
+  --border-small: 1px solid var(--border-color);
+  --box-shadow-large: 7px 7px var(--border-color);
+  --black: #151414;
+  --gray: #4c4847;
+  --white: #dad8d7;
+  --body-background-color: var(--white);
+  --link-color-hover: var(--gray);
+  --selection-color: #726c6a;
 }
 
-.standalone-heading {
-  width: -moz-fit-content;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-h1 {
-  font-size: 4.6rem;
-  margin-bottom: 1rem
-}
-
-h2 {
-  font-size: 3.6rem
-}
-
-h3 {
-  font-size: 2.8rem;
-  margin-top: .75rem
-}
-
-h4 {
-  font-size: 2.2rem
-}
-
-h5 {
-  font-size: 1.8rem
-}
-
-h1,
-h2,
-h3,
-h4 {
-  text-shadow: 1px 1px 1px var(--black-transparent)
-}
-
-h1>a:active,
-h1>a:focus,
-h1>a:hover {
-  color: inherit;
-  text-decoration: none
-}
-
-main {
-  display: grid;
-  grid-template-columns: 1fr 1fr var(--gap) minmax(1em, 70em) var(--gap) 1fr 1fr
-}
-
-main>* {
-  grid-column: 4
-}
-
-.header-content {
-  align-items: center;
-  display: flex;
-  gap: 1em
-}
-
-.header-content-vertical {
-  align-items: center;
-  display: flex;
-  flex-direction: column
-}
-
-header {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
-  padding-bottom: 1em;
-  padding-top: 1em
-}
-
-header :is(h1, h2, h3, h4, h5, section) {
-  grid-column: -1/1;
-  justify-self: center;
-  width: fit-content
-}
-
-header>* {
-  align-items: center;
-  justify-content: center
-}
-
-header>p {
-  margin: 0 0 2em
-}
-
-.md-syntax {
-  font-family: var(--code-font);
-  color: var(--gray-lighter);
-  font-weight: 400;
-  font-size: 0.8em;
-  user-select: none;
-  margin-right: 2px;
-}
-
-h1 .md-syntax,
-h2 .md-syntax,
-h3 .md-syntax,
-h4 .md-syntax,
-h5 .md-syntax {
-  opacity: 0.9;
-}
-
-strong {
-  color: var(--black);
-  letter-spacing: -0.02em;
-}
-
-em {
-  color: var(--gray);
-  font-style: italic;
-}
-
-blockquote {
-  border-left: var(--border-default);
-  margin: 1.5rem 0;
-  padding-left: 1.5rem;
-  font-family: var(--text-font);
-  color: var(--gray);
-}
-
-code .md-syntax {
-  color: var(--gray-lighter);
-}
-
-/* in-article stuff styling */
-/* coolstory: i once made it beautiful and ran purgecss without saving */
-
-article {
-  border: var(--border-default);
-  box-shadow: var(--box-shadow-large);
-  display: grid;
-  grid-column: 4;
-  grid-template-columns: min-content minmax(33%, 1fr) min-content;
-  margin-bottom: 1em;
-  padding: 1rem
-}
-
-article * {
-  grid-column: 1/-1;
-  text-align: left;
-}
-
-/* we want zero in index.html */
-article:not(.home) * {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-article:not(.home) h2,
-h3,
-h4,
-small {
-  margin-left: 1%;
-}
-
-article:not(.home) :is(h1, h2, h3, h4, h5) {
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-article :is(p:first-of-type, p:last-of-type) {
-  margin-bottom: 0;
-  margin-top: 0;
-}
-
-article+h2 {
-  background-color: var(--body-background-color);
-  justify-self: center;
-  margin-top: 1rem;
-  width: fit-content
-}
-
-ul.posts {
-  list-style-type: none;
-  margin: 0;
-  padding-inline-start: 0
-}
-
-ul.posts li {
-  display: flex;
-  font-weight: 700;
-  justify-content: space-between
-}
-
-ul.posts li>small {
-  color: var(--black);
-  justify-self: end;
-  text-transform: uppercase
-}
-
-ul.posts li>a {
-  color: var(--black);
-  grid-column: 1/-1
-}
-
-ul.posts li>a:active,
-ul.posts li>a:focus,
-ul.posts li>a:hover {
-  color: var(--link-color-hover);
-  text-decoration: inherit
-}
-
-ul.icons {
-  display: flex;
-  gap: 1rem;
-  grid-column: 1/-1;
-  justify-content: center;
-  list-style: none;
-  margin-bottom: 1rem;
-  margin-top: 0;
-  padding-left: 0
-}
-
-ul.icons li {
-  display: inline;
-  font-size: 2em
-}
-
-ul.icons a {
-  align-items: center;
-  border: var(--border-default);
-  box-shadow: var(--box-shadow-default);
-  display: inline-flex;
-  font-size: 1em;
-  height: 4rem;
-  justify-content: center;
-  padding: .2em .35em;
-  text-decoration: none;
-  width: 4rem
-}
-
-ul.icons a:hover {
-  box-shadow: none;
-  color: var(--link-color-hover)
-}
-
-a {
-  text-decoration: none
-}
-
-a {
-  color: var(--black)
-}
-
-a:active,
-a:focus,
-a:hover {
-  color: var(--link-color-hover)
-}
-
-footer p {
-  margin-bottom: .5ch;
-  margin-top: .5ch
-}
-
-footer p,
-p.center {
-  text-align: center
-}
-
-code,
-p a {
-  font-weight: 700
-}
-
-code {
-  overflow-x: auto;
-  background-color: var(--code-background-color);
-  border: var(--border-small);
-  box-shadow: var(--box-shadow-xsmall);
-  color: var(--code-foreground-color);
-  /* display: inline-block; */
-  font-family: var(--code-font);
-  font-size: .9em;
-  line-height: 1.2;
-  margin-left: .2rem;
-  margin-right: .2rem;
-  padding: .1rem .2rem
-}
-
-code::selection {
-  background-color: var(--code-foreground-color);
-  color: var(--code-background-color)
-}
-
-pre {
-  margin: 1rem 0
-}
-
-pre code {
-  background-color: var(--gray-lighterer);
-  box-shadow: var(--box-shadow-large);
-  display: block;
-  padding: .5rem
-}
-
-pre code::selection {
-  background-color: var(--white);
-  color: var(--color-2)
-}
-
-section {
-  background: var(--body-background-color);
-  border: var(--border-default);
-  margin-bottom: 2rem;
-  padding: 1rem
-}
-
-section>h4 {
-  font-family: var(--title-font);
-  font-size: 2.4rem;
-  margin: 0 0 1rem;
-  text-align: center;
-  text-shadow: 1px 1px 1px var(--black-transparent)
-}
-
-section dl {
-  border-left: var(--border-default);
-  margin: 1rem 0 0;
-  padding-left: 1.5rem
-}
-
-section dt {
-  font-family: var(--title-font);
-  font-size: 2rem;
-  font-weight: 700;
-  margin-top: 1.5rem
-}
-
-section dd {
-  line-height: 1.4;
-  margin: .5rem 0 0 1rem
-}
-
-section dt:first-of-type {
-  margin-top: 0
-}
+/* @supports (font-variation-settings:normal) {
+  :root {
+    --text-font: InterVariable, sans-serif
+  }
+} */
 
 html {
+  /*idk i should probably adjust it differently but whatever*/
   font-size: 62.5%;
   min-width: 375px
 }
@@ -364,190 +34,168 @@ body {
   background-position: -15px -15px;
   background-size: 40px 40px;
   font-family: var(--text-font);
-  font-optical-sizing: auto;
   font-size: 1.6em;
-  letter-spacing: normal;
-  line-height: 1.45em;
+  line-height: 1.45;
   margin: 0;
-  padding: 0
-}
-
-article,
-body {
   background-color: var(--body-background-color)
 }
 
-span img {
-  box-shadow: none;
-  display: block;
-  height: auto;
-  margin: 1rem auto;
-  max-width: 40%
-}
-
-@media screen and (max-width:768px) {
-  h1 {
-    font-size: 3.6rem
-  }
-
-  h2 {
-    font-size: 2.8rem
-  }
-
-  h3 {
-    font-size: 2.2rem
-  }
-
-  h4 {
-    font-size: 1.8rem
-  }
-
-  h5 {
-    font-size: 1.6rem;
-    font-size: 1.5rem
-  }
-}
-
-header section {
-  box-shadow: var(--box-shadow-large);
-  color: var(--black);
-  display: flex;
-  flex-direction: column;
-  padding: 1rem
-}
-
-header section {
-  border: var(--border-default)
-}
-
-button header {
-  background-color: var(--caution-header-background);
-  display: flex;
-  margin: 0;
-  padding: 0
-}
-
-.header-content-link {
-  color: inherit;
-  display: block;
-  text-decoration: none
-}
-
-.lum-canvas,
-.lum-canvas-container {
-  border: none;
-  width: 100%
-}
-
-.lum-canvas {
-  aspect-ratio: 1920/1080;
-  background: #333;
-  box-shadow: none;
-  cursor: not-allowed;
-  margin: auto;
-  pointer-events: none
-}
-
-*,
-:after,
-:before {
-  box-sizing: inherit
-}
-
-:root {
-  box-sizing: border-box;
-  color-scheme: only light;
-  font-family: var(--text-font);
-  font-feature-settings: "liga" 1, "calt" 1;
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: none;
-  -moz-text-size-adjust: none;
-  text-size-adjust: none;
-  --gap: 1ch;
-  --title-font: "DM Serif Display", serif;
-  --text-font: "Inter", sans-serif;
-  --code-font: "JetBrains Mono", monospace;
-  --border-color: var(--black);
-  --border-width-md: 3px;
-  --border-radius-round: 2em;
-  --border-small: 1px solid var(--border-color);
-  --border-default: var(--border-width-md) solid var(--border-color);
-  --black: #151414;
-  --gray: #4c4847;
-  --gray-light: #6e6e6e;
-  --gray-lighter: #8a8887;
-  --gray-lighterer: #c6c5c5;
-  --white: #dad8d7;
-  --color-1: #726c6a;
-  --color-2: #2a2827;
-  --box-shadow-color: var(--black);
-  --box-shadow-small: 2px 2px var(--box-shadow-color);
-  --box-shadow-default: 4px 4px var(--box-shadow-color);
-  --box-shadow-large: 7px 7px var(--box-shadow-color);
-  --body-background-color: var(--white);
-  --selection-color: var(--color-1);
-  --link-color-hover: var(--gray);
-  --code-background-color: var(--white);
-  --code-foreground-color: var(--black);
-  --important-header-background: var(--white);
-  --important-header-foreground: var(--white);
-  --important-text-background: var(--white);
-  --important-text-foreground: var(--white);
-  --important-icon: var(--icon-exclamation-square-fill);
-  --caution-header-background: var(--white);
-  --caution-header-foreground: var(--white);
-  --caution-text-background: var(--white);
-  --caution-text-foreground: var(--black);
-  --caution-icon: var(--icon-exclamation-circle-fill);
-  --note-header-background: var(--white);
-  --note-header-foreground: var(--black);
-  --note-text-background: var(--white);
-  --note-text-foreground: var(--black)
-}
-
-@supports (font-variation-settings:normal) {
-  :root {
-    --text-font: InterVariable, sans-serif
-  }
-}
 
 ::selection {
   background-color: var(--selection-color)
 }
 
-.fixed-controls {
-  position: fixed;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  z-index: 10;
+/*lf h1-5*/
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--title-font);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0 0 1rem;
+  text-align: center
 }
 
-.button-style {
-  background-color: var(--body-background-color);
-  border: var(--border-small);
-  box-shadow: var(--box-shadow-small);
-  cursor: pointer;
-  font-size: 1.6rem;
-  padding: 0.5rem 0.5rem;
-  text-decoration: none;
+strong {
+  color: var(--black)
+}
+
+em {
+  color: var(--gray);
+  font-style: italic
+}
+
+a {
   color: var(--black);
+  text-decoration: none
 }
 
-.button-style:hover {
-  box-shadow: none;
-  color: var(--link-color-hover);
+a:hover,
+a:focus,
+a:active {
+  color: var(--link-color-hover)
 }
 
-body.no-code-outline code:not(.keep-style) {
-  border: 1px solid transparent;
-  box-shadow: none;
-  background-color: transparent;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  color: inherit;
+/* Layout */
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr var(--gap) minmax(1em, 70em) var(--gap) 1fr 1fr
+}
+
+main>* {
+  grid-column: 4
+}
+
+header {
+  padding: 1em 0;
+  display: grid;
+  grid-template-columns: 1fr
+}
+
+header :is(h1, h2, h3, h4, h5, section) {
+  justify-self: center;
+  width: fit-content
+}
+
+article,
+section {
+  background-color: var(--body-background-color);
+  border: var(--border-default);
+  box-shadow: var(--box-shadow-large);
+  padding: 1rem;
+  margin-bottom: 1em
+}
+
+/* thin description text on homepage*/
+section p {
   margin: 0;
+}
+
+/* better projects list layout*/
+.header-content {
+  align-items: center;
+  display: flex;
+  gap: 1em;
+  margin-top: 0.75rem;
+}
+
+
+section {
+  border: var(--border-default);
+  background: var(--body-background-color);
+  padding: 1rem;
+  margin-bottom: 2rem
+}
+
+blockquote {
+  border-left: var(--border-default);
+  margin: 1.5rem 0;
+  padding-left: 1.5rem;
+  color: var(--gray)
+}
+
+/* Code */
+code {
+  background-color: var(--white);
+  border: var(--border-small);
+  color: var(--black);
+  font-family: var(--code-font);
+  /* font-size: .9em; */
+  padding: .1rem .3rem;
+  margin: 0 .2rem
+}
+
+pre {
+  margin: 1rem 0
+}
+
+pre code {
+  display: block;
+  padding: 1rem;
+  background: #c6c5c5;
+  overflow-x: auto
+}
+
+/* Lists */
+ul.posts {
+  list-style: none;
+  margin: 0;
+  padding: 0
+}
+
+ul.posts li {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700
+}
+
+ul.icons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  list-style: none;
   padding: 0;
+  margin: 1rem 0
+}
+
+ul.icons a {
+  border: var(--border-default);
+  box-shadow: 4px 4px var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  text-decoration: none
+}
+
+ul.icons a:hover {
+  box-shadow: none
+}
+
+/* align headlines as in md */
+article :is(h1, h2, h3, h4, h5) {
+  text-align: left;
 }

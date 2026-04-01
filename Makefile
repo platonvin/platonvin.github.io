@@ -24,7 +24,5 @@ watch: serve
 serve:
 	pnpm exec eleventy --serve
 
-purge_css: purgecss
-
-purgecss:
-	purgecss --css styles.css --content index.html articles/*.html projects/*.html -o styles.css
+# purgecss:
+# 	purgecss --css styles.css --content index.html articles/*.html projects/*.html -o styles.css

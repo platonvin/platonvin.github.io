@@ -55,14 +55,13 @@ To render this contour, we bind its vertex buffer and use push constants to pass
 * for blocks, which are grid-aligned, this is just their position
 * for models, it's rotation and translation
 
-Since we only need model-space position for vertices, and models are not expected to be large, and vertices of a voxel are snapped to its corners, each vertex position can be a tiny i8vec3 - just 3 bytes (in fact, model sizes are limit to 255 to fit into u8).
+Since we only need model-space position for vertices, and models are not expected to be large, and vertices of a voxel are snapped to its corners, each vertex position can be a tiny u8vec3 - just 3 bytes (in fact, model sizes are limited to 255 to fit into u8. We could also remap the u8 range to increments of 2).
 
 Also, for better culling, we don't actually store the contour as a single triangle mesh. We abuse the fact that voxel sides are grid-aligned and only have 6 possible normals. The mesh is divided into 6 sections, one for each normal, and we cull them separately against the camera direction (btw some big games also use it, but it works best for voxels).
 
 *if you are wondering why rasterization and not raytracing - rasterization IS raytracing - it is optimization of specialized case of raytracing*
 
 At this point, the lightmap command buffers are done (of course, we execute them before shading).
-
 
 
 ## GBuffer
@@ -83,10 +82,11 @@ At this point, we have rasterized all blocks and models into our GBuffer.
 
 There are some small visual features that I just really wanted to implement, so here we are:
 
-* Foliage: I thought that since the intention is to construct the world out of blocks, same can work for foliage - we don't need to store positions of individual foliage *objects*. So, foliage is generated entirely by shaders (mostly the vertex shader). We drawcall N instances of M vertices, where n ⊂ (0...N) corresponds to an index of a blade, and m ⊂ (0..M) corresponds to the index of a vertex in that blade.<br />
-  Actually, 1 instance of (M+1)*N vertices is enough - we render blades as a triangle strip(s) (to do work only once per vertex), and we could insert NaN vertex between strips to prevent the GPU from rendering triangles connecting them, but we might as well use GPU built-in instances - just saves GPU few thrown away NaN triangles.
+* Foliage: I thought that since the intention is to construct the world out of blocks, same can work for foliage - we don't need to store positions of individual foliage *objects*. So, foliage is generated entirely by shaders (mostly the vertex shader). We drawcall N instances of M vertices, where n ⊂ (0...N) corresponds to an index of a blade, and m ⊂ (0..M) corresponds to the index of a vertex in that blade.
+Actually, 1 instance of (M+1)*N vertices is enough - we render blades as a triangle strip(s) (to do work only once per vertex), and we could insert NaN vertex between strips to prevent the GPU from rendering triangles connecting them, but we might as well use GPU built-in instances - just saves GPU few thrown away NaN triangles.
+
 * Liquids: We could do a DFT/FFT for some big resolution, but it's too slow. Instead, we do a "fake/manual" FFT, where we compute a few separate small DFTs and combine them with different scales and amplitudes (I call them LOD levels). The height at a point p is ∑ᵢ Lodᵢ(p) * Scaleᵢ.
-  *If you are wondering where is actual liquid sim - im building renderer for games, not simulation. Faking visuals is enough*
+  *If you are wondering where is actual liquid sim - its renderer for games, not simulation. Faking visuals is enough*
 
 
 

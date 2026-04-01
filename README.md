@@ -1,7 +1,7 @@
 deps:
 * make
-* node.js + pnpm
-* nightly rust with std src
-* pnpm i -g purgecss
+* node.js + p?npm
+* 11ty
+* nightly rust with std src and wasm
 
 lum wasm builds from scratch, html artifacts are commited. TODO: delete history automatically once git is sluggish? 
