@@ -5,16 +5,16 @@
   --title-font: "Sans the skeleton", sans-serif;
   --text-font: "Sans the skeleton", sans-serif;
   --code-font: monospace;
-  --border-color: #151414;
-  --border-default: 3px solid var(--border-color);
-  --border-small: 1px solid var(--border-color);
-  --box-shadow-large: 7px 7px var(--border-color);
   --black: #151414;
   --gray: #4c4847;
   --white: #dad8d7;
+  --selection-color: #726c6a;
+  --border-color: var(--black);
+  --border-default: 3px solid var(--border-color);
+  --border-small: 1px solid var(--border-color);
+  --box-shadow-large: 7px 7px var(--border-color);
   --body-background-color: var(--white);
   --link-color-hover: var(--gray);
-  --selection-color: #726c6a;
 }
 
 html {
@@ -26,7 +26,7 @@ html {
 body {
   background-image: radial-gradient(#000 1px, transparent 0);
   background-position: -15px -15px;
-  background-size: 40px 40px;
+  background-size: 30px 31px;
   font-family: var(--text-font);
   font-size: 1.6em;
   line-height: 1.45;
@@ -39,11 +39,7 @@ body {
 }
 
 /*lf h1-5*/
-h1,
-h2,
-h3,
-h4,
-h5 {
+h1, h2, h3, h4, h5 {
   font-family: var(--title-font);
   font-weight: 700;
   line-height: 1.1;
@@ -65,9 +61,7 @@ a {
   text-decoration: none;
 }
 
-a:hover,
-a:focus,
-a:active {
+a:hover, a:focus, a:active {
   color: var(--link-color-hover);
 }
 
@@ -92,8 +86,7 @@ header :is(h1, h2, h3, h4, h5, section) {
   width: fit-content;
 }
 
-article,
-section {
+article, section {
   background-color: var(--body-background-color);
   border: var(--border-default);
   box-shadow: var(--box-shadow-large);
