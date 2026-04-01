@@ -1,3 +1,5 @@
 bg color to remove dots under text
 bring inline wasm back (likely pandoc option i removed)
 button to disable all `code` highlighting
+
+stop loading awesome font and instead embed it into css as svg

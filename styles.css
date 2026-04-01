@@ -17,12 +17,6 @@
   --selection-color: #726c6a;
 }
 
-/* @supports (font-variation-settings:normal) {
-  :root {
-    --text-font: InterVariable, sans-serif
-  }
-} */
-
 html {
   /*idk i should probably adjust it differently but whatever*/
   font-size: 62.5%;
@@ -37,7 +31,7 @@ body {
   font-size: 1.6em;
   line-height: 1.45;
   margin: 0;
-  background-color: var(--body-background-color)
+  background-color: var(--body-background-color);
 }
 
 
@@ -177,7 +171,7 @@ ul.icons {
   justify-content: center;
   list-style: none;
   padding: 0;
-  margin: 1rem 0
+  margin: 1rem 0;
 }
 
 ul.icons a {
@@ -188,6 +182,7 @@ ul.icons a {
   justify-content: center;
   width: 4rem;
   height: 4rem;
+  font-size: 3.1rem;
   text-decoration: none
 }
 
